@@ -42,20 +42,37 @@ slider = sliderInput("dateRange",
 ```
 
 # Dropdown 
-Users are able to select the shock they wish to implement 
 ```{r}
-
+dropdown <- selectInput("dropdownMenu", 
+              "Choose an Option:", 
+              choices = c("Covid-19 Recession" = "opt1", 
+                          "Lehmann Brother's Crash" = "opt2", 
+                          "Great Financial Crisis" = "opt3")
+)
 ```
+
+
+#Texts
+```{r}
+bodyText1 <- HTML("Hi test text to put it here")
+```
+
 
 ## Main
 basically the ui page, where everything comes in as one
 ```{r}
 ui <- fluidPage(
-  titlePanel("Time Series Analysis"),
-  
-  mainPanel(
-    plotOutput("timeSeriesGraph"), # Output for the time series graph
-    slider)
+  includeCSS("styles.css"),
+  div(class = "main",
+      titlePanel("Time Series Analysis"),
+      mainPanel(
+        bodyText1,
+        div(class = "graphBorder",
+            plotOutput("timeSeriesGraph")),
+        slider,
+        dropdown),
+      titlePanel("Real Time vs Vintage Data")
+  )
 )
 ```
 
@@ -94,13 +111,12 @@ server <- function(input, output) {
       #Colour the user selected training data red
       labs(title = "Dummy Time Series Graph", x = "Date", y = "Value") +
       theme_economist_white()
-
     plot
   })
 }
 ```
 
 Run the plot
-```{r, echo = FALSE}
+```{r, include = FALSE}
 shinyApp(ui,server)
 ```
