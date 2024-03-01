@@ -4,9 +4,21 @@
     margin-right: auto;
   }
   
-  .graphBorder{
+.graphBorder{
     border: 2px solid #2c3e50;
     border-radius: 5px;
     padding: 10px;
     margin: 20px 0;
-  }
+}
+.bodyText{
+  color: #000;
+  font-size: 13px;
+  margin: 10px 0;
+} 
+
+.dropdown{
+  background-color: #748
+  ;color: #999;
+  padding: 10px;
+  border: 2px;
+}

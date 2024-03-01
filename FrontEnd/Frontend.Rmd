@@ -54,7 +54,9 @@ dropdown <- selectInput("dropdownMenu",
 
 #Texts
 ```{r}
-bodyText1 <- HTML("Hi test text to put it here")
+bodyText <- function(text){
+  tags$p(text, class = "bodyText")
+}
 ```
 
 
@@ -66,7 +68,7 @@ ui <- fluidPage(
   div(class = "main",
       titlePanel("Time Series Analysis"),
       mainPanel(
-        bodyText1,
+        bodyText("Test Text"),
         div(class = "graphBorder",
             plotOutput("timeSeriesGraph")),
         slider,
