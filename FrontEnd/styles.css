@@ -22,3 +22,9 @@
   padding: 10px;
   border: 2px;
 }
+
+.boldText{
+  color: #000;
+  font-size: 13px;
+  bold: TRUE
+}
