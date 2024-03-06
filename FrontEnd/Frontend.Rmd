@@ -8,10 +8,15 @@ output: html_document
 ## Initialisation
 
 # Load Packages
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, echo =FALSE}
+#install.packages('rsconnect')
 library(shiny)
 library(tidyverse)
 library(ggthemes)
+library(lubridate)
+library(zoo)
+library(scrollytell)
+library(rsconnect)
 ```
 
 ## Breakdown of Frontend visuals
@@ -57,24 +62,50 @@ dropdown <- selectInput("dropdownMenu",
 bodyText <- function(text){
   tags$p(text, class = "bodyText")
 }
+
+boldText <-function(text){
+  tags$p(text, class = "boldText")
+}
+
+head1 <- function(text){
+  tags$p(text, class ="head1")
+}
+
+head2 <- function(text){
+  tags$p(text, class = "head2")
+}
 ```
 
 
 ## Main
 basically the ui page, where everything comes in as one
 ```{r}
-ui <- fluidPage(
-  includeCSS("styles.css"),
-  div(class = "main",
-      titlePanel("Time Series Analysis"),
-      mainPanel(
-        bodyText("Test Text"),
-        div(class = "graphBorder",
-            plotOutput("timeSeriesGraph")),
-        slider,
-        dropdown),
-      titlePanel("Real Time vs Vintage Data")
+ui <- navbarPage(
+  "Time Series Analysis",
+  includeCSS("styles.css"), 
+    tabPanel("Time Series Graph",
+           mainPanel(
+             head1("Test header1"),
+             head2("Test header2"),
+             bodyText("Test Text"),
+             div(class = "graphBorder", plotOutput("timeSeriesGraph")),
+             slider,
+             dropdown)
+  ),
+  
+  tabPanel("Machine Learning Model",
+           mainPanel(
+             boldText("Test!"),
+             bodyText("Content for Real Time vs Vintage Data.")
+           )
+  ),
+  
+  tabPanel("Time Series Model",
+           mainPanel(
+             bodyText("Content for another tab.")
+           )
   )
+  
 )
 ```
 
@@ -119,6 +150,6 @@ server <- function(input, output) {
 ```
 
 Run the plot
-```{r, include = FALSE}
+```{r, include = FALSE, echo = TRUE}
 shinyApp(ui,server)
 ```

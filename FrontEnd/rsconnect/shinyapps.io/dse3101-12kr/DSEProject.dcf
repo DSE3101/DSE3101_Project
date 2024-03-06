@@ -1,0 +1,12 @@
+name: DSEProject
+title: DSEProject
+username: dse3101-12kr
+account: dse3101-12kr
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 11416912
+bundleId: 8339026
+url: https://dse3101-12kr.shinyapps.io/DSEProject/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
