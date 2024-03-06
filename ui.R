@@ -9,6 +9,7 @@ library(scrollytell)
 library(rsconnect)
 library(shinythemes)
 
+
 slider = sliderInput("dateRange",
                      "Select Training Date:",
                      min = as.Date("1960-01-01"),
@@ -23,12 +24,27 @@ dropdown <- selectInput("dropdownMenu",
                                     "Great Financial Crisis" = "opt3")
 )
 
+MLPanel <- mainPanel(
+  tags$h1("Insert ML Model here"),
+  p("Nice")
+)
+
+ARPanel <- mainPanel(
+  tags$h1("Insert AR Model here"),
+  p("Nice")
+)
+
+ADLPanel <- mainPanel(
+  tags$h1("Insert ADL Model here"),
+  p("Nice")
+)
+
+
 
 #UI
 ui <- navbarPage(
   "Time Series Analysis",
   theme = shinytheme("slate"),
-  includeCSS("styles.css"),
   tabPanel("Time Series Graph",
            mainPanel(
              tags$h1("Test header1"),
@@ -50,6 +66,11 @@ ui <- navbarPage(
            mainPanel(
              p("Content for another tab.")
            )
+  ),
+  navbarMenu("Models", 
+             tabPanel("Machine Learning", MLPanel),
+             tabPanel("ADL", ADLPanel),
+             tabPanel("AR", ARPanel)
   )
 )
 

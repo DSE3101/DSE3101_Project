@@ -1,9 +1,4 @@
-.main{
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
+
 .graphBorder{
     border: 2px solid #2c3e50;
     border-radius: 5px;
@@ -17,8 +12,7 @@
 } 
 
 .dropdown{
-  background-color: #748
-  ;color: #999;
+  color: #999;
   padding: 10px;
   border: 2px;
 }
