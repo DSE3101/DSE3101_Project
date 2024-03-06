@@ -10,8 +10,8 @@
     padding: 10px;
     margin: 20px 0;
 }
-.bodyText{
-  color: #000;
+.p{
+  color: #FFFFFF;
   font-size: 13px;
   margin: 10px 0;
 } 
@@ -23,20 +23,11 @@
   border: 2px;
 }
 
-.boldText{
-  color: #000;
-  font-size: 13px;
+
+.h1{
   font-weight: bold;
 }
 
-.head1{
-  color: #000;
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.head2{
-  color: #000;
-  font-size: 16;
+.h2{
   text-decoration: underline;
 }

@@ -105,7 +105,6 @@ ui <- navbarPage(
              bodyText("Content for another tab.")
            )
   )
-  
 )
 ```
 
@@ -124,8 +123,8 @@ Only activate this when the time series code is ready
 ```{r}
 set.seed(123)
 dummyData <- data.frame(
-    date = seq(as.Date("1960-01-01"), as.Date("2023-12-31"), by = "month"),
-    value = cumsum(runif(768, min = -10, max = 10)) # Random walk data
+    date = seq(as.Date("1960-01-01"), as.Date("2023-12-31"), by = "quarter"),
+    value = cumsum(runif(256, min = -10, max = 10)) # Random walk data
   )
 ```
 
