@@ -17,61 +17,87 @@ slider = sliderInput("dateRange",
                      value = c(as.Date("1980-01-01"), as.Date("2020-01-01")),
                      timeFormat = "%Y-%m-%d")
 
-dropdown <- selectInput("dropdownMenu", 
-                        "Choose an Option:", 
-                        choices = c("Covid-19 Recession" = "opt1", 
-                                    "Lehmann Brother's Crash" = "opt2", 
-                                    "Great Financial Crisis" = "opt3")
-)
-Panels
+checkbox = checkboxGroupInput("checkboxMenu", 
+                   "Choose a model variable:", 
+                   choices = c("M1" = "opt2", 
+                               "Investment" = "opt3",
+                               "Total Reserves" = "opt4",
+                               "Nonborrowed Reserves" = "opt5",
+                               "Nonborrowed Reserves + Extended Credit" = "opt6",
+                               "Monetary Base" = "opt7",
+                               "Civilian Unemployed Rate" = "opt8",
+                               "CPI vs Chain-weighted Price Index" = "opt9",
+                               "3-month T Bill Rate" = "opt10",
+                               "10-year T-bond Rate" = "opt11")
+                   )
+#Panels
 MLPanel <- mainPanel(
   tags$h1("Recurrent Neural Network Model"),
   tags$h2("Description of model"),
   p("A recurrent neural network (RNN) model ")
 )
 
-ARPanel <- mainPanel(
-  tags$h1("Insert AR Model here"),
+AboutUsPanel <- mainPanel(
+  tags$h1("Insert about us here"),
+  p("Nice") ##PLot y-axis = today data, x-axis = real-time
+)
+
+GoalPanel <- mainPanel(
+  tags$h1("Insert goal here"),
   p("Nice")
 )
 
-ADLPanel <- mainPanel(
-  tags$h1("Insert ADL Model here"),
+EvaluationPanel <- mainPanel(
+  tags$h1("Insert evaluation here"),
   p("Nice")
 )
-
 
 
 #UI
 ui <- navbarPage(
   "Time Series Analysis",
   theme = shinytheme("slate"),
-  tabPanel("Time Series Graph",
+  tabPanel("Model Training",
            mainPanel(
-             tags$h1("Test header1"),
-             tags$h2("Test header2"),
-             p("Test Text"),
+             tags$h1("Benchmarking Time Series Graph using models"),
+             tags$h2("Make your own time series graph"),
+             p("In an attempt to make this project more interactive, we are going to allow users to select the
+               training data's date and variables they wish to use"),
              div(class = "graphBorder", plotOutput("timeSeriesGraph")),
              slider,
-             dropdown)
+             checkbox,
+             actionButton("trainModel", "Train the model!")
+           )
   ),
   
-  tabPanel("Machine Learning Model",
+  tabPanel("ARIMA",
            mainPanel(
              strong("Test!"),
              p("Content for Real Time vs Vintage Data.")
            )
   ),
   
-  tabPanel("Time Series Model",
+  tabPanel("QBVC",
            mainPanel(
              p("Content for another tab.")
            )
   ),
-  navbarMenu("Models", 
-             tabPanel("Machine Learning", MLPanel),
-             tabPanel("ADL", ADLPanel),
-             tabPanel("AR", ARPanel)
+  
+  tabPanel("ML",
+           mainPanel(
+             p("Content for another tab.")
+           )
+  ),
+  
+  tabPanel("AR",
+           mainPanel(
+             p("Content for another tab.")
+           )
+  ),
+  navbarMenu("About this project", 
+             tabPanel("About us", AboutUsPanel),
+             tabPanel("Goal", GoalPanel),
+             tabPanel("Evaluation", EvaluationPanel),
   )
 )
 
