@@ -23,10 +23,11 @@ dropdown <- selectInput("dropdownMenu",
                                     "Lehmann Brother's Crash" = "opt2", 
                                     "Great Financial Crisis" = "opt3")
 )
-
+Panels
 MLPanel <- mainPanel(
-  tags$h1("Insert ML Model here"),
-  p("Nice")
+  tags$h1("Recurrent Neural Network Model"),
+  tags$h2("Description of model"),
+  p("A recurrent neural network (RNN) model ")
 )
 
 ARPanel <- mainPanel(
