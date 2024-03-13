@@ -1,48 +1,16 @@
 import dash
-from dash import dcc, html
+from dash import html
+from dash import dcc
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
-import pandas as pd
+from components.slider import slider
+from components.checkbox import checkbox
+from data import generate_data
 import numpy as np
+import pandas as pd 
 
-# Generate dummy data
-np.random.seed(123)
-date_range = pd.date_range(start="1960-01-01", end="2023-12-31", freq='QE')
-values = np.cumsum(np.random.uniform(-10, 10, len(date_range)))
-dummy_data = pd.DataFrame({'date': date_range, 'value': values})
 
-# For the slider component
-date_range_yearly = pd.date_range(start='1960-01-01', end='2023-12-31', freq='YS')
-timestamps = date_range.view('int64') // 10**9
-marks = {i: {'label': str(year.year)} for i, year in enumerate(date_range_yearly)}
-slider = dcc.RangeSlider(id='date-slider',
-                            min=0,
-                            max=len(date_range_yearly)-1,
-                            value=[0, len(date_range_yearly)-1],
-                            marks={i: {'label': str(year.year)} for i, year in enumerate(date_range_yearly)},
-                            step=1  # Assuming you want to step through each year
-                            )
-
-#Checkbox component
-checkbox = dcc.Checklist(
-                id='checkbox-menu',
-                options=[
-                    {'label': 'M1', 'value': 'opt2'},
-                    {'label': 'Investment', 'value': 'opt3'},
-                    {'label': 'Total Reserves', 'value': 'opt4'},
-                    {'label': 'Nonborrowed Reserves', 'value': 'opt5'},
-                    {'label': 'Nonborrowed Reserves + Extended Credit', 'value': 'opt6'},
-                    {'label': 'Monetary Base', 'value': 'opt7'},
-                    {'label': 'Civilian Unemployed Rate', 'value': 'opt8'},
-                    {'label': 'CPI vs Chain-weighted Price Index', 'value': 'opt9'},
-                    {'label': '3-month T Bill Rate', 'value': 'opt10'},
-                    {'label': '10-year T-bond Rate', 'value': 'opt11'}
-                ],
-                value=[]  # Default selected values
-            )
-
-# Initialize the Dash app
 app = dash.Dash(__name__, external_stylesheets= [dbc.themes.SIMPLEX])
     
 app.layout = html.Div([
@@ -53,9 +21,9 @@ app.layout = html.Div([
             html.P("In an attempt to make this project more interactive, we are going to allow users to select the training data's date and variables they wish to use"),
             dcc.Graph(id='time-series-graph', className="graphBorder"),
             html.H4("Select training time period (Years)"),
-            html.Div([slider], className = "box"),
+            html.Div([slider()], className = "box"),
             html.H4("Select training variables"),
-            html.Div([checkbox], className = "box"),
+            html.Div([checkbox()], className = "box"),
             html.Button('Train the model!', id='train-model')
         ]),
         dcc.Tab(label='ARIMA', className="tab", children=[
