@@ -12,37 +12,20 @@ date_range = pd.date_range(start="1960-01-01", end="2023-12-31", freq='QE')
 values = np.cumsum(np.random.uniform(-10, 10, len(date_range)))
 dummy_data = pd.DataFrame({'date': date_range, 'value': values})
 
-# For yearly data, starting in January
-date_range_yearly = pd.date_range(start='1980-01-01', end='2020-01-01', freq='YS')
-
-# Convert dates to timestamps (you can choose another method if preferred)
+# For the slider component
+date_range_yearly = pd.date_range(start='1960-01-01', end='2023-12-31', freq='YS')
 timestamps = date_range.view('int64') // 10**9
-
-# Create marks for the slider (optional, for better readability)
 marks = {i: {'label': str(year.year)} for i, year in enumerate(date_range_yearly)}
-
-# Initialize the Dash app
-THEME = dbc.themes.CYBORG
-app = dash.Dash(__name__, external_stylesheets= [THEME])
-    
-
-app.layout = html.Div([
-    dcc.Tabs(id='tabs', children=[
-        dcc.Tab(label='Model Training', children=[
-            html.H1("Benchmarking Time Series Graph using models"),
-            html.H2("Make your own time series graph"),
-            html.P("In an attempt to make this project more interactive, we are going to allow users to select the training data's date and variables they wish to use"),
-            dcc.Graph(id='time-series-graph'),
-            html.H4("Select training time period (Years)"),
-            dcc.RangeSlider(id='date-slider',
+slider = dcc.RangeSlider(id='date-slider',
                             min=0,
                             max=len(date_range_yearly)-1,
                             value=[0, len(date_range_yearly)-1],
                             marks={i: {'label': str(year.year)} for i, year in enumerate(date_range_yearly)},
                             step=1  # Assuming you want to step through each year
-                            ),
-            html.H4("Select training variables"),
-            dcc.Checklist(
+                            )
+
+#Checkbox component
+checkbox = dcc.Checklist(
                 id='checkbox-menu',
                 options=[
                     {'label': 'M1', 'value': 'opt2'},
@@ -56,23 +39,38 @@ app.layout = html.Div([
                     {'label': '3-month T Bill Rate', 'value': 'opt10'},
                     {'label': '10-year T-bond Rate', 'value': 'opt11'}
                 ],
-                value=['opt2', 'opt3']  # Default selected values
-            ),
+                value=[]  # Default selected values
+            )
+
+# Initialize the Dash app
+app = dash.Dash(__name__, external_stylesheets= [dbc.themes.SIMPLEX])
+    
+app.layout = html.Div([
+    dcc.Tabs(id='tabs', children=[
+        dcc.Tab(label='Model Training', children=[
+            html.H1("Benchmarking Time Series Graph using models"),
+            html.H2("Make your own time series graph"),
+            html.P("In an attempt to make this project more interactive, we are going to allow users to select the training data's date and variables they wish to use"),
+            dcc.Graph(id='time-series-graph', className="graphBorder"),
+            html.H4("Select training time period (Years)"),
+            html.Div([slider], className = "box"),
+            html.H4("Select training variables"),
+            html.Div([checkbox], className = "box"),
             html.Button('Train the model!', id='train-model')
         ]),
-        dcc.Tab(label='ARIMA', children=[
+        dcc.Tab(label='ARIMA', className="tab", children=[
             html.Strong("Test!"),
             html.P("Content for Real Time vs Vintage Data.")
         ]),
-        dcc.Tab(label='AR', children=[
+        dcc.Tab(label='AR',className="tab" ,children=[
             html.Strong("Test!"),
             html.P("Content for Real Time vs Vintage Data.")
         ]),
-        dcc.Tab(label='ML', children=[
+        dcc.Tab(label='ML', className="tab", children=[
             html.Strong("Test!"),
             html.P("Content for Real Time vs Vintage Data.")
         ]),
-        dcc.Tab(label='Evaluation', children=[
+        dcc.Tab(label='Evaluation', className="tab", children=[
             html.Strong("Test!"),
             html.P("Content for Real Time vs Vintage Data.")
         ]),
