@@ -11,14 +11,13 @@ date_range = get_date_range()
 
 date_range_yearly = pd.date_range(start='1960-01-01', end='2023-12-31', freq='YS')
 timestamps = date_range.view('int64') // 10**9
-marks = {i: {'label': str(year.year)} for i, year in enumerate(date_range_yearly)}
 
 def slider():
     slider = dcc.RangeSlider(id='date-slider',
                             min=0,
                             max=len(date_range_yearly)-1,
                             value=[0, len(date_range_yearly)-1],
-                            marks={i: {'label': str(year.year)} for i, year in enumerate(date_range_yearly)},
+                            marks = {i: {'label': str(year.year)[-2:]} for i, year in enumerate(date_range_yearly)},
                             step=1  # Assuming you want to step through each year
                             )
     return slider

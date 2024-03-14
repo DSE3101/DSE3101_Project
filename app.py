@@ -10,8 +10,11 @@ from data import generate_data
 import numpy as np
 import pandas as pd 
 
+date_range_yearly = pd.date_range(start='1960-01-01', end='2023-12-31', freq='YS')
 
 app = dash.Dash(__name__, external_stylesheets= [dbc.themes.SIMPLEX])
+
+dummy_data = generate_data()
     
 app.layout = html.Div([
     dcc.Tabs(id='tabs', children=[
@@ -26,11 +29,11 @@ app.layout = html.Div([
             html.Div([checkbox()], className = "box"),
             html.Button('Train the model!', id='train-model')
         ]),
-        dcc.Tab(label='ARIMA', className="tab", children=[
+        dcc.Tab(label='AR', className="tab", children=[
             html.Strong("Test!"),
             html.P("Content for Real Time vs Vintage Data.")
         ]),
-        dcc.Tab(label='AR',className="tab" ,children=[
+        dcc.Tab(label='ADL',className="tab" ,children=[
             html.Strong("Test!"),
             html.P("Content for Real Time vs Vintage Data.")
         ]),
