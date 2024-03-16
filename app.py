@@ -11,9 +11,7 @@ import numpy as np
 import pandas as pd 
 
 date_range_yearly = pd.date_range(start='1960-01-01', end='2023-12-31', freq='YS')
-
 app = dash.Dash(__name__, external_stylesheets= [dbc.themes.SIMPLEX])
-
 dummy_data = generate_data()
     
 app.layout = html.Div([
