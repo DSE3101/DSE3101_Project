@@ -14,7 +14,7 @@ year = "21"
 quarter = "4"
 period_t = "ROUTPUT" + year + "Q" + quarter
 
-routput = pd.read_excel("../data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
+routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
 
 real_time_data = routput[period_t].dropna()
 real_time_model = AutoReg(real_time_data, lags=num_lags)
