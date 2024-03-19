@@ -1,13 +1,25 @@
 import numpy as np
 import pandas as pd 
 import pandas as pd
+import plotly.graph_objects as go
 
-def get_date_range():
-    return pd.date_range(start="1960-01-01", end="2023-12-31", freq='QE')
+def mainplot():
+    routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
+    real_time_data = routput["ROUTPUT21Q4"]
+    routput['DATE'] = pd.PeriodIndex(routput['DATE'], freq='Q').to_timestamp()
+    
+    # Creating a Plotly figure
+    fig = go.Figure()
 
-def generate_data():
-    np.random.seed(123)
-    date_range = pd.date_range(start="1960-01-01", end="2023-12-31", freq='QE')
-    values = np.cumsum(np.random.uniform(-10, 10, len(date_range)))
-    dummy_data = pd.DataFrame({'date': date_range, 'value': values})
-    return dummy_data
+    # Adding a trace for the ROUTPUT21Q4 data
+    fig.add_trace(go.Scatter(x=routput['DATE'], y=routput['ROUTPUT21Q4'], mode='lines', name='ROUTPUT21Q4'))
+
+    # Updating layout for readability
+    fig.update_layout(title='ROUTPUT21Q4 Over Time',
+                    xaxis_title='Time',
+                    yaxis_title='ROUTPUT21Q4 Value',
+                    hovermode="x")
+
+    # Showing the figure
+    return fig
+    
