@@ -6,6 +6,11 @@ import plotly.graph_objects as go
 def mainplot():
     routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
     real_time_data = routput["ROUTPUT21Q4"]
+
+    # Replace the colon in the 'DATE' column strings
+    routput['DATE'] = routput['DATE'].str.replace(':', '', regex=True)
+
+    # Create a PeriodIndex from the 'DATE' column with quarterly frequency
     routput['DATE'] = pd.PeriodIndex(routput['DATE'], freq='Q').to_timestamp()
     
     # Creating a Plotly figure
