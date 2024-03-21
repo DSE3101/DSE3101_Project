@@ -10,6 +10,7 @@ from data import mainplot
 import numpy as np
 import pandas as pd 
 
+routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
 date_range_yearly = pd.date_range(start='1960-01-01', end='2023-12-31', freq='YS')
 app = dash.Dash(__name__, external_stylesheets= [dbc.themes.SIMPLEX])
     
@@ -57,11 +58,11 @@ def update_graph(slider_value):
     selected_date = date_range_yearly[slider_value]
 
     # Filter data
-    filtered_data = dummy_data[(dummy_data['date'] <= selected_date)]
+    filtered_data = routput[(routput['date'] <= selected_date)]
     
     # Create the figure
     figure = go.Figure()
-    figure.add_trace(go.Scatter(x=dummy_data['date'], y=dummy_data['value'], mode='lines', name='All data'))
+    figure.add_trace(go.Scatter(x=routput['date'], y=routput['value'], mode='lines', name='All data'))
     figure.add_trace(go.Scatter(x=filtered_data['date'], y=filtered_data['value'], mode='lines', name='Training data', line=dict(color='red', width=2)))
     
     # Update layout
@@ -71,7 +72,7 @@ def update_graph(slider_value):
     return figure
 
 @app.callback(
-    Output('lag-caller', 'children', 'selected_year', 'number of lags'),
+    Output('lag-caller', 'children'),
     [Input('date-slider', 'value')]
 )
 def update_output(value):
