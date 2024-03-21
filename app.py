@@ -10,7 +10,7 @@ from data import mainplot
 import numpy as np
 import pandas as pd 
 
-routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
+routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A") 
 date_range_yearly = pd.date_range(start='1960-01-01', end='2023-12-31', freq='YS')
 app = dash.Dash(__name__, external_stylesheets= [dbc.themes.SIMPLEX])
     
@@ -56,14 +56,14 @@ app.layout = html.Div([
 )
 def update_graph(slider_value):
     selected_date = date_range_yearly[slider_value]
-
-    # Filter data
-    filtered_data = routput[(routput['date'] <= selected_date)]
+    routput['DATE'] = routput['DATE'].str.replace(':', '', regex=True)
+    routput['DATE'] = pd.PeriodIndex(routput['DATE'], freq='Q').to_timestamp()
+    filtered_data = routput[(routput['DATE'] <= selected_date)]
     
     # Create the figure
     figure = go.Figure()
-    figure.add_trace(go.Scatter(x=routput['date'], y=routput['value'], mode='lines', name='All data'))
-    figure.add_trace(go.Scatter(x=filtered_data['date'], y=filtered_data['value'], mode='lines', name='Training data', line=dict(color='red', width=2)))
+    figure.add_trace(go.Scatter(x=routput['DATE'], y=routput['ROUTPUT21Q4'], mode='lines', name='All data'))
+    figure.add_trace(go.Scatter(x=filtered_data['DATE'], y=filtered_data['ROUTPUT21Q4'], mode='lines', name='Training data', line=dict(color='red', width=2)))
     
     # Update layout
     figure.update_layout(title='Time Series Data', xaxis_title='Date', yaxis_title='Value')
