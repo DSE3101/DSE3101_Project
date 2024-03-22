@@ -1,69 +1,50 @@
 import dash
+import numpy as np
+import pandas as pd 
+import dash_bootstrap_components as dbc
+import plotly.graph_objs as go
 from dash import html
 from dash import dcc
 from dash.dependencies import Input, Output
-import dash_bootstrap_components as dbc
-import plotly.graph_objs as go
-from components.slider import slider
-from components.checkbox import checkbox
-from data import mainplot
-import numpy as np
-import pandas as pd 
+from components.ARTab import ARTab
+from components.TrainingTab import TrainingTab
+from components.ADLTab import ADLTab
+from components.MLTab import MLTab
+from components.EvalTab import EvalTab
 
-routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A") 
-date_range_yearly = pd.date_range(start='1960-01-01', end='2023-12-31', freq='YS')
+
+routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
+routput['DATE'] = routput['DATE'].str.replace(':', '', regex=True)
+routput['DATE'] = pd.PeriodIndex(routput['DATE'], freq='Q').to_timestamp()
+date_range_yearly = pd.date_range(start='1950-01-01', end='2023-12-31', freq='YS')
 app = dash.Dash(__name__, external_stylesheets= [dbc.themes.SIMPLEX])
-    
+
 app.layout = html.Div([
     dcc.Tabs(id='tabs', children=[
-        dcc.Tab(label='Model Training', className = "tab", children=[
-            html.H1("Benchmarking Time Series Graph using models"),
-            html.H2("Make your own time series graph"),
-            html.P("In an attempt to make this project more interactive, we are going to allow users to select the training data's date and variables they wish to use"),
-            html.P("The chosen time period will be used as the training period for all 3 models. The training variables selected will be used in the ADL and RNN model"),
-            dcc.Graph(id='time-series-graph', figure =mainplot(), className="graphBorder"),
-            html.H4("Select training time period (Years)"),
-            html.Div([slider()], className = "box"),
-            html.Strong(id = 'lag-caller'),
-            html.P(),
-            html.H4("Select training variables"),
-            html.Div([checkbox()], className = "box"),
-            html.Button('Train the model!', id='train-model')
-        ]),
-        dcc.Tab(label='AR', className="tab", children=[
-            html.Strong("Test!"),
-            html.P("Content for Real Time vs Vintage Data.")
-        ]),
-        dcc.Tab(label='ADL',className="tab" ,children=[
-            html.Strong("Test!"),
-            html.P("Content for Real Time vs Vintage Data.")
-        ]),
-        dcc.Tab(label='ML', className="tab", children=[
-            html.Strong("Test!"),
-            html.P("Content for Real Time vs Vintage Data.")
-        ]),
-        dcc.Tab(label='Evaluation', className="tab", children=[
-            html.Strong("Test!"),
-            html.P("Content for Real Time vs Vintage Data.")
-        ]),
+        dcc.Tab(label='Model Training', className = "tab", children= TrainingTab),
+        dcc.Tab(label='AR', className="tab", children= ARTab),
+        dcc.Tab(label='ADL',className="tab" ,children=ADLTab),
+        dcc.Tab(label='ML', className="tab", children=MLTab),
+        dcc.Tab(label='Evaluation', className="tab", children=EvalTab)
     ]),
     html.Div(id='tabs-content')
 ])
 
 @app.callback(
     Output('time-series-graph', 'figure'),
-    [Input('date-slider', 'value')]
+    [Input('date-slider', 'value'), Input('quarter-dropdown', 'value')]
 )
-def update_graph(slider_value):
-    selected_date = date_range_yearly[slider_value]
-    routput['DATE'] = routput['DATE'].str.replace(':', '', regex=True)
-    routput['DATE'] = pd.PeriodIndex(routput['DATE'], freq='Q').to_timestamp()
+def update_graph(slider_value, quarter_value):
+    # Convert the slider value and quarter value to a date
+    selected_year = date_range_yearly[slider_value].year
+    selected_date_str = f"{selected_year}{quarter_value}"
+    selected_date = pd.Period(selected_date_str, freq='Q').to_timestamp(how = 'end')
     filtered_data = routput[(routput['DATE'] <= selected_date)]
     
     # Create the figure
     figure = go.Figure()
-    figure.add_trace(go.Scatter(x=routput['DATE'], y=routput['ROUTPUT21Q4'], mode='lines', name='All data'))
-    figure.add_trace(go.Scatter(x=filtered_data['DATE'], y=filtered_data['ROUTPUT21Q4'], mode='lines', name='Training data', line=dict(color='red', width=2)))
+    figure.add_trace(go.Scatter(x=routput['DATE'], y=routput['ROUTPUT24Q1'], mode='lines', name='All data'))
+    figure.add_trace(go.Scatter(x=filtered_data['DATE'], y=filtered_data['ROUTPUT24Q1'], mode='lines', name='Training data', line=dict(color='red', width=2)))
     
     # Update layout
     figure.update_layout(title='Time Series Data', xaxis_title='Date', yaxis_title='Value')
@@ -73,17 +54,24 @@ def update_graph(slider_value):
 
 @app.callback(
     Output('lag-caller', 'children'),
-    [Input('date-slider', 'value')]
+    [Input('date-slider', 'value'), Input('quarter-dropdown', 'value')]
 )
-def update_output(value):
-    # Since the slider now selects a single value, adjust the calculation accordingly
-    selected_year = date_range_yearly[value].year
-    end_year = 2023
-    quarter_diff = 4  # Assuming Q4 means 4 quarters difference within the same year
-    # The calculation assumes the slider's value represents the end year
-    number_of_lags = (end_year - selected_year) * 4
-    return f'Number of lags from Q4 {selected_year} to Q4 2023: {number_of_lags}'
-
+def update_output(value, quarter_value):
+    safe_value = min(value, len(date_range_yearly) - 1)
+    selected_year = date_range_yearly[safe_value].year
+    
+    # Assuming the end date is Q1 2024
+    end_year = 2024
+    end_quarter = 'Q1'
+    
+    # Convert the quarter value to an integer for calculation
+    selected_quarter_int = int(quarter_value.replace('Q', ''))
+    end_quarter_int = int(end_quarter.replace('Q', ''))
+    
+    # Calculate the total number of quarters (lags) between the selected year/quarter and the end year/quarter
+    number_of_lags = (end_year - selected_year) * 4 + (end_quarter_int - selected_quarter_int)
+    
+    return f'Number of lags from {quarter_value} {selected_year} to Q1 2024: {number_of_lags}'
 
 if __name__ == '__main__':
     app.run_server(debug=True)

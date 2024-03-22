@@ -5,24 +5,15 @@ import plotly.graph_objects as go
 
 def mainplot():
     routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
-    real_time_data = routput["ROUTPUT21Q4"]
-
-    # Replace the colon in the 'DATE' column strings
+    real_time_data = routput["ROUTPUT24Q1"]
     routput['DATE'] = routput['DATE'].str.replace(':', '', regex=True)
-
-    # Create a PeriodIndex from the 'DATE' column with quarterly frequency
     routput['DATE'] = pd.PeriodIndex(routput['DATE'], freq='Q').to_timestamp()
-    
-    # Creating a Plotly figure
     fig = go.Figure()
-
-    # Adding a trace for the ROUTPUT21Q4 data
-    fig.add_trace(go.Scatter(x=routput['DATE'], y=routput['ROUTPUT21Q4'], mode='lines', name='ROUTPUT21Q4'))
-
+    fig.add_trace(go.Scatter(x=routput['DATE'], y=routput['ROUTPUT24Q1'], mode='lines', name='ROUTPUT24Q1'))
     # Updating layout for readability
-    fig.update_layout(title='ROUTPUT21Q4 Over Time',
+    fig.update_layout(title='ROUTPUT24Q1 Over Time',
                     xaxis_title='Time',
-                    yaxis_title='ROUTPUT21Q4 Value',
+                    yaxis_title='ROUTPUT24Q1 Value',
                     hovermode="x")
 
     # Showing the figure
