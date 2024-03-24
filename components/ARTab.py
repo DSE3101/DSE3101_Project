@@ -8,5 +8,6 @@ import numpy as np
 
 def ARTab():
     ARTab = [html.Strong("Test!"),
-            html.P("Content for Real Time vs Vintage Data.")]
+            html.P("Content for Real Time vs Vintage Data."),
+            dcc.Graph(id = "ar-plot")]
     return ARTab

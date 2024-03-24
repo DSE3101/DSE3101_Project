@@ -5,10 +5,9 @@ import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
 import pandas as pd
 import numpy as np
-from components.ARTab import ARTab
-from components.slider import slider
 from components.checkbox import checkbox
 from components.dropdown_quarter import dropdown
+from components.slider import slider
 from data import mainplot
 
 def TrainingTab():
