@@ -6,7 +6,7 @@ import plotly.graph_objs as go
 import pandas as pd
 import numpy as np
 
-date_range_yearly = pd.date_range(start='1950-01-01', end='2023-12-31', freq='YS')
+date_range_yearly = pd.date_range(start='1947-01-01', end='2023-12-31', freq='YS')
 
 def slider():
     slider = dcc.Slider(id='date-slider',
