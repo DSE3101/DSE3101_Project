@@ -47,8 +47,8 @@ print('Critical Values:')
 for key, value in real_time_result[4].items():
  print('\t%s: %.3f' % (key, value))
 
-# forecast
-forecasted_values = real_time_model_fit.predict(start=len(real_time_data), end=len(real_time_data)+10) # forecast 10 period ahead
+# forecast 10 periods ahead (can change)
+forecasted_values = real_time_model_fit.predict(start=len(real_time_data), end=len(real_time_data)+10) 
 print(real_time_data)
 print(forecasted_values)
 #print(type(forecasted_values))
@@ -98,7 +98,6 @@ for key, value in vintage_result[4].items():
 
 # forecasting 10 periods ahead
 vintage_forecasted_values = vintage_model_fit.predict(start=len(revised_vintage_data), end=len(revised_vintage_data)+10)
-
 
 # function to plot forecasted values
 def plot_vintage_forecast(data, forecast):
