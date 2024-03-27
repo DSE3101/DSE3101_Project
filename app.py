@@ -82,8 +82,7 @@ def update_output(value, quarter_value):
               )
 
 def ARmodel(value, quarter_value):
-    safe_value = min(value, len(date_range_yearly) - 1)
-    selected_year = date_range_yearly[safe_value].year
+    selected_year = date_range_yearly[int(value)].year
     start_year = 1947
     start_quarter = 'Q1'
     selected_quarter_int = int(quarter_value.replace('Q', ''))

@@ -12,14 +12,11 @@ from statsmodels.tsa.stattools import adfuller
 data = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
 
 #example of user input
-starting_year = "1990"
-starting_quarter = "1"
 ending_year = "2005"
 ending_quarter = "4"
-start_time = "ROUTPUT" + starting_year[-2:] + "Q" + starting_quarter
 end_time = "ROUTPUT" + ending_year[-2:] + "Q" + ending_quarter
-real_time_data = data[end_time].dropna()
-real_time_data = real_time_data[((int(starting_year)-1947)*4):] #filters dataset to what the user specified
+real_time_data = data[end_time].diff().dropna() #filters dataset to what the user specified and takes first difference
+
 
 # define the maximum number of lags based on the number of observations
 max_lags = min(30, len(real_time_data) - 1)  #limiting to a maximum of 30 lags or (nobs - 1)
@@ -32,6 +29,7 @@ for lag in range(10, max_lags + 1):
     aic_values.append(results.aic)
 # choose the lag order that minimizes the AIC
 optimal_lags = np.argmin(aic_values) + 1 
+#print(aic_values)
 #print(optimal_lags)
 
 #forming real time model
@@ -39,8 +37,18 @@ real_time_optimal_model = AutoReg(real_time_data, lags=optimal_lags)
 real_time_model_fit = real_time_optimal_model.fit()
 #print(real_time_model_fit.summary())
 
-# forecast
-forecasted_values = real_time_model_fit.predict(start=len(real_time_data), end=len(real_time_data)+10) # forecast 10 period ahead
+# autocorrelation_plot(real_time_data) & ADF statistic
+plot_acf(real_time_data, lags=optimal_lags)
+plt.show()
+real_time_result = adfuller(real_time_data)
+print('ADF Statistic: %f' % real_time_result[0])
+print('p-value: %f' % real_time_result[1])
+print('Critical Values:')
+for key, value in real_time_result[4].items():
+ print('\t%s: %.3f' % (key, value))
+
+# forecast 10 periods ahead (can change)
+forecasted_values = real_time_model_fit.predict(start=len(real_time_data), end=len(real_time_data)+10) 
 print(real_time_data)
 print(forecasted_values)
 #print(type(forecasted_values))
@@ -57,16 +65,12 @@ def plot_forecast(data, forecast):
     plt.show()
 plot_forecast(real_time_data, forecasted_values)
 
-###############################################
-## using vintage data ##
-
+######################### using vintage data #########################
 latest_year = "2024"
 latest_quarter = "1"
-#start_time = "ROUTPUT" + starting_year[-2:] + "Q" + starting_quarter
-#end_time = "ROUTPUT" + ending_year[-2:] + "Q" + ending_quarter
 latest_time = "ROUTPUT" + latest_year[-2:] + "Q" + latest_quarter
-latest_vintage_data = data[latest_time].dropna()
-revised_vintage_data = latest_vintage_data[((int(starting_year)-1947)*4):((int(ending_year)-1947)*4)]
+latest_vintage_data = data[latest_time].diff().dropna()
+revised_vintage_data = latest_vintage_data[:((int(ending_year)-1947)*4)]
 
 max_vintage_lags = min(10, len(revised_vintage_data) - 1)  #limiting to a maximum of 10 lags or (nobs - 1)
 # fit AutoReg models with different lag values
@@ -82,23 +86,30 @@ optimal_vintage_lags = np.argmin(vintage_aic_values) + 1
 vintage_optimal_model = AutoReg(revised_vintage_data, lags=optimal_vintage_lags)
 vintage_model_fit = vintage_optimal_model.fit()
 
-# forecasting
-vintage_forecasted_values = vintage_model_fit.predict(start=len(real_time_data), end=len(real_time_data)+10) # forecast 10 period ahead
-print(vintage_forecasted_values)
-#print(type(vintage_forecasted_values))
-print(revised_vintage_data) 
+# autocorrelation_plot(revised_vintage_data) & ADF statistic
+plot_acf(revised_vintage_data, lags=optimal_lags)
+plt.show()
+vintage_result = adfuller(revised_vintage_data)
+print('ADF Statistic: %f' % vintage_result[0])
+print('p-value: %f' % vintage_result[1])
+print('Critical Values:')
+for key, value in vintage_result[4].items():
+ print('\t%s: %.3f' % (key, value))
+
+# forecasting 10 periods ahead
+vintage_forecasted_values = vintage_model_fit.predict(start=len(revised_vintage_data), end=len(revised_vintage_data)+10)
 
 # function to plot forecasted values
-def plot_forecast(data, forecast):
+def plot_vintage_forecast(data, forecast):
     plt.figure(figsize=(10, 6))
     plt.plot(data.index, data.values, label='Revised Vintage Data', color='green')
     plt.plot(forecast.index, forecast.values, label='Forecast', color='red')
-    plt.title('AR Model Forecast with Vintage data')
+    plt.title('AR Model Forecast with Vintage Data')
     plt.xlabel('Year:Quarter')
     plt.ylabel('rGDP')
     plt.legend()
     plt.show()
-plot_forecast(revised_vintage_data, vintage_forecasted_values)
+plot_vintage_forecast(revised_vintage_data, vintage_forecasted_values)
 
 
 #transform the model by using entity-demeaned OLS regression (fixed effects) for adl 
