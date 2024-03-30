@@ -6,6 +6,7 @@ import plotly.graph_objs as go
 import pandas as pd
 import numpy as np
 
+## Obsolete, will remove when confirmed
 #Checkbox component
 def checkbox():
     checkbox = dcc.Checklist(

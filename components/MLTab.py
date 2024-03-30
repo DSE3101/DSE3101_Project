@@ -140,14 +140,8 @@ def train_and_evaluate_ml_model(X, y):
 
 def MLTab():
     X, y = load_and_preprocess_data()
-
-    # Train the model and get feature importance and MSE
     feature_importance_df, mse = train_and_evaluate_ml_model(X, y)
-
-    # Sort the DataFrame by importance and take the top 5
     top_5_features = feature_importance_df.sort_values(by='Importance', ascending=False).head(5)
-
-    # Manually construct the table to allow for custom styling
     table_header = [
         html.Thead(html.Tr([html.Th("Feature"), html.Th("Importance")]))
     ]
@@ -164,7 +158,7 @@ def MLTab():
     # Prepare content for the ML tab
     MLTab = html.Div([
         html.H3("Machine Learning Analysis"),
-        html.P("This section showcases the results of the machine learning analysis, including feature importance and model performance."),
+        html.P("In this section, we will use your selected training time period, coupled with our selected variables, to run a regression forest."),
         html.H4("Feature Importance"),
         dbc.Table(table_header + table_body, bordered=True, hover=True, responsive=True, striped=True),
         html.H4(f"Mean Squared Error (MSE): {mse:.2f}"),

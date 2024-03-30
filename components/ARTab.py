@@ -7,7 +7,6 @@ import pandas as pd
 import numpy as np
 
 def ARTab():
-    ARTab = [html.Strong("Test!"),
-            html.P("Content for Real Time vs Vintage Data."),
-            dcc.Graph(id = "ar-plot")]
+    ARTab = [html.Strong("Test!"), ## Lag number?
+            html.P("Content for Real Time vs Vintage Data.")]
     return ARTab
