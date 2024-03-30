@@ -11,16 +11,19 @@ def checkbox():
     checkbox = dcc.Checklist(
                 id='checkbox-menu',
                 options=[
-                    {'label': 'M1', 'value': 'opt2'},
-                    {'label': 'Investment', 'value': 'opt3'},
-                    {'label': 'Total Reserves', 'value': 'opt4'},
-                    {'label': 'Nonborrowed Reserves', 'value': 'opt5'},
-                    {'label': 'Nonborrowed Reserves + Extended Credit', 'value': 'opt6'},
-                    {'label': 'Monetary Base', 'value': 'opt7'},
-                    {'label': 'Civilian Unemployed Rate', 'value': 'opt8'},
-                    {'label': 'CPI vs Chain-weighted Price Index', 'value': 'opt9'},
-                    {'label': '3-month T Bill Rate', 'value': 'opt10'},
-                    {'label': '10-year T-bond Rate', 'value': 'opt11'}
+                    {'label': 'Consumer Confidence', 'value': 'csr_conf'},
+                    {'label': 'Consumer Price Index (CPI)', 'value': 'cpi'},
+                    {'label': 'Housing Starts', 'value': 'hstarts'},
+                    {'label': 'Interest Rates (3 Mths)', 'value': 'ir_3m'},
+                    {'label': 'Interest Rates (10 years)', 'value': 'ir_10y'},
+                    {'label': 'Money 1', 'value': 'm1'},
+                    {'label': 'Producer Consumer Price Index', 'value': 'pcpi'},
+                    {'label': 'Consumption', 'value': 'cons'},
+                    {'label': 'Exports', 'value': 'exp'},
+                    {'label': 'Government Spendings', 'value': 'govt_s'},
+                    {'label': 'Imports', 'value': 'imp'},
+                    {'label': 'Investments', 'value': 'inv'},
+                    {'label': 'Unemployment Rates', 'value': 'unemp'},
                 ],
                 value=[]  # Default selected values
             )

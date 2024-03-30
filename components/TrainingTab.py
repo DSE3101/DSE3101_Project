@@ -22,8 +22,6 @@ def TrainingTab():
         html.Div([dropdown()],className = "box"),
         html.Strong(id = 'lag-caller'),
         html.P(),
-        html.H4("Select training variables"),
-        html.Div([checkbox()], className = "box"),
         html.Button('Train the model!', id='train-model')
     ]
     return trainingtab

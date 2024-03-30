@@ -15,7 +15,7 @@ from dash.dependencies import Input, Output
 from components.ARTab import ARTab
 from components.TrainingTab import TrainingTab
 from components.ADLTab import ADLTab
-from components.MLTab import MLTab
+from components.MLTab import *
 from components.EvalTab import EvalTab
 from data import mainplot
 
@@ -97,6 +97,13 @@ def ARmodel(value, quarter_value):
     fig.add_trace(go.Scatter(x=real_time_data.index, y=real_time_data, mode='lines', name='Real Time Data'))
     
     return fig
+
+@app.callback(
+    Output('ml-tab-content', 'children'),  # Ensure this is the correct ID for the ML tab content container
+    [Input('checkbox-menu', 'value')]
+    )
+def update_ml_tab(selected_options):
+    return MLTab(selected_options)
 
 if __name__ == '__main__':
     app.run_server(debug=True)
