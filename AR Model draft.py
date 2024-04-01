@@ -40,7 +40,7 @@ print('AIC value for real-time data:', aic_values[optimal_lags-1])
 print('Optimal number of lags for real-time data:', optimal_lags)
 
 #forming real time model
-real_time_optimal_model = AutoReg(real_time_data, lags=optimal_lags)
+real_time_optimal_model = AutoReg(real_time_data, lags=20)
 real_time_model_fit = real_time_optimal_model.fit()
 #print(real_time_model_fit.summary())
 
@@ -54,15 +54,15 @@ print('Critical Values:')
 for key, value in real_time_result[4].items():
  print('\t%s: %.3f' % (key, value))
 
-# forecast 10 periods ahead (can change)
-forecasted_values = real_time_model_fit.predict(start=len(real_time_data), end=len(real_time_data)+10) 
+# forecast 8 periods ahead (can change)
+forecasted_values = real_time_model_fit.predict(start=len(real_time_data), end=len(real_time_data)+20) 
 print(forecasted_values)
-print(forecasted_values[234])
-print(forecasted_values[235])
-print(forecasted_values.index)
-print(forecasted_values.values)
 
 
+#probs = [0.05, 0.20, 0.35, 0.65,0.80,  0.95]
+#fan(data=real_time_data,probs=probs,history= forecasted_values.index >= 1)
+''' 
+# attempt 1
 probs = [0.05, 0.20, 0.35, 0.65, 0.80, 0.95]
 def plot_fan_chart_forecast(data, forecasted_values, probs, confidence_level=0.80):
     # Define the confidence level for the fan chart
@@ -97,9 +97,10 @@ def plot_fan_chart_forecast(data, forecasted_values, probs, confidence_level=0.8
 
 # Example usage:
 plot_fan_chart_forecast(real_time_data, forecasted_values, probs)
-
+'''
 
 '''
+# attempt 2
 # Plot the fan chart
 def plot_forecast_with_fan_chart(data, forecast, upper_bound, lower_bound):
     plt.figure(figsize=(10, 6))
@@ -116,32 +117,31 @@ def plot_forecast_with_fan_chart(data, forecast, upper_bound, lower_bound):
 plot_forecast_with_fan_chart(real_time_data, forecasted_values, upper_bound, lower_bound)
 '''
 
-
+#ATTEMPT 3
 y = forecasted_values.values
-print(y.dtype())
 x = forecasted_values.index
+CI = [0.842, 1.036, 1.282, 1.96] #60, 70, 80, 95% confidence interval
 # function to plot forecasted values
-def plot_forecast(data, forecast):
-    plt.figure(figsize=(10, 6))
+def plot_forecast(data, forecast, CI):
+    plt.figure(figsize=(20,7))
     plt.plot(data.index, data.values, label='Unrevised Real Time Data', color='blue')
-    plt.plot(forecast.index, forecast.values, label='Forecast', color='black')
-    fig, ax = plt.subplots()
-    for i in enumerate(y):
-        #SE = y - 
-        alpha = 0.5*(i+1)/len(y) # Modify the alpha value for each iteration.
-        ax.fill_between(x, y+1.282, y-1.282, color='red', alpha=alpha)
-    
+    plt.plot(forecast.index, forecast.values, label='Forecast', color='red')
+    for i, ci in enumerate(CI):
+        alpha = 0.5 * (i + 1) / len(CI)
+        lower_bound = forecast - ci * forecast.std()
+        upper_bound = forecast + ci * forecast.std()
+        plt.fill_between(forecast.index, lower_bound, upper_bound, color='green', alpha=alpha)
     plt.title('AR Model Forecast with Real-Time Data')
     plt.xlabel('Year:Quarter')
     plt.ylabel('rGDP')
     plt.legend()
     plt.show()
-plot_forecast(real_time_data, forecasted_values)
 
+plot_forecast(real_time_data, forecasted_values, CI)
 
 
 ######################### using vintage data #########################
-'''
+
 latest_year = "2024"
 latest_quarter = "1"
 latest_time = "ROUTPUT" + latest_year[-2:] + "Q" + latest_quarter
@@ -180,8 +180,8 @@ print('Critical Values:')
 for key, value in vintage_result[4].items():
  print('\t%s: %.3f' % (key, value))
 
-# forecasting 10 periods ahead
-vintage_forecasted_values = vintage_model_fit.predict(start=len(revised_vintage_data), end=len(revised_vintage_data)+10)
+# forecasting 8 periods ahead
+vintage_forecasted_values = vintage_model_fit.predict(start=len(revised_vintage_data), end=len(revised_vintage_data)+8)
 
 # function to plot forecasted values
 def plot_vintage_forecast(data, forecast):
@@ -198,6 +198,6 @@ plot_vintage_forecast(revised_vintage_data, vintage_forecasted_values)
 
 #transform the model by using entity-demeaned OLS regression (fixed effects) for adl 
 #AR dont need bc no other entities/variables, just lags
-'''
+
 
 
