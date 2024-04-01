@@ -40,7 +40,7 @@ print('AIC value for real-time data:', aic_values[optimal_lags-1])
 print('Optimal number of lags for real-time data:', optimal_lags)
 
 #forming real time model
-real_time_optimal_model = AutoReg(real_time_data, lags=20)
+real_time_optimal_model = AutoReg(real_time_data, lags=max_lags) # AR2 model is damn shit... can change lags=20 to see comparison
 real_time_model_fit = real_time_optimal_model.fit()
 #print(real_time_model_fit.summary())
 
@@ -54,10 +54,97 @@ print('Critical Values:')
 for key, value in real_time_result[4].items():
  print('\t%s: %.3f' % (key, value))
 
-# forecast 8 periods ahead (can change)
-forecasted_values = real_time_model_fit.predict(start=len(real_time_data), end=len(real_time_data)+20) 
+# forecast 10 periods ahead (can change)
+forecasted_values = real_time_model_fit.predict(start=len(real_time_data), end=len(real_time_data)+10) 
 print(forecasted_values)
 
+CI = [0.842, 1.036, 1.282, 1.96] #60, 70, 80, 95% confidence interval
+# function to plot forecasted values
+def plot_forecast(data, forecast, CI):
+    plt.figure(figsize=(20,7))
+    plt.plot(data.index, data.values, label='Unrevised Real Time Data', color='blue')
+    plt.plot(forecast.index, forecast.values, label='Forecast', color='red')
+    for i, ci in enumerate(CI):
+        alpha = 0.5 * (i + 1) / len(CI)
+        lower_bound = forecast - ci * forecast.std()
+        upper_bound = forecast + ci * forecast.std()
+        plt.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
+    plt.title('AR Model Forecast with Real-Time Data')
+    plt.xlabel('Year:Quarter')
+    plt.ylabel('rGDP')
+    plt.legend()
+    plt.show()
+
+plot_forecast(real_time_data, forecasted_values, CI)
+
+
+######################### using vintage data #########################
+
+latest_year = "2024"
+latest_quarter = "1"
+latest_time = "ROUTPUT" + latest_year[-2:] + "Q" + latest_quarter
+latest_vintage_data = data[latest_time].diff().dropna()
+revised_vintage_data = latest_vintage_data[:((int(ending_year)-1947)*4)]
+max_vintage_lags = 8 
+
+# fit AutoReg models with different lag values
+vintage_aic_values = []
+for lag in range(1, max_lags + 1):
+    if max_lags > lag:
+        model = AutoReg(revised_vintage_data[:-(max_lags-lag)], lags=lag)
+        results = model.fit()
+        vintage_aic_values.append(results.aic)
+    else:
+        model = AutoReg(revised_vintage_data, lags=lag)
+        results = model.fit()
+        vintage_aic_values.append(results.aic)
+# choose the lag order that minimizes the AIC
+optimal_vintage_lags = np.argmin(vintage_aic_values) + 1 
+#print(vintage_aic_values)
+print('AIC value for vintage data:', vintage_aic_values[optimal_vintage_lags-1])
+print('Optimal number of lags for vintage data:', optimal_vintage_lags)
+
+#forming AR model
+vintage_optimal_model = AutoReg(revised_vintage_data, lags=optimal_vintage_lags)
+vintage_model_fit = vintage_optimal_model.fit()
+
+# autocorrelation_plot(revised_vintage_data) & ADF statistic
+plot_acf(revised_vintage_data, lags=max_lags) ## depends how many lags do yall want to display
+plt.show()
+vintage_result = adfuller(revised_vintage_data)
+print('ADF Statistic: %f' % vintage_result[0])
+print('p-value: %f' % vintage_result[1])
+print('Critical Values:')
+for key, value in vintage_result[4].items():
+ print('\t%s: %.3f' % (key, value))
+
+# forecasting 10 periods ahead
+vintage_forecasted_values = vintage_model_fit.predict(start=len(revised_vintage_data), end=len(revised_vintage_data)+10)
+
+# function to plot forecasted values
+def plot_vintage_forecast(data, forecast):
+    plt.figure(figsize=(20, 7))
+    plt.plot(data.index, data.values, label='Revised Vintage Data', color='green')
+    plt.plot(forecast.index, forecast.values, label='Forecast', color='black')
+    for i, ci in enumerate(CI):
+        alpha = 0.5 * (i + 1) / len(CI)
+        lower_bound = forecast - ci * forecast.std()
+        upper_bound = forecast + ci * forecast.std()
+        plt.fill_between(forecast.index, lower_bound, upper_bound, color='green', alpha=alpha)
+    plt.title('AR Model Forecast with Vintage Data')
+    plt.xlabel('Year:Quarter')
+    plt.ylabel('rGDP')
+    plt.legend()
+    plt.show()
+plot_vintage_forecast(revised_vintage_data, vintage_forecasted_values)
+
+
+
+
+
+
+#transform the model by using entity-demeaned OLS regression (fixed effects) for adl 
+#AR dont need bc no other entities/variables, just lags
 
 #probs = [0.05, 0.20, 0.35, 0.65,0.80,  0.95]
 #fan(data=real_time_data,probs=probs,history= forecasted_values.index >= 1)
@@ -116,88 +203,3 @@ def plot_forecast_with_fan_chart(data, forecast, upper_bound, lower_bound):
 # Plot the forecast with the fan chart
 plot_forecast_with_fan_chart(real_time_data, forecasted_values, upper_bound, lower_bound)
 '''
-
-#ATTEMPT 3
-y = forecasted_values.values
-x = forecasted_values.index
-CI = [0.842, 1.036, 1.282, 1.96] #60, 70, 80, 95% confidence interval
-# function to plot forecasted values
-def plot_forecast(data, forecast, CI):
-    plt.figure(figsize=(20,7))
-    plt.plot(data.index, data.values, label='Unrevised Real Time Data', color='blue')
-    plt.plot(forecast.index, forecast.values, label='Forecast', color='red')
-    for i, ci in enumerate(CI):
-        alpha = 0.5 * (i + 1) / len(CI)
-        lower_bound = forecast - ci * forecast.std()
-        upper_bound = forecast + ci * forecast.std()
-        plt.fill_between(forecast.index, lower_bound, upper_bound, color='green', alpha=alpha)
-    plt.title('AR Model Forecast with Real-Time Data')
-    plt.xlabel('Year:Quarter')
-    plt.ylabel('rGDP')
-    plt.legend()
-    plt.show()
-
-plot_forecast(real_time_data, forecasted_values, CI)
-
-
-######################### using vintage data #########################
-
-latest_year = "2024"
-latest_quarter = "1"
-latest_time = "ROUTPUT" + latest_year[-2:] + "Q" + latest_quarter
-latest_vintage_data = data[latest_time].diff().dropna()
-revised_vintage_data = latest_vintage_data[:((int(ending_year)-1947)*4)]
-max_vintage_lags = 8 
-
-# fit AutoReg models with different lag values
-vintage_aic_values = []
-for lag in range(1, max_lags + 1):
-    if max_lags > lag:
-        model = AutoReg(revised_vintage_data[:-(max_lags-lag)], lags=lag)
-        results = model.fit()
-        vintage_aic_values.append(results.aic)
-    else:
-        model = AutoReg(revised_vintage_data, lags=lag)
-        results = model.fit()
-        vintage_aic_values.append(results.aic)
-# choose the lag order that minimizes the AIC
-optimal_vintage_lags = np.argmin(vintage_aic_values) + 1 
-#print(vintage_aic_values)
-print('AIC value for vintage data:', vintage_aic_values[optimal_vintage_lags-1])
-print('Optimal number of lags for vintage data:', optimal_vintage_lags)
-
-#forming AR model
-vintage_optimal_model = AutoReg(revised_vintage_data, lags=optimal_vintage_lags)
-vintage_model_fit = vintage_optimal_model.fit()
-
-# autocorrelation_plot(revised_vintage_data) & ADF statistic
-plot_acf(revised_vintage_data, lags=max_lags) ## erm how many lags do yall want to display
-plt.show()
-vintage_result = adfuller(revised_vintage_data)
-print('ADF Statistic: %f' % vintage_result[0])
-print('p-value: %f' % vintage_result[1])
-print('Critical Values:')
-for key, value in vintage_result[4].items():
- print('\t%s: %.3f' % (key, value))
-
-# forecasting 8 periods ahead
-vintage_forecasted_values = vintage_model_fit.predict(start=len(revised_vintage_data), end=len(revised_vintage_data)+8)
-
-# function to plot forecasted values
-def plot_vintage_forecast(data, forecast):
-    plt.figure(figsize=(10, 6))
-    plt.plot(data.index, data.values, label='Revised Vintage Data', color='green')
-    plt.plot(forecast.index, forecast.values, label='Forecast', color='red')
-    plt.title('AR Model Forecast with Vintage Data')
-    plt.xlabel('Year:Quarter')
-    plt.ylabel('rGDP')
-    plt.legend()
-    plt.show()
-plot_vintage_forecast(revised_vintage_data, vintage_forecasted_values)
-
-
-#transform the model by using entity-demeaned OLS regression (fixed effects) for adl 
-#AR dont need bc no other entities/variables, just lags
-
-
-
