@@ -61,7 +61,7 @@ print(forecasted_values)
 
 #probs = [0.05, 0.20, 0.35, 0.65,0.80,  0.95]
 #fan(data=real_time_data,probs=probs,history= forecasted_values.index >= 1)
-''' 
+''' just ignore the red stuff first
 # attempt 1
 probs = [0.05, 0.20, 0.35, 0.65, 0.80, 0.95]
 def plot_fan_chart_forecast(data, forecasted_values, probs, confidence_level=0.80):
