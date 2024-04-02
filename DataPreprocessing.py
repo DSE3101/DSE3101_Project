@@ -1,7 +1,11 @@
-import pandas as pd
 # Data downloaded as of 31 Mar 2024
-# Focus on quarterly real data
+# Used quarterly real data
 # Excluded discontinued variables
+# Monthly data is converted into quarterly by taking the value of the middle month
+# #N/A data replaced with -1
+
+import pandas as pd
+import pickle
 
 def pad_columns_to_09Q3(df, name):
     na_cols = [f'{name}65Q4']
@@ -349,7 +353,8 @@ RUC = rows_to_quarter(RUC)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/employ
 EMPLOY = pd.read_excel("./data/project data/employMvMd.xlsx", index_col="DATE")
 EMPLOY = month_to_quarter(EMPLOY, "EMPLOY")
-EMPLOY.drop(columns=["EMPlOY65Q1", "EMPLOY65Q2", "EMPLOY65Q3"], inplace=True)
+EMPLOY.drop(columns=["EMPLOY65Q1", "EMPLOY65Q2", "EMPLOY65Q3"], inplace=True)
+EMPLOY.fillna(-1, inplace=True)
 EMPLOY = rows_to_quarter(EMPLOY)
 
 # Indexes of Aggregate Weekly Hours: Total (H)
@@ -477,7 +482,16 @@ HSTARTS = pd.concat([na_df_HSTARTS, HSTARTS], axis=1)
 HSTARTS.index.names = ["DATE"]
 HSTARTS.fillna(-1, inplace=True)
 HSTARTS = rows_to_quarter(HSTARTS)
+
 # Real Gross Private Domestic Investment: Residential (RINVRESID)
 # Same as above
  
 # endregion
+
+with open('preprocessed_data.pkl', 'wb') as f:
+    pickle.dump((RCON, rcong, RCONND, RCOND, RCONS, rconshh, rconsnp, rinvbf, rinvresid,
+                 rinvchi, RNX, REX, RIMP, RG, RGF, RGSL, rconhh, WSD, OLI, PROPI, RENTI,
+                 DIV, PINTI, TRANR, SSCONTRIB, NPI, PTAX, NDPI, NCON, PINTPAID, TRANPF,
+                 NPSAV, RATESAV, NCPROFAT, NCPROFATW, M1, M2, CPI, PCPIX, PPPI, PPPIX,
+                 P, PCON, pcong, pconshh, pconsnp, pconhh, PCONX, PIMP, POP, LFC, LFPART,
+                 RUC, EMPLOY, H, HG, HS, OPH, ULC, IPT, IPM, CUT, CUM, HSTARTS), f)
