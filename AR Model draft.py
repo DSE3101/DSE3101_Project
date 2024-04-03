@@ -57,8 +57,12 @@ for key, value in real_time_result[4].items():
 # forecast 10 periods ahead (can change)
 forecasted_values = real_time_model_fit.predict(start=len(real_time_data), end=len(real_time_data)+10) 
 print(forecasted_values)
+h = np.array(forecasted_values.values)
+print('h:', h)
 
-CI = [0.842, 1.036, 1.282, 1.96] #60, 70, 80, 95% confidence interval
+
+
+CI = [0.842, 1.036, 1.282, 1.96] #60, 70, 80, 95% prediction interval
 # function to plot forecasted values
 def plot_forecast(data, forecast, CI):
     plt.figure(figsize=(20,7))
