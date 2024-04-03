@@ -15,7 +15,7 @@ from dash.dependencies import Input, Output
 from components.ARTab import ARTab
 from components.TrainingTab import TrainingTab
 from components.ADLTab import ADLTab
-from components.MLTab import MLTab
+from components.MLTab import *
 from components.EvalTab import EvalTab
 from data import mainplot
 
@@ -76,27 +76,6 @@ def update_output(value, quarter_value):
     
     return f'Number of lags from Q1 1947 to {quarter_value} {selected_year}: {number_of_lags}'
 
-@app.callback(
-    Output('ar-plot', 'figure'),
-              [Input('quarter-dropdown', 'value'), Input('date-slider', 'value')]
-              )
-
-def ARmodel(value, quarter_value):
-    selected_year = date_range_yearly[int(value)].year
-    start_year = 1947
-    start_quarter = 'Q1'
-    selected_quarter_int = int(quarter_value.replace('Q', ''))
-    start_quarter_int = int(start_quarter.replace('Q', ''))
-    num_lags = (selected_year - start_year) * 4 + (selected_quarter_int - start_quarter_int)
-    
-    period_t = "ROUTPUT" + selected_year%100 + "Q" + quarter_value
-    real_time_data = routput[period_t].dropna()
-    real_time_model = AutoReg(real_time_data, lags=num_lags)
-    real_time_model_fit = real_time_model.fit()
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=real_time_data.index, y=real_time_data, mode='lines', name='Real Time Data'))
-    
-    return fig
 
 if __name__ == '__main__':
     app.run_server(debug=True)
