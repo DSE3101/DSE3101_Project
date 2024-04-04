@@ -25,3 +25,4 @@ def TrainingTab():
         html.Button('Train the model!', id='train-model')
     ]
     return trainingtab
+
