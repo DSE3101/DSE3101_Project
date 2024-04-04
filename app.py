@@ -170,8 +170,6 @@ def trainML(year, quarter):
     # Evaluate the model's performance
     latest_y_pred = latest_rf_model_selected.predict(latest_X_test_selected)
     latest_mse = mean_squared_error(latest_y_test, latest_y_pred)
-    print("\nMean Squared Error (MSE) with Latest Selected Variables:", latest_mse)
-
 
     # Train Test Split
     real_time_X_train, real_time_X_test, real_time_y_train, real_time_y_test = train_test_split(real_time_X, real_time_y, test_size=0.2, random_state=42)
@@ -187,14 +185,10 @@ def trainML(year, quarter):
     real_time_feature_importance_df = pd.DataFrame({'Feature': real_time_X.columns, 'Importance': real_time_feature_importance})
     real_time_feature_importance_df = real_time_feature_importance_df.sort_values(by='Importance', ascending=False)
 
-    # Print feature importance scores
-    print("Real Time Feature Importance Scores:")
-    print(real_time_feature_importance_df)
 
     # Choose the top N variables based on feature importance
     top_n_variables = 21  # You can adjust this value based on your preference
     real_time_selected_variables = real_time_feature_importance_df.head(top_n_variables)['Feature'].tolist()
-    print("\nTop", top_n_variables, "Real Time Variables Selected:", real_time_selected_variables)
 
     # Train a new random forest model using only the selected variables
     real_time_X_train_selected = real_time_X_train[real_time_selected_variables]
@@ -206,7 +200,8 @@ def trainML(year, quarter):
     # Evaluate the model's performance
     real_time_y_pred = real_time_rf_model_selected.predict(real_time_X_test_selected)
     real_time_mse = mean_squared_error(real_time_y_test, real_time_y_pred)
-    print("\nMean Squared Error (MSE) with Real Time Selected Variables:", real_time_mse)
+    
+    return latest_mse, real_time_feature_importance_df, top_n_variables, real_time_selected_variables, real_time_mse
 
 if __name__ == '__main__':
     app.run_server(debug=True)
