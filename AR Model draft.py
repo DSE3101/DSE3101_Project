@@ -4,11 +4,8 @@ import matplotlib.pyplot as plt
 from statsmodels.tsa.ar_model import AutoReg
 from statsmodels.tools.eval_measures import aic
 from tkinter import *
-from tkinter import ttk
-from pandas.plotting import lag_plot
 from statsmodels.graphics.tsaplots import plot_acf
 from statsmodels.tsa.stattools import adfuller
-from fanchart import fan
 
 data = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
 
