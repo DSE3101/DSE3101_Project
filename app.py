@@ -6,20 +6,18 @@ import plotly.graph_objs as go
 from matplotlib import pyplot as plt
 from statsmodels.tsa.ar_model import AutoReg
 from pandas.plotting import lag_plot
-# from pandas.plotting import autocorrelation_plot
+from pandas.plotting import autocorrelation_plot
 from statsmodels.graphics.tsaplots import plot_acf
 from statsmodels.tsa.stattools import adfuller
 from dash import html
 from dash import dcc
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 from components.ARTab import ARTab
-from components.TrainingTab import TrainingTab
+from components.TrainingResultsTab import TrainingResultsTab
 from components.ADLTab import ADLTab
 from components.MLTab import *
-#from components.EvalTab import EvalTab
 from data import mainplot
 import pickle
-
 
 routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
 routput['DATE'] = routput['DATE'].str.replace(':', '', regex=True)
@@ -28,13 +26,12 @@ date_range_yearly = pd.date_range(start='1947-01-01', end='2023-12-31', freq='YS
 app = dash.Dash(__name__, external_stylesheets= [dbc.themes.DARKLY])
 
 app.layout = html.Div([
-    dcc.Tabs(id='tabs', children=[
-        dcc.Tab(label='Model Training', className = "tab", children= TrainingTab()),
-        dcc.Tab(label='AR', className="tab", children= ARTab()),
-        dcc.Tab(label='ADL',className="tab" ,children=ADLTab()),
-        dcc.Tab(label='ML', className="tab", children=MLTab()),
-        #dcc.Tab(label='Evaluation', className="tab", children=EvalTab())
-    ]),
+    dcc.Tabs(id='tabs', value='model-training', children=[
+        dcc.Tab(label='Model Training', value='model-training', className="tab", children=TrainingResultsTab()),
+        dcc.Tab(label='AR', value='ar', className="tab", children=ARTab()),
+        dcc.Tab(label='ADL', value='adl', className="tab", children=ADLTab()),
+        dcc.Tab(label='ML', value='ml', className="tab", children=MLTab()),
+]),
     html.Div(id='tabs-content'),
     dcc.Store(id = 'year-quarter')
 ])
@@ -95,113 +92,55 @@ def update_shared_data(date_slider_value, quarter_dropdown_value):
     }
     return data
 
-#Preprocess the data using the input and outputs
-
+#Train model button
 @app.callback(
-    Output('X', 'y'),
-    [Input('year-quarter', 'data')]
+    [Output('evaluation-results', 'children'),  
+     Output('evaluation-results', 'style')],   
+    [Input('train-model', 'n_clicks')],
+    [State('year-quarter', 'data')] 
 )
-def trainML(year, quarter):
-    with open('preprocessed_data.pkl', 'rb') as f:
-        (RCON, rcong, RCONND, RCOND, RCONS, rconshh, rconsnp, rinvbf, rinvresid,
-        rinvchi, RNX, REX, RIMP, RG, RGF, RGSL, rconhh, WSD, OLI, PROPI, RENTI,
-        DIV, PINTI, TRANR, SSCONTRIB, NPI, PTAX, NDPI, NCON, PINTPAID, TRANPF,
-        NPSAV, RATESAV, NCPROFAT, NCPROFATW, M1, M2, CPI, PCPIX, PPPI, PPPIX,
-        P, PCON, pcong, pconshh, pconsnp, pconhh, PCONX, PIMP, POP, LFC, LFPART,
-        RUC, EMPLOY, H, HG, HS, OPH, ULC, IPT, IPM, CUT, CUM, HSTARTS, ROUTPUT) = pickle.load(f)
+def update_evaluation_results_and_show(n_clicks, year_quarter_data):
+    if n_clicks is None or year_quarter_data is None:
+        return "Please select a date and quarter, then press 'Train the model!'.", {'display': 'none'}
 
-    macro_variables = [RCON, rcong, RCONND, RCOND, RCONS, rconshh, rconsnp, rinvbf, rinvresid,
-        rinvchi, RNX, REX, RIMP, RG, RGF, RGSL, rconhh, WSD, OLI, PROPI, RENTI,
-        DIV, PINTI, TRANR, SSCONTRIB, NPI, PTAX, NDPI, NCON, PINTPAID, TRANPF,
-        NPSAV, RATESAV, NCPROFAT, NCPROFATW, M1, M2, CPI, PCPIX, PPPI, PPPIX,
-        P, PCON, pcong, pconshh, pconsnp, pconhh, PCONX, PIMP, POP, LFC, LFPART,
-        RUC, EMPLOY, H, HG, HS, OPH, ULC, IPT, IPM, CUT, CUM, HSTARTS, ROUTPUT]
-    # Create YYQq to slice vintages by index
-    vintages = ["65Q4"]
-    vintages.extend([f'{i}Q{j}' for i in range(66, 100) for j in range(1, 5)])
-    vintages.extend([f'0{i}Q{j}' for i in range(0, 10) for j in range(1, 5)])
-    vintages.extend([f'{i}Q{j}' for i in range(10, 24) for j in range(1, 5)])
-    vintages.extend(["24Q1"])
-
-    #Get vintage
-    quarter_index = vintages.index(f'{year[-2:]}Q{quarter}')
-    df = []
-    for var in macro_variables:
-        df.append(var.iloc[:, quarter_index])
-    df = pd.concat(df, axis=1)
-    # Remove rows after chosen quarter
-    df = df[df.index <= f"{year}:Q{quarter}"]
-    X = df.iloc[:, :-1]
-    y = df.iloc[:, -1]
-
-    real_time_X, real_time_y = get_vintage_data(year_input, quarter_input)
-    latest_X, latest_y = get_vintage_data(ROUTPUT.columns[-1][-4:-2], ROUTPUT.columns[-1][-1])
-
-    # Train Test Split
-    latest_X_train, latest_X_test, latest_y_train, latest_y_test = train_test_split(latest_X, latest_y, test_size=0.2, random_state=42)
-
-    # Train a random forest model
-    latest_rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
-    latest_rf_model.fit(latest_X_train, latest_y_train)
-
-    # Get feature importance scores
-    latest_feature_importance = latest_rf_model.feature_importances_
-
-    # Create a DataFrame to store feature importance scores
-    latest_feature_importance_df = pd.DataFrame({'Feature': latest_X.columns, 'Importance': latest_feature_importance})
-    latest_feature_importance_df = latest_feature_importance_df.sort_values(by='Importance', ascending=False)
-
-    # Print feature importance scores
-    print("Latest Feature Importance Scores:")
-    print(latest_feature_importance_df)
-
-    # Choose the top N variables based on feature importance
-    top_n_variables = 21  # You can adjust this value based on your preference
-    latest_selected_variables = latest_feature_importance_df.head(top_n_variables)['Feature'].tolist()
-    print("\nTop", top_n_variables, "Latest Variables Selected:", latest_selected_variables)
-
-    # Train a new random forest model using only the selected variables
-    latest_X_train_selected = latest_X_train[latest_selected_variables]
-    latest_X_test_selected = latest_X_test[latest_selected_variables]
-
-    latest_rf_model_selected = RandomForestRegressor(n_estimators=100, random_state=42)
-    latest_rf_model_selected.fit(latest_X_train_selected, latest_y_train)
-
-    # Evaluate the model's performance
-    latest_y_pred = latest_rf_model_selected.predict(latest_X_test_selected)
-    latest_mse = mean_squared_error(latest_y_test, latest_y_pred)
-
-    # Train Test Split
-    real_time_X_train, real_time_X_test, real_time_y_train, real_time_y_test = train_test_split(real_time_X, real_time_y, test_size=0.2, random_state=42)
-
-    # Train a random forest model
-    real_time_rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
-    real_time_rf_model.fit(real_time_X_train, real_time_y_train)
-
-    # Get feature importance scores
-    real_time_feature_importance = real_time_rf_model.feature_importances_
-
-    # Create a DataFrame to store feature importance scores
-    real_time_feature_importance_df = pd.DataFrame({'Feature': real_time_X.columns, 'Importance': real_time_feature_importance})
-    real_time_feature_importance_df = real_time_feature_importance_df.sort_values(by='Importance', ascending=False)
-
-
-    # Choose the top N variables based on feature importance
-    top_n_variables = 21  # You can adjust this value based on your preference
-    real_time_selected_variables = real_time_feature_importance_df.head(top_n_variables)['Feature'].tolist()
-
-    # Train a new random forest model using only the selected variables
-    real_time_X_train_selected = real_time_X_train[real_time_selected_variables]
-    real_time_X_test_selected = real_time_X_test[real_time_selected_variables]
-
-    real_time_rf_model_selected = RandomForestRegressor(n_estimators=100, random_state=42)
-    real_time_rf_model_selected.fit(real_time_X_train_selected, real_time_y_train)
-
-    # Evaluate the model's performance
-    real_time_y_pred = real_time_rf_model_selected.predict(real_time_X_test_selected)
-    real_time_mse = mean_squared_error(real_time_y_test, real_time_y_pred)
+    year = year_quarter_data['year']
+    quarter = year_quarter_data['quarter']
     
-    return latest_mse, real_time_feature_importance_df, top_n_variables, real_time_selected_variables, real_time_mse
+    evaluation = [
+        html.H3("Evaluating our models"),
+        html.P("We will use 2 tests to determine which model is the most appropriate"),
+        html.P("The tests are RMSE and Diebold-Mariano Test"),
+        html.H4("RMSE"),
+        html.P("RMSE is an extremely simple and easy to implement test"),
+        ##Insert 3 graphs, which are 3 fancharts, and with the test data
+        html.H5("AR Model"),
+        #Graph 1
+        html.P("The AR model serves as our baseline model. Based on econometric theory, it should be the worst performing in terms of RMSE values"),
+        #html.P("Running the AR model described above, the RMSE value is" + rmse_ar),
+        html.P("The value is quite high, so we will see how our next model fare"),
+        html.P("Based on our models, the model with the lowest RMSE is xxx"),
+        html.H5("ADL Model"),
+        #Graph 2
+        #html.P("The ADL model will return us a RMSE value of " + rmse_adl), #Text will be on the right
+        html.H5("Regression Forest Model"),
+        #Graph 3
+        #html.P("Last but not least, running our own regression model returns us the RMSE value of " + rmse_forest),
+        
+        html.P("But using the RMSE has its own issues,"),
+        html.P("For instance, RMSE are extremely sensitive to outliers, and is not as statistically sound as our other test."),
+        html.P("This is where our next test comes in"),
+
+        html.H4("Diebold-Mariano (DM) Test"),
+        html.P("We will now run the DM test between the ADL and regression forest model."), 
+        html.P("The reason why we are not running this on the AR model is because we have already established that the AR model is simply a benchmark model.")
+    ]
+    
+    # Return the content for the evaluation results and update the style to make it visible
+    return evaluation, {'display': 'block'}
+
+#ML Model
+
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
