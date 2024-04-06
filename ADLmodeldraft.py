@@ -1,9 +1,11 @@
-#from last week LOL its q shit
-# m currently editing on it - fang 
+#TRYING THE MODEL but i need help on the data part hurhur
+
 
 import pandas as pd
 from statsmodels.tsa.api import VAR
-from statsmodels.tools.eval_measures import aic
+from statsmodels.tools.eval_measures import rmse, aic
+from itertools import combinations
+
 from statsmodels.graphics.tsaplots import plot_acf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -95,8 +97,7 @@ investments_latest = investments.iloc[-60:, -2].reset_index(drop=True)
 gdp_latest = gdp.iloc[-60:, -2].reset_index(drop=True)
 unemployment_rate_latest = unemployment_rate.iloc[-60:, -2].reset_index(drop=True)
 
-#user to choose variables 
-# example they choose cpi, import, consumption
+# i use gdp, cpi, imports, and consumption first
 df = [gdp_latest,cpi_latest,imports_latest,consumption_latest]
 selected_data = pd.concat(df, axis=1)
 selected_data = selected_data.replace(',', '', regex=True)
@@ -104,51 +105,62 @@ selected_data = selected_data.replace(' ', '', regex=True)
 selected_data = selected_data.astype(float)
 print(selected_data)
 
-aic_values = []
-for lag in range(1, 20):  #choose optimum from 20 lags
-    model = VAR(selected_data)
-    results = model.fit(lag)
-    aic_values.append(results.aic)
-    
-optimal_lags = np.argmin(aic_values) + 1 
-#print(aic_values)
-print(optimal_lags)
+#initialise best model and best aic
+best_model = None
+best_aic = np.inf
+best_combi = None
+
+#iterate thru all possible combinations of models to find best model based on lowest aic
+for i in range(1, len(selected_data) + 1):
+    for combi in itertools.combinations(selected_data, i):
+        #combine the selected variables w gdp
+        model_data = pd.concat([gdp_latest] + list(combi), axis = 1)
+
+        #fit ADL model
+        model = VAR(model_data)
+        fitted_model = model.fit()
+
+        #calc aic
+        aic = model_fitted.aic
+
+        #update best model if aic is lower
+        if aic < best_aic:
+            best_aic = aic
+            best_model = model_fitted
+            best_combi = combi
+
+print("best combination:", best_combi)
+print("best AIC:", best_aic)
+print(fitted_model)
+
+
 
 #check autocorrelation for each variable separately
 for column in selected_data.columns:
     plot_acf(selected_data[column], title=f'Autocorrelation for {column}')
     plt.show()
 
-#create ADL model with the optimal lag length
-final_model = VAR(selected_data)
-final_results = final_model.fit(optimal_lags)
-#print(final_results.summary())
-print(final_results)
+# forecast 8 steps
+forecasted_values = best_model.forecast(selected_data.values[-best_model.k_ar:], 8)
 
-# forecasting 10 periods ahead
-# Get the index of the 'ROUTPUT24Q1' variable in the selected_data DataFrame
-output_index = selected_data.columns.get_loc('ROUTPUT24Q1')
-# Forecast only the 'ROUTPUT24Q1' variable for the next 10 periods
-forecasted_values = final_results.forecast(y=selected_data.values[-optimal_lags:], steps=10)[:, output_index]
+CI = [0.57, 0.842, 1.282] # 50, 60, 80% predictional interval
 
-# Create a pandas DataFrame for the forecasted values with appropriate index
-forecast_index = pd.period_range(selected_data.index[-1], periods=10, freq='Q')
-forecasted_values_df = pd.DataFrame(forecasted_values, index=forecast_index, columns=['Forecast'])
-
-# Plot the forecasted values
-plot_vintage_forecast(selected_data['ROUTPUT24Q1'], forecasted_values_df)
-
-# function to plot forecasted values
-def plot_vintage_forecast(data, forecast):
-    plt.figure(figsize=(10, 6))
-    plt.plot(data.index, data.values, label='Original Data', color='green')
-    plt.plot(forecast.index, forecast.values, label='Forecast', color='red')
-    plt.title('ADL Model Forecast')
+def plot_forecast(data, forecast, CI):
+    plt.figure(figsize=(20,7))
+    plt.plot(data.index, data['gdp'].values, label='Unrevised Real Time Data', color='blue')
+    plt.plot(forecast.index, forecast, label='Forecast', color='red')
+    for i, ci in enumerate(CI):
+        alpha = 0.5 * (i + 1) / len(CI)
+        lower_bound = forecast - ci * forecast.std()
+        upper_bound = forecast + ci * forecast.std()
+        plt.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
+    plt.title('ADL Model Forecast Test')
     plt.xlabel('Year:Quarter')
     plt.ylabel('rGDP')
     plt.legend()
     plt.show()
 
+plot_forecast(selected_data, forecasted_values[:, 0], CI)
 
 
 
