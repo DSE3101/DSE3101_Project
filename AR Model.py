@@ -50,7 +50,7 @@ def AR_MODEL():
             print('\t%s: %.3f' % (key, value))
 
     def forecasted_values_data(y_data, ar_model_fit):
-        forecasted_values = ar_model_fit.predict(start=len(y_data), end=len(y_data)+16) #forecasting 12 periods ahead
+        forecasted_values = ar_model_fit.predict(start=len(y_data), end=len(y_data)+11) #forecasting 12 periods ahead
         return forecasted_values
 
     def h_step_forecast(forecast_data):
