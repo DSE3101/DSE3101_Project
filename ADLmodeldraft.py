@@ -1,7 +1,12 @@
+#from last week LOL its q shit
+# m currently editing on it - fang 
+
 import pandas as pd
 from statsmodels.tsa.api import VAR
 from statsmodels.tools.eval_measures import aic
 from statsmodels.graphics.tsaplots import plot_acf
+import numpy as np
+import matplotlib.pyplot as plt
 
 #DATA PREPROCESSING
 # USED NICS DATA PREPROCESSING FOR THIS
@@ -73,43 +78,76 @@ gdp = phil_month_to_quarter_cigxm(gdp)
 unemployment_rate = pd.read_csv("./data/project data/Unemployment Rate.csv")
 unemployment_rate = phil_month_to_quarter_others(unemployment_rate)
 
-#merge based on date
-data_frames = [gdp, csr_conf, cpi, h_starts, ir_3m, ir_10y, m1, pcpi, consumption, exports, govt_spending, imports, investments,unemployment_rate]
-merged_data = pd.concat(data_frames, axis=1)
-
-#clean merged data
-merged_data = merged_data.replace(',', '', regex=True)
-merged_data = merged_data.replace(' ', '', regex=True)
-merged_data = merged_data.apply(pd.to_numeric, errors='coerce')
-merged_data = merged_data.dropna()
+#user choose date range
+#USED NICS ONE ALSO. used last 60 rows, 24Q1
+csr_conf_latest = csr_conf.iloc[-60:,-2].reset_index(drop=True)
+cpi_latest = cpi.iloc[-60:,-2].reset_index(drop=True)
+h_starts_latest = h_starts.iloc[-60:, -2].reset_index(drop=True)
+ir_3m_latest = ir_3m.iloc[-60:, -2].reset_index(drop=True)
+ir_10y_latest = ir_10y.iloc[-60:, -2].reset_index(drop=True)
+m1_latest = m1.iloc[-60:, -2].reset_index(drop=True)
+pcpi_latest = pcpi.iloc[-60:, -2].reset_index(drop=True)
+consumption_latest = consumption.iloc[-60:, -2].reset_index(drop=True)
+exports_latest = exports.iloc[-60:, -2].reset_index(drop=True)
+govt_spending_latest = govt_spending.iloc[-60:, -2].reset_index(drop=True)
+imports_latest = imports.iloc[-60:, -2].reset_index(drop=True)
+investments_latest = investments.iloc[-60:, -2].reset_index(drop=True)
+gdp_latest = gdp.iloc[-60:, -2].reset_index(drop=True)
+unemployment_rate_latest = unemployment_rate.iloc[-60:, -2].reset_index(drop=True)
 
 #user to choose variables 
-#ok wait i confused they choose variables and date range is it 
+# example they choose cpi, import, consumption
+df = [gdp_latest,cpi_latest,imports_latest,consumption_latest]
+selected_data = pd.concat(df, axis=1)
+selected_data = selected_data.replace(',', '', regex=True)
+selected_data = selected_data.replace(' ', '', regex=True)
+selected_data = selected_data.astype(float)
+print(selected_data)
 
-#adjust df so that it contains only the variables and lags
-selected_data = merged_data
-
-#choose minimum AIC based on lag lengths
-min_aic = float('inf')
-optimal_lag = 0
-
-for lag in range(1, 11):  #can adjust range 
-    model = VAR(merged_data)
+aic_values = []
+for lag in range(1, 20):  #choose optimum from 20 lags
+    model = VAR(selected_data)
     results = model.fit(lag)
-    current_aic = aic(results.aic)
+    aic_values.append(results.aic)
     
-    if current_aic < min_aic:
-        min_aic = current_aic
-        optimal_lag = lag
+optimal_lags = np.argmin(aic_values) + 1 
+#print(aic_values)
+print(optimal_lags)
 
-#check autocorrelation
-plot_acf(merged_data) 
+#check autocorrelation for each variable separately
+for column in selected_data.columns:
+    plot_acf(selected_data[column], title=f'Autocorrelation for {column}')
+    plt.show()
 
 #create ADL model with the optimal lag length
-final_model = VAR(merged_data)
-final_results = final_model.fit(optimal_lag)
-print(final_results.summary())
+final_model = VAR(selected_data)
+final_results = final_model.fit(optimal_lags)
+#print(final_results.summary())
+print(final_results)
 
+# forecasting 10 periods ahead
+# Get the index of the 'ROUTPUT24Q1' variable in the selected_data DataFrame
+output_index = selected_data.columns.get_loc('ROUTPUT24Q1')
+# Forecast only the 'ROUTPUT24Q1' variable for the next 10 periods
+forecasted_values = final_results.forecast(y=selected_data.values[-optimal_lags:], steps=10)[:, output_index]
+
+# Create a pandas DataFrame for the forecasted values with appropriate index
+forecast_index = pd.period_range(selected_data.index[-1], periods=10, freq='Q')
+forecasted_values_df = pd.DataFrame(forecasted_values, index=forecast_index, columns=['Forecast'])
+
+# Plot the forecasted values
+plot_vintage_forecast(selected_data['ROUTPUT24Q1'], forecasted_values_df)
+
+# function to plot forecasted values
+def plot_vintage_forecast(data, forecast):
+    plt.figure(figsize=(10, 6))
+    plt.plot(data.index, data.values, label='Original Data', color='green')
+    plt.plot(forecast.index, forecast.values, label='Forecast', color='red')
+    plt.title('ADL Model Forecast')
+    plt.xlabel('Year:Quarter')
+    plt.ylabel('rGDP')
+    plt.legend()
+    plt.show()
 
 
 
