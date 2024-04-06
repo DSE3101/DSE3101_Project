@@ -35,10 +35,10 @@ def get_data():
     year_input = "2012"
     # quarter_input = input("Choose a quarter from 1 to 4")
     quarter_input = "2"
-    # h_step_input = input("Choose number of steps to forecast")
-    h_step_input = 12
+    # h_step_input = int(input("Choose number of steps to forecast")) - 1
+    h_step_input = 12 - 1
     years_ahead = h_step_input // 4
-    quarters_ahead = h_step_input % 8
+    quarters_ahead = h_step_input % 4
     h_step_year = int(year_input) + years_ahead
     h_step_quarter = int(quarter_input) + quarters_ahead
     if h_step_quarter > 4:
@@ -55,7 +55,8 @@ def get_data():
     latest_y_train = latest_y.iloc[:len(real_time_y)]
     latest_X_test = latest_X.iloc[len(real_time_y):, :]
     latest_y_test = latest_y.iloc[len(real_time_y):]
+    print(real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test)
 
     return real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter
 
-
+get_data()
