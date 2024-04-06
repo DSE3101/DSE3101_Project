@@ -1,40 +1,71 @@
 import pandas as pd
-import pickle
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+from GetData import get_data
 
-# Load the macro variables
-with open('preprocessed_data.pkl', 'rb') as f:
-    (RCON, rcong, RCONND, RCOND, RCONS, rconshh, rconsnp, rinvbf, rinvresid,
-     rinvchi, RNX, REX, RIMP, RG, RGF, RGSL, rconhh, WSD, OLI, PROPI, RENTI,
-     DIV, PINTI, TRANR, SSCONTRIB, NPI, PTAX, NDPI, NCON, PINTPAID, TRANPF,
-     NPSAV, RATESAV, NCPROFAT, NCPROFATW, M1, M2, CPI, PCPIX, PPPI, PPPIX,
-     P, PCON, pcong, pconshh, pconsnp, pconhh, PCONX, PIMP, POP, LFC, LFPART,
-     RUC, EMPLOY, H, HG, HS, OPH, ULC, IPT, IPM, CUT, CUM, HSTARTS) = pickle.load(f)
+real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data()
 
-macro_variables = [RCON, rcong, RCONND, RCOND, RCONS, rconshh, rconsnp, rinvbf, rinvresid,
-     rinvchi, RNX, REX, RIMP, RG, RGF, RGSL, rconhh, WSD, OLI, PROPI, RENTI,
-     DIV, PINTI, TRANR, SSCONTRIB, NPI, PTAX, NDPI, NCON, PINTPAID, TRANPF,
-     NPSAV, RATESAV, NCPROFAT, NCPROFATW, M1, M2, CPI, PCPIX, PPPI, PPPIX,
-     P, PCON, pcong, pconshh, pconsnp, pconhh, PCONX, PIMP, POP, LFC, LFPART,
-     RUC, EMPLOY, H, HG, HS, OPH, ULC, IPT, IPM, CUT, CUM, HSTARTS]
+top_n_variables = len(real_time_X.columns) // 3
 
-# Create YYQq to slice vintages by index
-vintages = ["65Q4"]
-vintages.extend([f'{i}Q{j}' for i in range(66, 100) for j in range(1, 5)])
-vintages.extend([f'0{i}Q{j}' for i in range(0, 10) for j in range(1, 5)])
-vintages.extend([f'{i}Q{j}' for i in range(10, 24) for j in range(1, 5)])
-vintages.extend(["24Q1"])
+# Train real time Random Forest model
+real_time_rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
+real_time_rf_model.fit(real_time_X, real_time_y)
 
-# year_input = input("Choose real time data from 1966 to 2023")
-year_input = "1998"
-# quarter_input = input("Choose a quarter from 1 to 4")
-quarter_input = "3"
-quarter_index = vintages.index(f'{year_input[-2:]}Q{quarter_input}')
+# Get feature importance scores
+real_time_feature_importance = real_time_rf_model.feature_importances_
 
-# Combine all variables for chosen quarter
-real_time_data = []
-for var in macro_variables:
-    real_time_data.append(var.iloc[:, quarter_index])
-real_time_data = pd.concat(real_time_data, axis=1)
+# Create a DataFrame to store feature importance scores
+real_time_feature_importance_df = pd.DataFrame({'Feature': real_time_X.columns, 'Importance': real_time_feature_importance})
+real_time_feature_importance_df = real_time_feature_importance_df.sort_values(by='Importance', ascending=False)
 
-# Remove quarters after chosen quarter
-print(real_time_data[real_time_data.index <= f"{year_input}:Q{quarter_input}"])
+# Print feature importance scores
+print("Real Time Feature Importance Scores:")
+print(real_time_feature_importance_df)
+
+# Choose the top N variables based on feature importance
+real_time_selected_variables = real_time_feature_importance_df.head(top_n_variables)['Feature'].tolist()
+real_time_selected_variables_to_latest = []
+for var in real_time_selected_variables:
+    real_time_selected_variables_to_latest.append(var[:-4] + curr_year + "Q" + curr_quarter)
+print("\nTop", top_n_variables, "Latest Variables Selected:", real_time_selected_variables)
+
+# Train a new random forest model using only the selected variables
+real_time_rf_model_selected = RandomForestRegressor(n_estimators=100, random_state=42)
+real_time_rf_model_selected.fit(latest_X_train[real_time_selected_variables_to_latest], latest_y_train)
+
+# Evaluate the model's performance
+real_time_y_pred = real_time_rf_model_selected.predict(latest_X_test[real_time_selected_variables_to_latest])
+real_time_rmsfe = mean_squared_error(latest_y_test, real_time_y_pred)**(0.5)
+print("\nRoot Mean Squared Forecast Error (RMSFE) with Real Time Selected Variables:", real_time_rmsfe)
+
+# Train latest Random Forest model
+latest_rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
+latest_rf_model.fit(latest_X_train, latest_y_train)
+
+# Get feature importance scores
+latest_feature_importance = latest_rf_model.feature_importances_
+
+# Create a DataFrame to store feature importance scores
+latest_feature_importance_df = pd.DataFrame({'Feature': latest_X_train.columns, 'Importance': latest_feature_importance})
+latest_feature_importance_df = latest_feature_importance_df.sort_values(by='Importance', ascending=False)
+
+# Print feature importance scores
+print("Latest Feature Importance Scores:")
+print(latest_feature_importance_df)
+
+# Choose the top N variables based on feature importance
+latest_selected_variables = latest_feature_importance_df.head(top_n_variables)['Feature'].tolist()
+latest_selected_variables_to_latest = []
+for var in latest_selected_variables:
+    latest_selected_variables_to_latest.append(var[:-4] + curr_year + "Q" + curr_quarter)
+print("\nTop", top_n_variables, "Latest Variables Selected:", latest_selected_variables)
+
+# Train a new random forest model using only the selected variables, using latest vintage data
+latest_rf_model_selected = RandomForestRegressor(n_estimators=100, random_state=42)
+latest_rf_model_selected.fit(latest_X_train[latest_selected_variables_to_latest], latest_y_train)
+
+# Evaluate the model's performance
+latest_y_pred = latest_rf_model_selected.predict(latest_X_test[latest_selected_variables_to_latest])
+latest_rmsfe = mean_squared_error(latest_y_test, latest_y_pred)**(0.5)
+print("\nRoot Mean Squared Forecast Error (RMSFE) with Latest Selected Variables:", latest_rmsfe)

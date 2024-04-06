@@ -1,30 +1,22 @@
 
 .box{
-    border: 2px solid #3ce67a;
+    border: 2px solid hsl(0, 0%, 100%);
     border-radius: 5px;
     padding: 10px;
     margin: 20px 0;
 }
 
 .graphBorder {
-  border: 1px solid #3ce67a;
+  border: 1px solid hsl(0, 0%, 100%);
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 4px;
 }
 
+.tab-selected {
+  background-color: #222; 
+  color: #fff;
+}
+
 .tab {
-  padding: 10px;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  transition: background-color 0.3s ease-in-out;
-}
-
-.tab:hover {
-  background-color: #13d833;
-}
-
-.tab.selected {
-  border-color: #007bff;
-  background-color: #007bff;
-  color: white;
+  color: #ccc; 
 }

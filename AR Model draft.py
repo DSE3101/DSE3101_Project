@@ -4,11 +4,8 @@ import matplotlib.pyplot as plt
 from statsmodels.tsa.ar_model import AutoReg
 from statsmodels.tools.eval_measures import aic
 from tkinter import *
-from tkinter import ttk
-from pandas.plotting import lag_plot
 from statsmodels.graphics.tsaplots import plot_acf
 from statsmodels.tsa.stattools import adfuller
-from fanchart import fan
 
 data = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
 
@@ -54,15 +51,11 @@ print('Critical Values:')
 for key, value in real_time_result[4].items():
  print('\t%s: %.3f' % (key, value))
 
-# forecast 10 periods ahead (can change)
-forecasted_values = real_time_model_fit.predict(start=len(real_time_data), end=len(real_time_data)+10) 
-print(forecasted_values)
-h = np.array(forecasted_values.values)
-print('h:', h)
+# forecast 12 periods ahead (can change)
+forecasted_values = real_time_model_fit.predict(start=len(real_time_data), end=len(real_time_data)+12) 
+h = forecasted_values.values
 
-
-
-CI = [0.842, 1.036, 1.282, 1.96] #60, 70, 80, 95% prediction interval
+CI = [0.57, 0.842, 1.282] #50, 60, 80% predictional interval
 # function to plot forecasted values
 def plot_forecast(data, forecast, CI):
     plt.figure(figsize=(20,7))
@@ -93,9 +86,9 @@ max_vintage_lags = 8
 
 # fit AutoReg models with different lag values
 vintage_aic_values = []
-for lag in range(1, max_lags + 1):
-    if max_lags > lag:
-        model = AutoReg(revised_vintage_data[:-(max_lags-lag)], lags=lag)
+for lag in range(1, max_vintage_lags + 1):
+    if max_vintage_lags > lag:
+        model = AutoReg(revised_vintage_data[:-(max_vintage_lags-lag)], lags=lag)
         results = model.fit()
         vintage_aic_values.append(results.aic)
     else:
@@ -122,8 +115,8 @@ print('Critical Values:')
 for key, value in vintage_result[4].items():
  print('\t%s: %.3f' % (key, value))
 
-# forecasting 10 periods ahead
-vintage_forecasted_values = vintage_model_fit.predict(start=len(revised_vintage_data), end=len(revised_vintage_data)+10)
+# forecasting 12 periods ahead
+vintage_forecasted_values = vintage_model_fit.predict(start=len(revised_vintage_data), end=len(revised_vintage_data)+12)
 
 # function to plot forecasted values
 def plot_vintage_forecast(data, forecast):
@@ -141,7 +134,6 @@ def plot_vintage_forecast(data, forecast):
     plt.legend()
     plt.show()
 plot_vintage_forecast(revised_vintage_data, vintage_forecasted_values)
-
 
 
 
