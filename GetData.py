@@ -49,6 +49,7 @@ def get_data():
 
     # Slice data as needed
     real_time_X, real_time_y = get_vintage_data(year_input, quarter_input, year_input, quarter_input)
+    real_time_X, real_time_y = real_time_X[:-1], real_time_y[:-1]
     latest_X, latest_y = get_vintage_data(curr_year, curr_quarter, h_step_year, h_step_quarter)
     latest_X_train = latest_X.iloc[:len(real_time_y), :]
     latest_y_train = latest_y.iloc[:len(real_time_y)]
@@ -56,3 +57,5 @@ def get_data():
     latest_y_test = latest_y.iloc[len(real_time_y):]
 
     return real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter
+
+
