@@ -36,7 +36,7 @@ def get_data():
     # quarter_input = input("Choose a quarter from 1 to 4")
     quarter_input = "2"
     # h_step_input = input("Choose number of steps to forecast")
-    h_step_input = 11
+    h_step_input = 12
     years_ahead = h_step_input // 4
     quarters_ahead = h_step_input % 8
     h_step_year = int(year_input) + years_ahead
