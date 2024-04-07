@@ -10,8 +10,12 @@ from sklearn.metrics import mean_squared_error
 import pickle
 import statsmodels.api as sm
 from statsmodels.tsa.api import ARDL
+from statsmodels.tsa.ardl import ARDLResults
 
 real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data("2012","2")
+year_input='2012'
+quarter_input = '2'
+x_data = real_time_X.loc[:,[f'CPI{year_input[-2:]}Q{quarter_input}',f'RUC{year_input[-2:]}Q{quarter_input}',f'M1{year_input[-2:]}Q{quarter_input}',f'HSTARTS{year_input[-2:]}Q{quarter_input}',f'IPM{year_input[-2:]}Q{quarter_input}',f'OPH{year_input[-2:]}Q{quarter_input}']]
 
 x_columns = real_time_X.columns
 # def data_transformation_x(x_data):
@@ -19,17 +23,16 @@ x_realtime = real_time_X.diff().dropna()
 # def data_transformation_y(y_data):
 y_realtime = real_time_y.diff().dropna()
 
-print(x_realtime)
-print(y_realtime)
-ardl_model = ARDL(y_realtime, lags=8, exog=x_realtime,order=1)
-ardl_model.fit()
-
-
+ardl_model = ARDL(y_realtime, lags=8, exog=x_realtime, order=2)
+ardl_results = ardl_model.fit()
+print(ardl_results.summary())
+print(ardl_model.ardl_order)
+print(ardl_results.aic)
 
 
 
 '''
-
+    
 def finding_min_aic(y_data, x_data):
     max_lags = 8 # since our data is quarterly, can consider up to 6-8 max lags
     aic_values = []
@@ -49,7 +52,7 @@ def finding_min_aic(y_data, x_data):
     optimal_lag = np.argmin(aic_values) + 1 
     #print(aic_values)
     return optimal_lag
-'''
+
 def forming_ADL_model(y_data,x_data,lag_y,lag_x):
     y_lagged = sm.tsa.lagmat(y_data, maxlag=lag_y, trim='both')
     x_lagged = sm.tsa.lagmat(x_data, maxlag=lag_x, trim='both')   
@@ -65,7 +68,7 @@ def forming_ADL_model(y_data,x_data,lag_y,lag_x):
     adl_results = adl_model.fit()
     #print(adl_results.summary())
     return adl_results
-    '''
+
 def forming_ADL_model(y_data, x_data, lag_y, lag_x):
     # Generate lagged arrays for y and x variables
     y_lagged = sm.tsa.lagmat(y_data, maxlag=lag_y, trim='both')
@@ -131,61 +134,5 @@ def plot_real_time_forecast(forecast):
 optimal_lags = finding_min_aic(real_time_data,x_data)
 print('Optimal lags:', optimal_lags)
 adl_model = forming_ADL_model(real_time_data,x_data,optimal_lags,optimal_lags)
-    
-
-
-
-
-
-def find_min_aic(y_data, x_data):
-    max_lags = 8  # Maximum number of lags to consider
-    min_aic = float('inf')  # Initialize minimum AIC
-    optimal_lags = None  # Initialize optimal lag configuration
-
-    n_obs = len(y_data)  # Number of observations
-
-    # Iterate over different lag orders for the endogenous variable (y)
-    for lag_y in range(1, max_lags + 1):
-        # Generate lagged y variable
-        y_lagged = sm.tsa.lagmat(y_data, maxlag=lag_y)
-
-        # Iterate over different lag orders for each exogenous variable (x)
-        for lag_x in range(1, max_lags + 1):
-            # Generate lagged versions of each exogenous variable
-            x_lagged = sm.tsa.lagmat(x_data, maxlag=lag_x)
-
-            # Determine the maximum lag order to ensure the same sample size
-            max_lag = max(lag_y, lag_x)
-
-            # Trim the lagged datasets to have the same sample size
-            y_lagged_trimmed = y_lagged[max_lag:]
-            x_lagged_trimmed = x_lagged[max_lag:]
-
-            # Combine lagged y and x variables
-            lagged_data = pd.concat([pd.DataFrame(y_lagged_trimmed), pd.DataFrame(x_lagged_trimmed)], axis=1)
-
-            # Add constant term
-            lagged_data = sm.add_constant(lagged_data)
-
-            # Fit the OLS model
-            model = sm.OLS(y_data[max_lag:], lagged_data)
-            results = model.fit()
-
-            # Check if current AIC is lower than minimum AIC
-            if results.aic < min_aic:
-                min_aic = results.aic
-                optimal_lags = (lag_y, lag_x)
-                optimal_model = results
-
-    return optimal_lags, optimal_model
-
-# Find optimal lag configuration and fit the ADL model
-optimal_lags, optimal_model = find_min_aic(real_time_data, x_data)
-
-# Print the optimal lag configuration
-print("Optimal lag configuration:", optimal_lags)
-
-# Print the summary of the optimal model
-print("Optimal model summary:", optimal_model.summary())
 
 '''
