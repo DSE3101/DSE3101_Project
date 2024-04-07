@@ -11,12 +11,3 @@
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 4px;
 }
-
-.tab-selected {
-  background-color: #222; 
-  color: #fff;
-}
-
-.tab {
-  color: #375a7f; 
-}

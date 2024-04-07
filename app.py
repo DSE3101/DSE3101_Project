@@ -4,6 +4,7 @@ import pandas as pd
 import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
 from matplotlib import pyplot as plt
+import matplotlib.ticker as ticker
 from statsmodels.tsa.ar_model import AutoReg
 from pandas.plotting import lag_plot
 from pandas.plotting import autocorrelation_plot
@@ -18,6 +19,9 @@ from components.ADLTab import ADLTab
 from components.MLTab import *
 from data import mainplot
 import pickle
+from GetData import get_data
+from sklearn.metrics import mean_squared_error
+from AR_Model import AR_MODEL
 
 routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
 routput['DATE'] = routput['DATE'].str.replace(':', '', regex=True)
@@ -87,8 +91,8 @@ def update_shared_data(date_slider_value, quarter_dropdown_value):
     # Logic to process the slider and dropdown values
     # For example, convert slider value to year and quarter to a specific format
     data = {
-        'year': date_slider_value,
-        'quarter': quarter_dropdown_value
+        'year': str(date_slider_value),
+        'quarter': str(quarter_dropdown_value)
     }
     return data
 
@@ -105,6 +109,9 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
 
     year = year_quarter_data['year']
     quarter = year_quarter_data['quarter']
+    quarter = quarter.replace("Q", "")
+
+    ar_model_results = AR_MODEL(year, quarter)
     
     evaluation = [
         html.H3("Evaluating our models"),
@@ -112,11 +119,13 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
         html.P("The tests are RMSE and Diebold-Mariano Test"),
         html.H4("RMSE"),
         html.P("RMSE is an extremely simple and easy to implement test"),
-        ##Insert 3 graphs, which are 3 fancharts, and with the test data
+        ##Insert 3 graphs, which are 3 fancharts, and with two lines on the same graph
         html.H5("AR Model"),
         #Graph 1
         html.P("The AR model serves as our baseline model. Based on econometric theory, it should be the worst performing in terms of RMSE values"),
-        #html.P("Running the AR model described above, the RMSE value is" + rmse_ar),
+        html.P(f"Running the AR model described above, the RMSE value using the real time data is: {ar_model_results[2]}"),
+        html.P(f"Compared to using the vintage data of 2024Q1, which AR Model results is : {ar_model_results[5]}"),
+
         html.P("The value is quite high, so we will see how our next model fare"),
         html.P("Based on our models, the model with the lowest RMSE is xxx"),
         html.H5("ADL Model"),
@@ -135,7 +144,6 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
         html.P("The reason why we are not running this on the AR model is because we have already established that the AR model is simply a benchmark model.")
     ]
     
-    # Return the content for the evaluation results and update the style to make it visible
     return evaluation, {'display': 'block'}
 
 #ML Model

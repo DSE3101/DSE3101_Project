@@ -10,8 +10,8 @@ from sklearn.metrics import mean_squared_error
 
 #need to run GetData.py first
 
-def AR_MODEL():
-    real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data()
+def AR_MODEL(year_input, quarter_input):
+    real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data(year_input, quarter_input)
 
     def converting_to_stationary(y_data):
         real_time_data = y_data.diff().dropna()
@@ -43,11 +43,11 @@ def AR_MODEL():
 
     def adfuller_stats(y_data):
         real_time_result = adfuller(y_data)
-        print('ADF Statistic: %f' % real_time_result[0])
-        print('p-value: %f' % real_time_result[1])
-        print('Critical Values:')
-        for key, value in real_time_result[4].items():
-            print('\t%s: %.3f' % (key, value))
+        #print('ADF Statistic: %f' % real_time_result[0])
+        #print('p-value: %f' % real_time_result[1])
+        #print('Critical Values:')
+        #for key, value in real_time_result[4].items():
+            #print('\t%s: %.3f' % (key, value))
 
     def forecasted_values_data(y_data, ar_model_fit):
         forecasted_values = ar_model_fit.predict(start=len(y_data), end=len(y_data)+11) #forecasting 12 periods ahead
@@ -125,5 +125,3 @@ def AR_MODEL():
     print('Vintage RMSFE:',vintage_rmsfe)
 
     return real_time_optimal_lags, h_realtime, real_time_rmsfe, vintage_optimal_lags, h_vintage, vintage_rmsfe
-
-AR_MODEL()

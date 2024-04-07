@@ -1,7 +1,7 @@
 import pickle
 import pandas as pd
 
-def get_data():
+def get_data(year_input, quarter_input):
     # Load the macro variables
     with open('preprocessed_data.pkl', 'rb') as f:
         macro_variables = pickle.load(f)
@@ -38,9 +38,9 @@ def get_data():
     # chosen_variable_name = input("Choose a macro variable to forecast:\n")
     chosen_variable_name = "ROUTPUT"
     # year_input = input("Choose real time data from 1966 to 2023:\n")
-    year_input = "2012"
+    # year_input = "2012"
     # quarter_input = input("Choose a quarter from 1 to 4:\n")
-    quarter_input = "2"
+    # quarter_input = "2"
     # h_step_input = int(input("Choose number of steps to forecast:\n")) - 1
     h_step_input = 12
     # curr_year = input("Choose latest time period (YYYY):\n")
