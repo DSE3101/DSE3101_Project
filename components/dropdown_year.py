@@ -16,6 +16,6 @@ def dropdown_year():
         value=str(date_range_yearly[-10].year),
         clearable=False,
         searchable=True,
-        style={'width': '100%'},
+        style={'width': '100%', 'color': 'black'},
     )
     return dropdown

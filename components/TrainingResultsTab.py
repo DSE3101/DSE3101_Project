@@ -20,8 +20,8 @@ def TrainingResultsTab():
         dcc.Graph(id='time-series-graph', figure =mainplot(), className="graphBorder"),
         html.H4("Select training time period (Years)"),
          html.Div([
-            html.Div([dropdown_year()], className="dropdown-container"),
-            html.Div([dropdown()], className="dropdown-container")
+            html.Div([dropdown_year()], id = "dropdown-year",className="dropdown-container"),
+            html.Div([dropdown()], id = "dropdown-quarter", className="dropdown-container")
         ], style={'display': 'flex-grow', 'flex-direction': 'row', 'gap': '30px'}), 
 
         html.Strong(id = 'lag-caller'),

@@ -43,13 +43,12 @@ app.layout = html.Div([
 #Slider elements will update the graph
 @app.callback(
     Output('time-series-graph', 'figure'),
-    [Input('date-slider', 'value'), Input('quarter-dropdown', 'value')]
+    [Input('dropdown-year', 'value'), Input('dropdown-quarter', 'value')]
 )
-def update_graph(slider_value, quarter_value):
+def update_graph(year_value, quarter_value):
     # Convert the slider value and quarter value to a date
-    selected_year = date_range_yearly[slider_value].year
-    selected_date_str = f"{selected_year}{quarter_value}"
-    selected_date = pd.Period(selected_date_str, freq='Q').to_timestamp(how = 'end')
+    selected_date_str = f"{year_value}Q{quarter_value}"
+    selected_date = pd.Period(selected_date_str, freq='Q').to_timestamp(how='end')
     filtered_data = routput[(routput['DATE'] <= selected_date)]
     
     # Create the figure
@@ -66,11 +65,9 @@ def update_graph(slider_value, quarter_value):
 #Data taken from slider and quarter will be shown as a reactive statement in trainingtab
 @app.callback(
     Output('lag-caller', 'children'),
-    [Input('date-slider', 'value'), Input('quarter-dropdown', 'value')]
+    [Input('dropdown-year', 'value'), Input('dropdown-quarter', 'value')]
     )
-def update_output(value, quarter_value):
-    safe_value = min(value, len(date_range_yearly) - 1)
-    selected_year = date_range_yearly[safe_value].year
+def update_output(year_value, quarter_value):
     
     start_year = 1947
     start_quarter = 'Q1'
@@ -78,21 +75,21 @@ def update_output(value, quarter_value):
     selected_quarter_int = int(quarter_value.replace('Q', ''))
     start_quarter_int = int(start_quarter.replace('Q', ''))
     
-    number_of_lags = (selected_year - start_year) * 4 + (selected_quarter_int - start_quarter_int)
+    number_of_lags = (year_value - start_year) * 4 + (selected_quarter_int - start_quarter_int)
     
-    return f'Number of lags from Q1 1947 to {quarter_value} {selected_year}: {number_of_lags}'
+    return f'Number of lags from Q1 1947 to {quarter_value} {year_value}: {number_of_lags}'
 
 #Data taken from training tab will be called to AR, ADL and ML
 @app.callback(
     Output('year-quarter', 'data'),
-    [Input('date-slider', 'value'), Input('quarter-dropdown', 'value')]
+    [Input('dropdown-year', 'value'), Input('dropdown-quarter', 'value')]
 )
-def update_shared_data(date_slider_value, quarter_dropdown_value):
+def update_shared_data(year_value, quarter_value):
     # Logic to process the slider and dropdown values
     # For example, convert slider value to year and quarter to a specific format
     data = {
-        'year': str(date_slider_value),
-        'quarter': str(quarter_dropdown_value)
+        'year': str(year_value),
+        'quarter': str(quarter_value)
     }
     return data
 

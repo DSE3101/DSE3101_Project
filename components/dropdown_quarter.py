@@ -8,7 +8,6 @@ import numpy as np
 
 def dropdown():
     dropdown = dcc.Dropdown(
-        id='quarter-dropdown',
         options=[
             {'label': 'Q1', 'value': 'Q1'},
             {'label': 'Q2', 'value': 'Q2'},
@@ -17,5 +16,6 @@ def dropdown():
         ],
         value='Q1',  # Default value
         clearable=False,
+        style={'width': '100%', 'color': 'black'},
     )
     return dropdown
