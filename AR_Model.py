@@ -10,7 +10,7 @@ from sklearn.metrics import mean_squared_error
 
 #need to run GetData.py first
 
-def AR_MODEL():
+def AR_MODEL(year_input, quarter_input):
     real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data(year_input, quarter_input)
 
     def converting_to_stationary(y_data):
