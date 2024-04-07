@@ -9,9 +9,9 @@ import numpy as np
 date_range_yearly = pd.date_range(start='1947-01-01', end='2023-12-31', freq='YS')
 
 def dropdown_year():
-    date_range_yearly = pd.date_range(start='1947-01-01', end='2023-12-31', freq='YS')
+    date_range_yearly = pd.date_range(start='1947-01-01', end='2019-10-01', freq='YS')
     dropdown = dcc.Dropdown(
-        id='year-dropdown',
+        id = "dropdown-year",
         options=[{'label': str(year.year), 'value': str(year.year)} for year in date_range_yearly],
         value=str(date_range_yearly[-10].year),
         clearable=False,
