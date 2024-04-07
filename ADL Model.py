@@ -11,23 +11,80 @@ import pickle
 import statsmodels.api as sm
 from statsmodels.tsa.api import ARDL
 from statsmodels.tsa.ardl import ARDLResults
+from itertools import combinations
 
 real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data("2012","2")
 year_input='2012'
 quarter_input = '2'
-x_data = real_time_X.loc[:,[f'CPI{year_input[-2:]}Q{quarter_input}',f'RUC{year_input[-2:]}Q{quarter_input}',f'M1{year_input[-2:]}Q{quarter_input}',f'HSTARTS{year_input[-2:]}Q{quarter_input}',f'IPM{year_input[-2:]}Q{quarter_input}',f'OPH{year_input[-2:]}Q{quarter_input}']]
+# x_data = real_time_X.loc[:,[f'CPI{year_input[-2:]}Q{quarter_input}',f'RUC{year_input[-2:]}Q{quarter_input}',f'M1{year_input[-2:]}Q{quarter_input}',f'HSTARTS{year_input[-2:]}Q{quarter_input}',f'IPM{year_input[-2:]}Q{quarter_input}',f'OPH{year_input[-2:]}Q{quarter_input}']]
+# x_data = x_data.diff().dropna()
 
-x_columns = real_time_X.columns
-# def data_transformation_x(x_data):
-x_realtime = real_time_X.diff().dropna()
-# def data_transformation_y(y_data):
-y_realtime = real_time_y.diff().dropna()
+# x_columns = real_time_X.columns
+# # def data_transformation_x(x_data):
+# x_realtime = real_time_X.diff().dropna()
+# # def data_transformation_y(y_data):
+# y_realtime = real_time_y.diff().dropna()
 
-ardl_model = ARDL(y_realtime, lags=8, exog=x_realtime, order=2)
-ardl_results = ardl_model.fit()
-print(ardl_results.summary())
-print(ardl_model.ardl_order)
-print(ardl_results.aic)
+
+def convert_to_datetime(year_quarter_str):
+    # Split year and quarter
+    year, quarter = year_quarter_str.split(':')
+    # Map quarter to month
+    quarter_to_month = {'Q1': "1", 'Q2': "4", 'Q3': "7", 'Q4': "10"}
+    month = quarter_to_month[quarter]
+    # Create datetime object
+    datetime_obj = pd.to_datetime(f'{year}-{month}-01')
+    # Specify frequency as quarterly
+    datetime_obj = pd.Period(datetime_obj, freq='Q')
+    return datetime_obj
+
+real_time_X.index = real_time_X.index.map(convert_to_datetime)
+real_time_y.index = real_time_y.index.map(convert_to_datetime)
+
+# Define candidate variables
+candidate_vars = ['CPI', 'RUC', 'M1', 'HSTARTS', 'IPM', 'OPH']
+
+# Define maximum lag order
+max_lag = 8
+
+best_model = None
+best_aic = float('inf')
+
+# Iterate over all combinations of variables
+for num_vars in range(1, len(candidate_vars) + 1):
+    for vars_combination in combinations(candidate_vars, num_vars):
+        # Generate column names for the combination
+        x_columns = [f'{var}{year_input[-2:]}Q{quarter_input}' for var in vars_combination]
+        
+        # Filter real_time_X for selected columns
+        x_data_subset = real_time_X.loc[:, x_columns]
+        
+        # Fit ARDL model with different lag orders
+        for lag in range(1, max_lag + 1):
+            ardl_model = ARDL(endog=real_time_y, lags=lag, exog=x_data_subset, order=lag)
+            ardl_results = ardl_model.fit()
+            aic = ardl_results.aic
+            
+            # Update best model if current model has lower AIC
+            if aic < best_aic:
+                best_aic = aic
+                best_model = (ardl_model, ardl_results, vars_combination, lag)
+
+# Print results of the best model
+print("Best Model:")
+print("Variables:", best_model[2])
+print("Lag Order:", best_model[3])
+print("AIC:", best_model[1].aic)
+print(best_model[1].summary())
+
+
+
+# ardl_model = ARDL(endog=y_realtime, lags=8, exog=x_data, order=8)
+# # ardl_model = ARDL(y_realtime, lags=8, exog=x_realtime, order=2)
+# ardl_results = ardl_model.fit()
+# print(ardl_results.summary())
+# print(ardl_model.ardl_order)
+# print(ardl_results.aic)
 
 
 
