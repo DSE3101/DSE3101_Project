@@ -74,5 +74,3 @@ def random_forest(year, quarter):
     print("\nRoot Mean Squared Forecast Error (RMSFE) with Latest Selected Variables:", latest_rmsfe)
 
     return real_time_selected_variables, real_time_rmsfe, real_time_y_pred, latest_selected_variables, latest_rmsfe, latest_y_pred
-
-random_forest("2009", "2")
