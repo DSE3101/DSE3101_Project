@@ -27,7 +27,7 @@ routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
 routput['DATE'] = routput['DATE'].str.replace(':', '', regex=True)
 routput['DATE'] = pd.PeriodIndex(routput['DATE'], freq='Q').to_timestamp()
 date_range_yearly = pd.date_range(start='1947-01-01', end='2023-12-31', freq='YS')
-app = dash.Dash(__name__, external_stylesheets= [dbc.themes.DARKLY])
+app = dash.Dash(__name__, suppress_callback_exceptions=True, external_stylesheets= [dbc.themes.DARKLY])
 
 app.layout = html.Div([
     dcc.Tabs(id='tabs', value='model-training', children=[
@@ -47,7 +47,7 @@ app.layout = html.Div([
 )
 def update_graph(year_value, quarter_value):
     # Convert the slider value and quarter value to a date
-    selected_date_str = f"{year_value}Q{quarter_value}"
+    selected_date_str = f"{year_value}{quarter_value}"
     selected_date = pd.Period(selected_date_str, freq='Q').to_timestamp(how='end')
     filtered_data = routput[(routput['DATE'] <= selected_date)]
     
@@ -67,17 +67,9 @@ def update_graph(year_value, quarter_value):
     Output('lag-caller', 'children'),
     [Input('dropdown-year', 'value'), Input('dropdown-quarter', 'value')]
     )
+
 def update_output(year_value, quarter_value):
-    
-    start_year = 1947
-    start_quarter = 'Q1'
-    
-    selected_quarter_int = int(quarter_value.replace('Q', ''))
-    start_quarter_int = int(start_quarter.replace('Q', ''))
-    
-    number_of_lags = (year_value - start_year) * 4 + (selected_quarter_int - start_quarter_int)
-    
-    return f'Number of lags from Q1 1947 to {quarter_value} {year_value}: {number_of_lags}'
+    return f'Your training data will be from 1947 Q1 to {year_value} {quarter_value}'
 
 #Data taken from training tab will be called to AR, ADL and ML
 @app.callback(
@@ -101,12 +93,15 @@ def update_shared_data(year_value, quarter_value):
     [State('year-quarter', 'data')] 
 )
 def update_evaluation_results_and_show(n_clicks, year_quarter_data):
+    print("Button clicked:", n_clicks)
+    print("Data received:", year_quarter_data)
+
     if n_clicks is None or year_quarter_data is None:
-        return "Please select a date and quarter, then press 'Train the model!'.", {'display': 'none'}
+        print("Data is missing. Please select a date and quarter, then press 'Train the model!'")
+        return [], {'display': 'none'}  # Returning an empty list for 'children'
 
     year = year_quarter_data['year']
-    quarter = year_quarter_data['quarter']
-    quarter = quarter.replace("Q", "")
+    quarter = year_quarter_data['quarter'].replace("Q", "")
 
     ar_model_results = AR_MODEL(year, quarter)
     
