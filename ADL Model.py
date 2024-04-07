@@ -9,14 +9,26 @@ from GetData import get_data
 from sklearn.metrics import mean_squared_error
 import pickle
 import statsmodels.api as sm
+from statsmodels.tsa.api import ARDL
 
-real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data()
+real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data("2012","2")
 
-x_data = real_time_X.loc[:,["RCON12Q2","rconshh12Q2","OPH12Q2","ULC12Q2","HSTARTS12Q2"]] #example of 5 variables that we chose
+x_columns = real_time_X.columns
 # def data_transformation_x(x_data):
-x_data = x_data.diff().dropna()
+x_realtime = real_time_X.diff().dropna()
 # def data_transformation_y(y_data):
-real_time_data = real_time_y.diff().dropna()
+y_realtime = real_time_y.diff().dropna()
+
+print(x_realtime)
+print(y_realtime)
+ardl_model = ARDL(y_realtime, lags=8, exog=x_realtime,order=1)
+ardl_model.fit()
+
+
+
+
+
+'''
 
 def finding_min_aic(y_data, x_data):
     max_lags = 8 # since our data is quarterly, can consider up to 6-8 max lags
@@ -176,4 +188,4 @@ print("Optimal lag configuration:", optimal_lags)
 # Print the summary of the optimal model
 print("Optimal model summary:", optimal_model.summary())
 
-
+'''
