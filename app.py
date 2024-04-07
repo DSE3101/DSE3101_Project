@@ -98,7 +98,7 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
 
     if n_clicks is None or year_quarter_data is None:
         print("Data is missing. Please select a date and quarter, then press 'Train the model!'")
-        return [], {'display': 'none'}  # Returning an empty list for 'children'
+        return [], {'display': 'none'}
 
     year = year_quarter_data['year']
     quarter = year_quarter_data['quarter'].replace("Q", "")

@@ -27,6 +27,7 @@ def TrainingResultsTab():
         html.Strong(id = 'lag-caller'),
         html.P(),
         html.Button('Train the model!', id='train-model'),
+        html.Div(id='evaluation-results', style={'display': 'none'})
         ])
     ]
     return training
