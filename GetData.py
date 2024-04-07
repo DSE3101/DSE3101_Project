@@ -37,7 +37,6 @@ def get_data():
     
     # chosen_variable_name = input("Choose a macro variable to forecast:\n")
     chosen_variable_name = "ROUTPUT"
-    # chosen_variable = macro_variables[macro_variable_names.index(chosen_variable_name)]
     # year_input = input("Choose real time data from 1966 to 2023:\n")
     year_input = "2012"
     # quarter_input = input("Choose a quarter from 1 to 4:\n")
@@ -67,7 +66,4 @@ def get_data():
     latest_y_train = latest_y.iloc[:len(real_time_y)]
     latest_X_test = latest_X.iloc[len(real_time_y):, :]
     latest_y_test = latest_y.iloc[len(real_time_y):]
-    print(real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test)
     return real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter
-
-get_data()
