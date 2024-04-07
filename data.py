@@ -16,15 +16,6 @@ def mainplot():
                     yaxis_title='ROUTPUT24Q1 Value',
                     hovermode="x")
     
-    fig.add_annotation(x="Jan 2020",
-                       y="10.345k",
-                       text="Important point",
-                       showarrow=True,
-                       arrowhead=5,
-                       arrowsize= 4,
-                       arrowwidth=2,
-                       arrowcolor= "red")
-
     # Showing the figure
     return fig
     
