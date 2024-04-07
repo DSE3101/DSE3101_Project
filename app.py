@@ -27,7 +27,7 @@ routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
 routput['DATE'] = routput['DATE'].str.replace(':', '', regex=True)
 routput['DATE'] = pd.PeriodIndex(routput['DATE'], freq='Q').to_timestamp()
 date_range_yearly = pd.date_range(start='1947-01-01', end='2023-12-31', freq='YS')
-app = dash.Dash(__name__, suppress_callback_exceptions=True, external_stylesheets= [dbc.themes.DARKLY])
+app = dash.Dash(__name__, external_stylesheets= [dbc.themes.DARKLY])
 
 app.layout = html.Div([
     dcc.Tabs(id='tabs', value='model-training', children=[

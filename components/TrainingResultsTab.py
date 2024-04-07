@@ -21,13 +21,13 @@ def TrainingResultsTab():
         html.H4("Select training time period (Years)"),
          html.Div([
             html.Div([dropdown_year()],className="dropdown-container"),
-            html.Div([dropdown()], id = "dropdown-quarter", className="dropdown-container")
+            html.Div([dropdown()], className="dropdown-container")
         ], style={'display': 'flex-grow', 'flex-direction': 'row', 'gap': '30px'}), 
 
         html.Strong(id = 'lag-caller'),
         html.P(),
         html.Button('Train the model!', id='train-model'),
-        html.Div(id='evaluation-results', style={'display': 'none'})
+        html.Div(id='evaluation-results', style={'display': 'none', 'backgroundColor': 'lightblue', 'padding': '20px', 'margin': '10px 0', 'borderRadius': '5px'})
         ])
     ]
     return training
