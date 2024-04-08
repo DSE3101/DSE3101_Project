@@ -240,13 +240,15 @@ NCPROFATW.fillna(-999, inplace=True)
 
 # M1 Money Stock (M1)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/m1
-M1 = pd.read_excel("./data/project data/m1QvMd.xlsx", index_col="DATE").apply(lambda x: np.log(x)).diff().fillna(-999)
+M1 = pd.read_excel("./data/project data/m1QvMd.xlsx", index_col="DATE")
 M1 = rows_to_quarter(M1)
+M1 = M1.apply(lambda x: np.log(x)).diff().fillna(-999)
 
 # M2 Money Stock (M2)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/m2
-M2 = pd.read_excel("./data/project data/m2QvMd.xlsx", index_col="DATE").apply(lambda x: np.log(x)).diff().fillna(-999)
+M2 = pd.read_excel("./data/project data/m2QvMd.xlsx", index_col="DATE")
 M2 = rows_to_quarter(M2)
+M2 = M2.apply(lambda x: np.log(x)).diff().fillna(-999)
 
 # endregion
 
@@ -254,29 +256,33 @@ M2 = rows_to_quarter(M2)
 
 # Consumer Price Index, Quarterly Vintages (CPI)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/cpi
-CPI = pd.read_excel("./data/project data/cpiQvMd.xlsx", index_col="DATE").apply(lambda x: np.log(x)).diff().diff().fillna(-999)
+CPI = pd.read_excel("./data/project data/cpiQvMd.xlsx", index_col="DATE")
 CPI = rows_to_quarter(CPI)
+CPI = CPI.apply(lambda x: np.log(x)).diff().diff().fillna(-999)
 
 # Core Consumer Price Index (PCPIX)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/pcpix
-PCPIX = pd.read_excel("./data/project data/pcpixMvMd.xlsx", index_col="DATE").apply(lambda x: np.log(x)).diff().diff()
+PCPIX = pd.read_excel("./data/project data/pcpixMvMd.xlsx", index_col="DATE")
 PCPIX = month_to_quarter(PCPIX, "PCPIX")
-PCPIX = pad_columns_to_98Q4(PCPIX, "PCPIX")
 PCPIX = rows_to_quarter(PCPIX)
+PCPIX = PCPIX.apply(lambda x: np.log(x)).diff().diff()
+PCPIX = pad_columns_to_98Q4(PCPIX, "PCPIX")
 
 # Producer Price Index, Final Demand Finished Goods (PPPI)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/pppi
-PPPI = pd.read_excel("./data/project data/pppiMvMd.xlsx", index_col="DATE").apply(lambda x: np.log(x)).diff().diff()
+PPPI = pd.read_excel("./data/project data/pppiMvMd.xlsx", index_col="DATE")
 PPPI = month_to_quarter(PPPI, "PPPI")
-PPPI = pad_columns_to_98Q4(PPPI, "PPPI")
 PPPI = rows_to_quarter(PPPI)
+PPPI = PPPI.apply(lambda x: np.log(x)).diff().diff()
+PPPI = pad_columns_to_98Q4(PPPI, "PPPI")
 
 # Core Producer Price Index, Final Demand Finished Goods (PPPIX)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/pppix
-PPPIX = pd.read_excel("./data/project data/pppixMvMd.xlsx", index_col="DATE").apply(lambda x: np.log(x)).diff().diff()
+PPPIX = pd.read_excel("./data/project data/pppixMvMd.xlsx", index_col="DATE")
 PPPIX = month_to_quarter(PPPIX, "PPPIX")
-PPPIX = pad_columns_to_98Q4(PPPIX, "PPPIX")
 PPPIX = rows_to_quarter(PPPIX)
+PPPIX = PPPIX.apply(lambda x: np.log(x)).diff().diff()
+PPPIX = pad_columns_to_98Q4(PPPIX, "PPPIX")
 
 # Price Index for GNP/GDP (P)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/p
@@ -326,42 +332,49 @@ PIMP = pd.read_excel("./data/project data/pimpQvQd.xlsx", index_col="DATE").appl
 
 # Civilian Noninstitutional Population, 16+ (POP)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/pop
-POP = pd.read_excel("./data/project data/popMvMd.xlsx", index_col="DATE").diff()
+POP = pd.read_excel("./data/project data/popMvMd.xlsx", index_col="DATE")
 POP = month_to_quarter(POP, "POP")
-POP = pad_columns_to_98Q4(POP, "POP")
 POP = rows_to_quarter(POP)
+POP = POP.diff()
+POP = pad_columns_to_98Q4(POP, "POP")
 
 # Civilian Labor Force, 16+ (LFC)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/lfc
-LFC = pd.read_excel("./data/project data/lfcMvMd.xlsx", index_col="DATE").diff()
+LFC = pd.read_excel("./data/project data/lfcMvMd.xlsx", index_col="DATE")
 LFC = month_to_quarter(LFC, "LFC")
-LFC = pad_columns_to_98Q4(LFC, "LFC")
 LFC = rows_to_quarter(LFC)
+LFC = LFC.diff()
+LFC = pad_columns_to_98Q4(LFC, "LFC")
 
 # Civilian Participation Rate, 16+, Constructed (LFPART)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/lfpart
-LFPART = pd.read_excel("./data/project data/lfpartMvMd.xlsx", index_col="DATE").diff()
+LFPART = pd.read_excel("./data/project data/lfpartMvMd.xlsx", index_col="DATE")
 LFPART = month_to_quarter(LFPART, "LFPART")
-LFPART = pad_columns_to_98Q4(LFPART, "LFPART")
 LFPART = rows_to_quarter(LFPART)
+LFPART = LFPART.diff()
+LFPART = pad_columns_to_98Q4(LFPART, "LFPART")
 
 # Unemployment Rate (RUC)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/ruc
-RUC = pd.read_excel("./data/project data/rucQvMd.xlsx", index_col="DATE").diff().fillna(-999)
+RUC = pd.read_excel("./data/project data/rucQvMd.xlsx", index_col="DATE")
 RUC = rows_to_quarter(RUC)
+RUC = RUC.diff().fillna(-999)
 
 # Nonfarm Payroll Employment (EMPLOY)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/employ
-EMPLOY = pd.read_excel("./data/project data/employMvMd.xlsx", index_col="DATE").apply(lambda x: np.log(x)).diff()
+EMPLOY = pd.read_excel("./data/project data/employMvMd.xlsx", index_col="DATE")
 EMPLOY = month_to_quarter(EMPLOY, "EMPLOY")
+EMPLOY = rows_to_quarter(EMPLOY)
+EMPLOY = EMPLOY.apply(lambda x: np.log(x)).diff()
 EMPLOY.drop(columns=["EMPLOY65Q1", "EMPLOY65Q2", "EMPLOY65Q3"], inplace=True)
 EMPLOY.fillna(-999, inplace=True)
-EMPLOY = rows_to_quarter(EMPLOY)
 
 # Indexes of Aggregate Weekly Hours: Total (H)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/h
-H = pd.read_excel("./data/project data/hMvMd.xlsx", index_col="DATE").apply(lambda x: np.log(x)).diff()
+H = pd.read_excel("./data/project data/hMvMd.xlsx", index_col="DATE").apply(lambda x: np.log(x))
 H = month_to_quarter(H, "H")
+H = rows_to_quarter(H)
+H = H.diff()
 na_cols_H = ["H65Q4"]
 na_cols_H.extend([f'H{i}Q{j}' for i in range(66, 71) for j in range (1, 5)])
 na_cols_H.extend(["H71Q1", "H71Q2", "H71Q3"])
@@ -369,12 +382,13 @@ na_df_H = pd.DataFrame(columns=na_cols_H)
 H = pd.concat([na_df_H, H], axis=1)
 H.index.names = ["DATE"]
 H.fillna(-999, inplace=True)
-H = rows_to_quarter(H)
 
 # Indexes of Aggregate Weekly Hours: Goods Sector (HG)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/hg
-HG = pd.read_excel("./data/project data/hgMvMd.xlsx", index_col="DATE").apply(lambda x: np.log(x)).diff()
+HG = pd.read_excel("./data/project data/hgMvMd.xlsx", index_col="DATE")
 HG = month_to_quarter(HG, "HG")
+HG = rows_to_quarter(HG)
+HG = HG.apply(lambda x: np.log(x)).diff()
 na_cols_HG = ["HG65Q4"]
 na_cols_HG.extend([f'HG{i}Q{j}' for i in range(66, 71) for j in range (1, 5)])
 na_cols_HG.extend(["HG71Q1", "HG71Q2", "HG71Q3"])
@@ -382,12 +396,13 @@ na_df_HG = pd.DataFrame(columns=na_cols_HG)
 HG = pd.concat([na_df_HG, HG], axis=1)
 HG.index.names = ["DATE"]
 HG.fillna(-999, inplace=True)
-HG = rows_to_quarter(HG)
 
 # Indexes of Aggregate Weekly Hours: Service Sector (HS)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/hs
-HS = pd.read_excel("./data/project data/hsMvMd.xlsx", index_col="DATE").apply(lambda x: np.log(x)).diff()
+HS = pd.read_excel("./data/project data/hsMvMd.xlsx", index_col="DATE")
 HS = month_to_quarter(HS, "HS")
+HS = rows_to_quarter(HS)
+HS = HS.apply(lambda x: np.log(x)).diff()
 na_cols_HS = ["HS65Q4"]
 na_cols_HS.extend([f'HS{i}Q{j}' for i in range(66, 71) for j in range (1, 5)])
 na_cols_HS.extend(["HS71Q1", "HS71Q2", "HS71Q3"])
@@ -395,7 +410,6 @@ na_df_HS = pd.DataFrame(columns=na_cols_HS)
 HS = pd.concat([na_df_HS, HS], axis=1)
 HS.index.names = ["DATE"]
 HS.fillna(-999, inplace=True)
-HS = rows_to_quarter(HS)
 
 # endregion
 
@@ -417,25 +431,27 @@ ULC = pad_columns_to_98Q4(ULC, "ULC")
 
 # Industrial Production Index: Total (IPT)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/ipt
-IPT = pd.read_excel("./data/project data/iptMvMd.xlsx", index_col="DATE").apply(lambda x: np.log(x)).diff()
+IPT = pd.read_excel("./data/project data/iptMvMd.xlsx", index_col="DATE")
 IPT = month_to_quarter(IPT, "IPT")
+IPT = rows_to_quarter(IPT)
+IPT = IPT.apply(lambda x: np.log(x)).diff()
 IPT.drop(columns=["IPT62Q4",
                   "IPT63Q1", "IPT63Q2", "IPT63Q3", "IPT63Q4",
                   "IPT64Q1", "IPT64Q2", "IPT64Q3", "IPT64Q4",
                   "IPT65Q1", "IPT65Q2", "IPT65Q3"], inplace=True)
 IPT.fillna(-999, inplace=True)
-IPT = rows_to_quarter(IPT)
 
 # Industrial Production Index: Manufacturing (IPM)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/ipm
-IPM = pd.read_excel("./data/project data/ipmMvMd.xlsx", index_col="DATE").apply(lambda x: np.log(x)).diff()
+IPM = pd.read_excel("./data/project data/ipmMvMd.xlsx", index_col="DATE")
 IPM = month_to_quarter(IPM, "IPM")
+IPM = rows_to_quarter(IPM)
+IPM = IPM.apply(lambda x: np.log(x)).diff()
 IPM.drop(columns=["IPM62Q4",
                   "IPM63Q1", "IPM63Q2", "IPM63Q3", "IPM63Q4",
                   "IPM64Q1", "IPM64Q2", "IPM64Q3", "IPM64Q4",
                   "IPM65Q1", "IPM65Q2", "IPM65Q3"], inplace=True)
 IPM.fillna(-999, inplace=True)
-IPM = rows_to_quarter(IPM)
 
 # Capacity Utilization Rate: Total (CUT)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/cut
@@ -443,6 +459,7 @@ CUT = pd.read_excel("./data/project data/cutMvMd.xlsx", index_col="DATE")
 na_rows_CUT = pd.DataFrame(columns=CUT.columns, index=["1947:02", "1947:05", "1947:08", "1947:11"])
 CUT = pd.concat([na_rows_CUT, CUT], axis=0)
 CUT = month_to_quarter(CUT, "CUT")
+CUT = rows_to_quarter(CUT)
 na_cols_CUT = ["CUT65Q4"]
 na_cols_CUT.extend([f'CUT{i}Q{j}' for i in range(66, 83) for j in range(1, 5)])
 na_cols_CUT.extend(["CUT83Q1", "CUT83Q2"])
@@ -450,7 +467,6 @@ na_df_CUT = pd.DataFrame(columns=na_cols_CUT)
 CUT = pd.concat([na_df_CUT, CUT], axis=1)
 CUT.index.names = ["DATE"]
 CUT.fillna(-999, inplace=True)
-CUT = rows_to_quarter(CUT)
 
 # Capacity Utilization Rate: Manufacturing (CUM)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/cum
@@ -458,6 +474,7 @@ CUM = pd.read_excel("./data/project data/cumMvMd.xlsx", index_col="DATE")
 na_rows_CUM = pd.DataFrame(columns=CUM.columns, index=["1947:02", "1947:05", "1947:08", "1947:11"])
 CUM = pd.concat([na_rows_CUM, CUM], axis=0)
 CUM = month_to_quarter(CUM, "CUM")
+CUM = rows_to_quarter(CUM)
 na_cols_CUM = ["CUM65Q4"]
 na_cols_CUM.extend([f'CUM{i}Q{j}' for i in range(66, 79) for j in range(1, 5)])
 na_cols_CUM.extend(["CUM79Q1", "CUM79Q2"])
@@ -465,7 +482,6 @@ na_df_CUM = pd.DataFrame(columns=na_cols_CUM)
 CUM = pd.concat([na_df_CUM, CUM], axis=1)
 CUM.index.names = ["DATE"]
 CUM.fillna(-999, inplace=True)
-CUM = rows_to_quarter(CUM)
 
 # endregion
 
@@ -473,8 +489,10 @@ CUM = rows_to_quarter(CUM)
 
 # Housing Starts (HSTARTS)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/hstarts
-HSTARTS = pd.read_excel("./data/project data/hstartsMvMd.xlsx", index_col="DATE").apply(lambda x: np.log(x)).diff()
+HSTARTS = pd.read_excel("./data/project data/hstartsMvMd.xlsx", index_col="DATE")
 HSTARTS = month_to_quarter(HSTARTS, "HSTARTS")
+HSTARTS = rows_to_quarter(HSTARTS).apply(lambda x: np.log(x)).diff()
+HSTARTS = HSTARTS
 na_cols_HSTARTS = ["HSTARTS65Q4",
                    "HSTARTS66Q1", "HSTARTS66Q2", "HSTARTS66Q3", "HSTARTS66Q4",
                    "HSTARTS67Q1", "HSTARTS67Q2", "HSTARTS67Q3", "HSTARTS67Q4"]
@@ -482,7 +500,6 @@ na_df_HSTARTS = pd.DataFrame(columns=na_cols_HSTARTS)
 HSTARTS = pd.concat([na_df_HSTARTS, HSTARTS], axis=1)
 HSTARTS.index.names = ["DATE"]
 HSTARTS.fillna(-999, inplace=True)
-HSTARTS = rows_to_quarter(HSTARTS)
 
 # Real Gross Private Domestic Investment: Residential (RINVRESID)
 # Same as above
