@@ -8,13 +8,14 @@ from statsmodels.tsa.stattools import adfuller
 from GetData import get_data
 from sklearn.metrics import mean_squared_error
 
-#need to run GetData.py first
+# Run GetData.py first
 
 def AR_MODEL(year_input, quarter_input):
     real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data(year_input, quarter_input)
-
+    
     def converting_to_stationary(y_data):
-        real_time_data = y_data.diff().dropna()
+        y_data[y_data.columns[0]] = y_data[y_data.columns[0]].replace(-999,np.nan)
+        real_time_data = y_data.dropna()
         return real_time_data
 
     def finding_minimum_aic(y_data):
@@ -125,3 +126,6 @@ def AR_MODEL(year_input, quarter_input):
     print('Vintage RMSFE:',vintage_rmsfe)
 
     return real_time_optimal_lags, h_realtime, real_time_rmsfe, vintage_optimal_lags, h_vintage, vintage_rmsfe
+
+# Example usage
+AR_MODEL("2012","2")
