@@ -80,8 +80,6 @@ def update_output(year_value, quarter_value):
     [Input('dropdown-year', 'value'), Input('dropdown-quarter', 'value')]
 )
 def update_shared_data(year_value, quarter_value):
-    # Logic to process the slider and dropdown values
-    # For example, convert slider value to year and quarter to a specific format
     data = {
         'year': str(year_value),
         'quarter': str(quarter_value)
@@ -96,11 +94,7 @@ def update_shared_data(year_value, quarter_value):
     [State('year-quarter', 'data')] 
 )
 def update_evaluation_results_and_show(n_clicks, year_quarter_data):
-    print("Button clicked:", n_clicks)
-    print("Data received:", year_quarter_data)
-
     if n_clicks is None or year_quarter_data is None:
-        print("Data is missing. Please select a date and quarter, then press 'Train the model!'")
         return [], {'display': 'none'}
 
     year = year_quarter_data['year']
@@ -114,9 +108,9 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
         html.Div([
             html.Div([
                 html.H5("AR Model"),
-                dcc.Graph(figure=ar_model_results[7]),
+                html.Img(src='assets/ar_real_time_plot.png'),
                 html.P(f"Real Time Data RMSE: {ar_model_results[2]}"),
-                dcc.Graph(figure=ar_model_results[6]),
+                html.Img(src='assets/ar_vintage_plot.png'),
                 html.P(f"Vintage Data RMSE: {ar_model_results[5]}")
             ], className="model-container"),
             # ADL Model Container
@@ -138,7 +132,6 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
         className="evaluation-container")
     ], style={'background-color': 'lightblue', 'padding': '10px', 'border-radius': '5px'})
 
-    
     return evaluation, {'display': 'block'}
 
 
