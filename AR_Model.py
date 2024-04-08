@@ -8,14 +8,13 @@ from statsmodels.tsa.stattools import adfuller
 from GetData import get_data
 from sklearn.metrics import mean_squared_error
 
-# Run GetData.py first
+#need to run GetData.py first
 
 def AR_MODEL(year_input, quarter_input):
     real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data(year_input, quarter_input)
-    
+
     def converting_to_stationary(y_data):
-        y_data[y_data.columns[0]] = y_data[y_data.columns[0]].replace(-999,np.nan)
-        real_time_data = y_data.dropna()
+        real_time_data = y_data.diff().dropna()
         return real_time_data
 
     def finding_minimum_aic(y_data):
@@ -100,22 +99,22 @@ def AR_MODEL(year_input, quarter_input):
     real_time_data = converting_to_stationary(real_time_y)
     real_time_optimal_lags = finding_minimum_aic(real_time_data)
     real_time_AR_model = forming_AR_model(real_time_data,real_time_optimal_lags)
-    autocorrelation_plot(real_time_data)
+    #autocorrelation_plot(real_time_data)
     adfuller_stats(real_time_data)
     realtime_table_of_forecasts = forecasted_values_data(real_time_data, real_time_AR_model)
     h_realtime = h_step_forecast(forecasted_values_data(real_time_data, real_time_AR_model)) 
-    plot_forecast_real_time(real_time_data, realtime_table_of_forecasts, CI)
+    #plot_forecast_real_time(real_time_data, realtime_table_of_forecasts, CI)
     real_time_rmsfe = calculating_rmsfe(latest_y_test,h_realtime)
 
     ###### for vintage data ######
     vintage_data = converting_to_stationary(latest_y_train)
     vintage_optimal_lags = finding_minimum_aic(vintage_data)
     vintage_AR_model = forming_AR_model(vintage_data,vintage_optimal_lags)
-    autocorrelation_plot(vintage_data)
+    #autocorrelation_plot(vintage_data)
     adfuller_stats(vintage_data)
     vintage_table_of_forecasts = forecasted_values_data(vintage_data, vintage_AR_model)
     h_vintage = h_step_forecast(forecasted_values_data(vintage_data, vintage_AR_model)) 
-    plot_forecast_vintage(vintage_data, vintage_table_of_forecasts, CI)
+    #plot_forecast_vintage(vintage_data, vintage_table_of_forecasts, CI)
     vintage_rmsfe = calculating_rmsfe(latest_y_test,h_vintage)
 
     print('Lags chosen for real time AR model:',real_time_optimal_lags)
@@ -126,6 +125,3 @@ def AR_MODEL(year_input, quarter_input):
     print('Vintage RMSFE:',vintage_rmsfe)
 
     return real_time_optimal_lags, h_realtime, real_time_rmsfe, vintage_optimal_lags, h_vintage, vintage_rmsfe
-
-# Example usage
-AR_MODEL("2012","2")
