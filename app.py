@@ -22,6 +22,7 @@ import pickle
 from GetData import get_data
 from sklearn.metrics import mean_squared_error
 from AR_Model import AR_MODEL
+from RandomForest import *
 
 routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
 routput['DATE'] = routput['DATE'].str.replace(':', '', regex=True)
@@ -104,6 +105,7 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
     quarter = year_quarter_data['quarter'].replace("Q", "")
 
     ar_model_results = AR_MODEL(year, quarter)
+    random_forest_results = random_forest(year, quarter)
     
     evaluation = html.Div([
         html.H3("Evaluating our models"),
@@ -123,13 +125,13 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
                 #dcc.Graph(figure=adl_model_graph['vintage']),  # Placeholder for actual graph
             #], className="model-container"),
             # RF Model Container
-            #html.Div([
-            #    html.H5("Regression Forest Model"),
-            #    dcc.Graph(figure=rf_model_graph['real_time']),  # Placeholder for actual graph
-            #    html.P(f"Real Time Data RMSE: {rf_model_rmse['real_time']}"),
-            #    dcc.Graph(figure=rf_model_graph['vintage']),  # Placeholder for actual graph
-            #    html.P(f"Vintage Data RMSE: {rf_model_rmse['vintage']}")
-            #], className="model-container"),
+            html.Div([
+                html.H5("Regression Forest Model"),
+                #dcc.Graph(figure=random_forest_results[1])  # Placeholder for actual graph
+                html.P(f"Real Time Data RMSE: {random_forest_results[1]}"),
+                #dcc.Graph(figure=rf_model_graph['vintage']),  # Placeholder for actual graph
+                html.P(f"Vintage Data RMSE: {random_forest_results[4]}")
+            ], className="model-container"),
         ],
         className="evaluation-container")
     ], style={'background-color': 'lightblue', 'padding': '10px', 'border-radius': '5px'})
