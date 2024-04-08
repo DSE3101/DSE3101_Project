@@ -12,6 +12,10 @@ from sklearn.metrics import mean_squared_error
 import plotly.tools as tls
 import base64
 from io import BytesIO
+from matplotlib.ticker import MaxNLocator
+import matplotlib.dates as mdates
+
+
 
 #need to run GetData.py first
 
@@ -65,7 +69,7 @@ def AR_MODEL(year_input, quarter_input):
     CI = [0.57, 0.842, 1.282] #50, 60, 80% predictional interval
 
     def plot_forecast_real_time(data, forecast, CI):
-        fig, ax = plt.subplots(figsize=(3,3))  # Create a new figure and set the size
+        fig, ax = plt.subplots(figsize=(4,4))  # Create a new figure and set the size
         ax.plot(data.index, data.values, label='Unrevised Real Time Data', color='blue')
         ax.plot(forecast.index, forecast.values, label='Forecast', color='red')
         for i, ci in enumerate(CI):
@@ -73,7 +77,7 @@ def AR_MODEL(year_input, quarter_input):
             lower_bound = forecast - ci * forecast.std()
             upper_bound = forecast + ci * forecast.std()
             ax.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
-        ax.xaxis.set_major_locator(ticker.IndexLocator(base=30, offset=0))
+        ax.xaxis.set_major_locator(MaxNLocator(5))
         ax.set_title('AR Model Forecast with Real-Time Data')
         ax.set_xlabel('Year:Quarter')
         ax.set_ylabel('rGDP')
@@ -92,7 +96,7 @@ def AR_MODEL(year_input, quarter_input):
 
 
     def plot_forecast_vintage(data, forecast, CI):
-        fig, ax = plt.subplots(figsize=(3,3))  # Create a new figure and set the size
+        fig, ax = plt.subplots(figsize=(4,4))  # Create a new figure and set the size
         ax.plot(data.index, data.values, label='Revised Vintage Data', color='blue')
         ax.plot(forecast.index, forecast.values, label='Forecast', color='red')
         for i, ci in enumerate(CI):
@@ -100,13 +104,22 @@ def AR_MODEL(year_input, quarter_input):
             lower_bound = forecast - ci * forecast.std()
             upper_bound = forecast + ci * forecast.std()
             ax.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
-        ax.xaxis.set_major_locator(ticker.IndexLocator(base=30, offset=0))
+        ax.xaxis.set_major_locator(MaxNLocator(5))
         ax.set_title('AR Model Forecast with Revised Vintage Data')
         ax.set_xlabel('Year:Quarter')
         ax.set_ylabel('rGDP')
         ax.legend()
-        fig.savefig('assets/ar_vintage_plot.png')  # Save the figure explicitly
-        plt.close(fig)  # Close the figure to prevent it from displaying
+        buffer = BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close(fig)
+        buffer.seek(0)
+        
+        image_png = buffer.getvalue()
+        base64_string = base64.b64encode(image_png).decode('utf-8')
+        buffer.close()
+        
+        return f"data:image/png;base64,{base64_string}"
+
 
 
 
@@ -133,7 +146,7 @@ def AR_MODEL(year_input, quarter_input):
     adfuller_stats(vintage_data)
     vintage_table_of_forecasts = forecasted_values_data(vintage_data, vintage_AR_model)
     h_vintage = h_step_forecast(forecasted_values_data(vintage_data, vintage_AR_model)) 
-    plot_forecast_vintage(vintage_data, vintage_table_of_forecasts, CI)
+    vintage_plot = plot_forecast_vintage(vintage_data, vintage_table_of_forecasts, CI)
     vintage_rmsfe = calculating_rmsfe(latest_y_test,h_vintage)
     
     print('Lags chosen for real time AR model:',real_time_optimal_lags)
@@ -143,7 +156,7 @@ def AR_MODEL(year_input, quarter_input):
     print('Forecasted values for vintage AR model:',h_vintage)
     print('Vintage RMSFE:',vintage_rmsfe)
 
-    return real_time_optimal_lags, h_realtime, real_time_rmsfe, vintage_optimal_lags, h_vintage, vintage_rmsfe, real_time_plot
+    return real_time_optimal_lags, h_realtime, real_time_rmsfe, vintage_optimal_lags, h_vintage, vintage_rmsfe, real_time_plot, vintage_plot
 
 # Example usage
 # AR_MODEL("2012","2")

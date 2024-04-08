@@ -109,28 +109,34 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
     evaluation = html.Div([
         html.H3("Evaluating our models", style={'text-align': 'center', 'color' :"black"}),
         # AR Model Container
+    html.Div([
+        html.H5("AR Model", className="model-header"),
+        # Model Split Container for graphs and metrics
         html.Div([
-            html.H5("AR Model", className="model-header"),
+            # Real Time Data Column
             html.Div([
-                # Real Time Data Column
+                html.Img(src=ar_model_results[6], className="graph-image"),
                 html.Div([
-                    html.Img(src=ar_model_results[6], className="graph-image"),
-                    html.Div([
-                        html.B("Real Time Data RMSFE: ", style = {'color':'black'}),
-                        html.P(f"{round(ar_model_results[2], 3)}", className="rmse-value")
-                    ], className="rmse-box")
-                ], className="graph-container"),
+                    html.B("Real Time Data RMSFE: ", style={'color': 'black'}),
+                    html.P(f"{round(ar_model_results[2], 3)}", className="rmse-value")
+                ], className="rmse-box")
+            ], className="graph-container"),
 
-                # Vintage Data Column
+            # Vintage Data Column
+            html.Div([
+                html.Img(src=ar_model_results[7], className="graph-image"),
                 html.Div([
-                    html.Img(src='assets/ar_vintage_plot.png', className="graph-image"),
-                    html.Div([
-                        html.B("Vintage Data RMSFE: ", style = {'color':'black'}),
-                        html.P(f"{round(ar_model_results[5], 3)}", className="rmse-value")
-                    ], className="rmse-box")
-                ], className="graph-container"),
-            ], className="model-split-container"),
-        ], className="model-container"),
+                    html.B("Vintage Data RMSFE: ", style={'color': 'black'}),
+                    html.P(f"{round(ar_model_results[5], 3)}", className="rmse-value")
+                ], className="rmse-box")
+            ], className="graph-container"),
+        ], className="model-split-container"),
+        
+        # Write-up Section
+        html.Div([
+            html.P(f"Here is an insightful analysis based on the AR model results. This analysis provides an in-depth look at how the model performs with real-time and vintage data, highlighting the key takeaways and implications for future forecasting.", style={'color': 'black'}),
+        ], className="write-up-container"),
+    ], className="model-container"),
 
         # ADL Model Container (Repeat the structure as needed for other models)
         html.Div([
@@ -154,8 +160,13 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
                     ], className="rmse-box")
                 ], className="graph-container"),
             ], className="model-split-container"),
-        ], className="model-container"),
 
+            # Write-up Section
+        html.Div([
+            html.P(f"Here is an insightful analysis based on the AR model results. This analysis provides an in-depth look at how the model performs with real-time and vintage data, highlighting the key takeaways and implications for future forecasting.", style={'color': 'black'}),
+        ], className="write-up-container"),
+    ], className="model-container"),
+        
         # RF Model Container (Repeat the structure as needed for other models)
         html.Div([
             html.H5("RF Model", className="model-header"),
@@ -178,7 +189,12 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
                     ], className="rmse-box")
                 ], className="graph-container"),
             ], className="model-split-container"),
-        ], className="model-container"),
+            
+            # Write-up Section
+        html.Div([
+            html.P(f"Here is an insightful analysis based on the AR model results. This analysis provides an in-depth look at how the model performs with real-time and vintage data, highlighting the key takeaways and implications for future forecasting.", style={'color': 'black'}),
+        ], className="write-up-container"),
+    ], className="model-container"),
         #Final part
     ], className="evaluation-container", style={'background-color': 'lightblue', 'padding': '20px', 'border-radius': '5px', 'margin': '20px', 'display': 'flex', 'flex-direction': 'column', 'gap': '20px'})
 
