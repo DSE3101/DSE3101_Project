@@ -15,6 +15,8 @@ from statsmodels.tsa.ardl import ARDLResults
 from itertools import combinations
 
 real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data("2012","2")
+# Columns of testing set {var}24Q1, is renamed to follow columns of training set {var}12Q2
+# This is to allow the ARDL model to match column names
 latest_X_test.columns = real_time_X.columns
 latest_y_test.columns = real_time_y.columns
 
@@ -105,31 +107,33 @@ real_time_y.index = real_time_y.index.map(convert_to_datetime)
 candidate_vars = ['CPI', 'RUC', 'M1', 'HSTARTS', 'IPM', 'OPH']
 best_model, best_x_cols = best_adl_model(candidate_vars)
 variables_in_realtime_model = best_model[2]
-#print(variables_in_realtime_model)
 real_time_optimal_lags = best_model[3]
-#print(real_time_optimal_lags)
 forecast_steps = 12
 forecast = best_model[1].forecast(steps=12, exog=latest_X_test.loc[:, best_x_cols])
 print(forecast)
 
 
+forecast.index = latest_y_test.index
+rmsfe = mean_squared_error(forecast, latest_y_test[f"ROUTPUT{year_input[-2:]}Q{quarter_input}"]) ** 0.5
+print('rmsfe:',rmsfe)
 ######## acf & adf #########
 combined = combining_data(real_time_X,real_time_y,variables_in_realtime_model)
 combined_data = converting_to_stationary(combined)
-print(combined)
-print(combined.dropna())
 #plot_individual_acf(combined_data)
 #plot_adl_autocorrelation(combined_data)
 #adf_test(combined_data)
 
 
-# Plot the forecasted values along with the actual values
+
+y = real_time_y.iloc[1:, 0]
+y.index = y.index.strftime('%YYYY:%Q')
+# Plot the forecast against time
 plt.figure(figsize=(10, 6))
-plt.plot(y.index, y.values, label='Actual', marker='o')
-plt.plot(pd.date_range(start=y.index[-1], periods=forecast_steps + 1, freq='Q')[1:], forecast, label='Forecast', marker='o')
-plt.title('ARDL Forecast')
-plt.xlabel('Date')
-plt.ylabel('Values')
+plt.plot(y.index, y.values, label='Unrevised Real Time Data', color='blue')
+plt.plot(forecast.index, forecast.values, label='Forecast', color='red')
+plt.xlabel('Time')
+plt.ylabel('Value')
+plt.xticks(y.index[::30]) 
+plt.title('ADL Model Forecast with Real-Time Data')
 plt.legend()
-plt.grid(True)
-plt.xticks(rotation=45)
+plt.show()
