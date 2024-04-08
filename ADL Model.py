@@ -15,6 +15,9 @@ from statsmodels.tsa.ardl import ARDLResults
 from itertools import combinations
 
 real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data("2012","2")
+latest_X_test.columns = real_time_X.columns
+latest_y_test.columns = real_time_y.columns
+
 year_input='2012'
 quarter_input = '2'
 
@@ -53,13 +56,13 @@ def best_adl_model(variables):
                 if aic < best_aic:
                     best_aic = aic
                     best_model = (ardl_model, ardl_results, vars_combination, lag)
-                    best_x_subset = x_data_subset
+                    best_x_cols = x_data_subset.columns
     print("Best Model:")
     print("Variables:", best_model[2])
     print("Lag Order:", best_model[3])
     print("AIC:", best_model[1].aic)
     print(best_model[1].summary())
-    return best_model, best_x_subset
+    return best_model, best_x_cols
 
 def combining_data(x_data,y_data,chosen_variables):
     formatted_chosen_variables =[]
@@ -100,13 +103,14 @@ real_time_X.index = real_time_X.index.map(convert_to_datetime)
 real_time_y.index = real_time_y.index.map(convert_to_datetime)
 
 candidate_vars = ['CPI', 'RUC', 'M1', 'HSTARTS', 'IPM', 'OPH']
-best_model, best_x_subset = best_adl_model(candidate_vars)
+best_model, best_x_cols = best_adl_model(candidate_vars)
 variables_in_realtime_model = best_model[2]
 #print(variables_in_realtime_model)
 real_time_optimal_lags = best_model[3]
 #print(real_time_optimal_lags)
 forecast_steps = 12
-forecast = best_model[1].predict(start=len(real_time_y), end=len(real_time_y) + forecast_steps - 1, exog = best_x_subset)
+forecast = best_model[1].forecast(steps=12, exog=latest_X_test.loc[:, best_x_cols])
+print(forecast)
 
 
 ######## acf & adf #########
@@ -129,12 +133,3 @@ plt.ylabel('Values')
 plt.legend()
 plt.grid(True)
 plt.xticks(rotation=45)
-
-
-
-
-
-
-
-
-
