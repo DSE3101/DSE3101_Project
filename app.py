@@ -27,6 +27,8 @@ from RandomForest import *
 routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
 routput['DATE'] = routput['DATE'].str.replace(':', '', regex=True)
 routput['DATE'] = pd.PeriodIndex(routput['DATE'], freq='Q').to_timestamp()
+routput = routput[routput['DATE'].dt.year >= 1965]
+
 date_range_yearly = pd.date_range(start='1947-01-01', end='2023-12-31', freq='YS')
 app = dash.Dash(__name__, external_stylesheets= [dbc.themes.DARKLY])
 
@@ -112,9 +114,9 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
         html.Div([
             html.Div([
                 html.H5("AR Model"),
-                #dcc.Graph(figure=ar_model_graph['real_time']),
+                dcc.Graph(figure=ar_model_results[7]),
                 html.P(f"Real Time Data RMSE: {ar_model_results[2]}"),
-                #dcc.Graph(figure=ar_model_graph['vintage']),
+                dcc.Graph(figure=ar_model_results[6]),
                 html.P(f"Vintage Data RMSE: {ar_model_results[5]}")
             ], className="model-container"),
             # ADL Model Container

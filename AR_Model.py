@@ -7,6 +7,7 @@ from statsmodels.graphics.tsaplots import plot_acf
 from statsmodels.tsa.stattools import adfuller
 from GetData import get_data
 from sklearn.metrics import mean_squared_error
+import plotly.tools as tls
 
 #need to run GetData.py first
 
@@ -58,38 +59,52 @@ def AR_MODEL(year_input, quarter_input):
 
     CI = [0.57, 0.842, 1.282] #50, 60, 80% predictional interval
     def plot_forecast_real_time(data, forecast, CI):
-        plt.figure(figsize=(20,7))
-        plt.plot(data.index, data.values, label='Unrevised Real Time Data', color='blue')
-        plt.plot(forecast.index, forecast.values, label='Forecast', color='red')
+        fig, ax = plt.subplots(figsize=(20,7))
+        ax.plot(data.index, data.values, label='Unrevised Real Time Data', color='blue')
+        ax.plot(forecast.index, forecast.values, label='Forecast', color='red')
         for i, ci in enumerate(CI):
             alpha = 0.5 * (i + 1) / len(CI)
             lower_bound = forecast - ci * forecast.std()
             upper_bound = forecast + ci * forecast.std()
-            plt.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
-        every_30th_locator = ticker.IndexLocator(base=30, offset=0)
-        plt.gca().xaxis.set_major_locator(every_30th_locator)
-        plt.title('AR Model Forecast with Real-Time Data')
-        plt.xlabel('Year:Quarter')
-        plt.ylabel('rGDP')
-        plt.legend()
-        plt.show()
+            ax.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
+        ax.xaxis.set_major_locator(ticker.IndexLocator(base=30, offset=0))
+        ax.set_title('AR Model Forecast with Real-Time Data')
+        ax.set_xlabel('Year:Quarter')
+        ax.set_ylabel('rGDP')
+        ax.legend()
+        plotly_fig = tls.mpl_to_plotly(fig)
+        plt.close(fig)
+        plotly_fig.update_layout(
+            autosize=False,
+            width=300,
+            height=300, 
+            margin=dict(l=40, r=40, t=40, b=40)
+            )
+        return plotly_fig
 
     def plot_forecast_vintage(data, forecast, CI):
-        plt.figure(figsize=(20,7))
-        plt.plot(data.index, data.values, label='Revised Vintage Data', color='green')
-        plt.plot(forecast.index, forecast.values, label='Forecast', color='red')
+        fig, ax = plt.subplots(figsize=(20,7))
+        ax.plot(data.index, data.values, label='Vintage Real Time Data', color='blue')
+        ax.plot(forecast.index, forecast.values, label='Forecast', color='red')
         for i, ci in enumerate(CI):
             alpha = 0.5 * (i + 1) / len(CI)
             lower_bound = forecast - ci * forecast.std()
             upper_bound = forecast + ci * forecast.std()
-            plt.fill_between(forecast.index, lower_bound, upper_bound, color='green', alpha=alpha)
-        every_30th_locator = ticker.IndexLocator(base=30, offset=0)
-        plt.gca().xaxis.set_major_locator(every_30th_locator)
-        plt.title('AR Model Forecast with Vintage Data')
-        plt.xlabel('Year:Quarter')
-        plt.ylabel('rGDP')
-        plt.legend()
-        plt.show()
+            ax.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
+        ax.xaxis.set_major_locator(ticker.IndexLocator(base=30, offset=0))
+        ax.set_title('AR Model Forecast with Vintage Data')
+        ax.set_xlabel('Year:Quarter')
+        ax.set_ylabel('rGDP')
+        ax.legend()
+        plotly_fig = tls.mpl_to_plotly(fig)
+        plt.close(fig)
+        plotly_fig.update_layout(
+            autosize=False,
+            width=300,
+            height=300, 
+            margin=dict(l=40, r=40, t=40, b=40)
+            )
+        return plotly_fig
 
     def calculating_rmsfe(y_true, y_predicted):
         rmsfe = mean_squared_error(y_true,y_predicted)**(0.5)
@@ -103,7 +118,7 @@ def AR_MODEL(year_input, quarter_input):
     adfuller_stats(real_time_data)
     realtime_table_of_forecasts = forecasted_values_data(real_time_data, real_time_AR_model)
     h_realtime = h_step_forecast(forecasted_values_data(real_time_data, real_time_AR_model)) 
-    #plot_forecast_real_time(real_time_data, realtime_table_of_forecasts, CI)
+    real_time_plot = plot_forecast_real_time(real_time_data, realtime_table_of_forecasts, CI)
     real_time_rmsfe = calculating_rmsfe(latest_y_test,h_realtime)
 
     ###### for vintage data ######
@@ -114,7 +129,7 @@ def AR_MODEL(year_input, quarter_input):
     adfuller_stats(vintage_data)
     vintage_table_of_forecasts = forecasted_values_data(vintage_data, vintage_AR_model)
     h_vintage = h_step_forecast(forecasted_values_data(vintage_data, vintage_AR_model)) 
-    #plot_forecast_vintage(vintage_data, vintage_table_of_forecasts, CI)
+    vintage_plot = plot_forecast_vintage(vintage_data, vintage_table_of_forecasts, CI)
     vintage_rmsfe = calculating_rmsfe(latest_y_test,h_vintage)
 
     print('Lags chosen for real time AR model:',real_time_optimal_lags)
@@ -124,4 +139,4 @@ def AR_MODEL(year_input, quarter_input):
     print('Forecasted values for vintage AR model:',h_vintage)
     print('Vintage RMSFE:',vintage_rmsfe)
 
-    return real_time_optimal_lags, h_realtime, real_time_rmsfe, vintage_optimal_lags, h_vintage, vintage_rmsfe
+    return real_time_optimal_lags, h_realtime, real_time_rmsfe, vintage_optimal_lags, h_vintage, vintage_rmsfe, vintage_plot, real_time_plot
