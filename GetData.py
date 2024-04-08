@@ -71,15 +71,10 @@ def get_data(year_input, quarter_input):
         latest_y_test = latest_y.iloc[len(real_time_y):]
         real_time_X = real_time_X.iloc[slice_before_1959:len(real_time_y), :]
         real_time_y = real_time_y.iloc[slice_before_1959:len(real_time_y), :]
-
     else:
         latest_X_train = latest_X.iloc[:len(real_time_y), :]
         latest_y_train = latest_y.iloc[:len(real_time_y)]
         latest_X_test = latest_X.iloc[len(real_time_y):, :]
         latest_y_test = latest_y.iloc[len(real_time_y):]
 
-    print(real_time_X, real_time_y, latest_X_train, latest_y_train)
-
     return real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter
-
-get_data("1992", "4")

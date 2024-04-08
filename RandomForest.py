@@ -33,8 +33,6 @@ def random_forest(year, quarter):
 
     # Train a new random forest model using only the selected variables
     real_time_rf_model_selected = RandomForestRegressor(n_estimators=100, random_state=42)
-    print(latest_X_train)
-    print(real_time_selected_variables_to_latest)
     real_time_rf_model_selected.fit(latest_X_train[real_time_selected_variables_to_latest], latest_y_train.values.ravel())
 
     # Evaluate the model's performance
