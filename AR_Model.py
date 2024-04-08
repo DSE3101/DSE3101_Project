@@ -10,6 +10,8 @@ from statsmodels.tsa.stattools import adfuller
 from GetData import get_data
 from sklearn.metrics import mean_squared_error
 import plotly.tools as tls
+import base64
+from io import BytesIO
 
 #need to run GetData.py first
 
@@ -76,8 +78,17 @@ def AR_MODEL(year_input, quarter_input):
         ax.set_xlabel('Year:Quarter')
         ax.set_ylabel('rGDP')
         ax.legend()
-        fig.savefig('assets/ar_real_time_plot.png')  # Save the figure explicitly
-        plt.close(fig)  # Close the figure to prevent it from displaying
+
+        buffer = BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close(fig)
+        buffer.seek(0)
+        
+        image_png = buffer.getvalue()
+        base64_string = base64.b64encode(image_png).decode('utf-8')
+        buffer.close()
+        
+        return f"data:image/png;base64,{base64_string}"
 
 
     def plot_forecast_vintage(data, forecast, CI):
@@ -111,7 +122,7 @@ def AR_MODEL(year_input, quarter_input):
     adfuller_stats(real_time_data)
     realtime_table_of_forecasts = forecasted_values_data(real_time_data, real_time_AR_model)
     h_realtime = h_step_forecast(forecasted_values_data(real_time_data, real_time_AR_model)) 
-    plot_forecast_real_time(real_time_data, realtime_table_of_forecasts, CI)
+    real_time_plot = plot_forecast_real_time(real_time_data, realtime_table_of_forecasts, CI)
     real_time_rmsfe = calculating_rmsfe(latest_y_test,h_realtime)
     
     ###### for vintage data ######
@@ -132,7 +143,7 @@ def AR_MODEL(year_input, quarter_input):
     print('Forecasted values for vintage AR model:',h_vintage)
     print('Vintage RMSFE:',vintage_rmsfe)
 
-    return real_time_optimal_lags, h_realtime, real_time_rmsfe, vintage_optimal_lags, h_vintage, vintage_rmsfe
+    return real_time_optimal_lags, h_realtime, real_time_rmsfe, vintage_optimal_lags, h_vintage, vintage_rmsfe, real_time_plot
 
 # Example usage
 # AR_MODEL("2012","2")

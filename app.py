@@ -23,6 +23,9 @@ from GetData import get_data
 from sklearn.metrics import mean_squared_error
 from AR_Model import AR_MODEL
 from RandomForest import *
+import base64
+from io import BytesIO
+
 
 routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
 routput['DATE'] = routput['DATE'].str.replace(':', '', regex=True)
@@ -94,7 +97,7 @@ def update_shared_data(year_value, quarter_value):
     [State('year-quarter', 'data')] 
 )
 def update_evaluation_results_and_show(n_clicks, year_quarter_data):
-    if n_clicks is None or year_quarter_data is None:
+    if n_clicks is None:
         return [], {'display': 'none'}
 
     year = year_quarter_data['year']
@@ -104,64 +107,83 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
     random_forest_results = random_forest(year, quarter)
     
     evaluation = html.Div([
-        html.H3("Evaluating our models", style={'text-align': 'center'}),
+        html.H3("Evaluating our models", style={'text-align': 'center', 'color' :"black"}),
+        # AR Model Container
         html.Div([
             html.H5("AR Model", className="model-header"),
             html.Div([
-                # Column for Real-Time Data
+                # Real Time Data Column
                 html.Div([
-                    html.Img(src='assets/ar_real_time_plot.png', className="graph-image"),
-                    html.Div([html.B("Real Time Data RMSE:"),
-                              html.P(f"{round(ar_model_results[2],3)}")],
-                             className="rmse-value")
+                    html.Img(src=ar_model_results[6], className="graph-image"),
+                    html.Div([
+                        html.B("Real Time Data RMSFE: ", style = {'color':'black'}),
+                        html.P(f"{round(ar_model_results[2], 3)}", className="rmse-value")
+                    ], className="rmse-box")
                 ], className="graph-container"),
-                # Column for Vintage Data 
+
+                # Vintage Data Column
                 html.Div([
                     html.Img(src='assets/ar_vintage_plot.png', className="graph-image"),
-                    html.Div([html.B("Real Time Data RMSE:"),
-                              html.P(f"{round(ar_model_results[2],3)}")],
-                             className="rmse-value")
+                    html.Div([
+                        html.B("Vintage Data RMSFE: ", style = {'color':'black'}),
+                        html.P(f"{round(ar_model_results[5], 3)}", className="rmse-value")
+                    ], className="rmse-box")
                 ], className="graph-container"),
-            ], className="model-container"),
-            #ADL Model
+            ], className="model-split-container"),
+        ], className="model-container"),
+
+        # ADL Model Container (Repeat the structure as needed for other models)
+        html.Div([
             html.H5("ADL Model", className="model-header"),
             html.Div([
-                # Column for Real-Time Data
+                # Real Time Data Column
                 html.Div([
                     html.Img(src='assets/ar_real_time_plot.png', className="graph-image"),
-                    html.Div([html.B("Real Time Data RMSE:"),
-                              html.P(f"{round(ar_model_results[2],3)}")],
-                             className="rmse-value")
+                    html.Div([
+                        html.B("Real Time Data RMSFE: ", style = {'color':'black'}),
+                        html.P(f"{round(ar_model_results[2], 3)}", className="rmse-value")
+                    ], className="rmse-box")
                 ], className="graph-container"),
-                # Column for Vintage Data 
+
+                # Vintage Data Column
                 html.Div([
                     html.Img(src='assets/ar_vintage_plot.png', className="graph-image"),
-                    html.Div([html.B("Real Time Data RMSE:"),
-                              html.P(f"{round(ar_model_results[2],3)}")],
-                             className="rmse-value")
+                    html.Div([
+                        html.B("Vintage Data RMSFE: ", style = {'color':'black'}),
+                        html.P(f"{round(ar_model_results[5], 3)}", className="rmse-value")
+                    ], className="rmse-box")
                 ], className="graph-container"),
-            ], className="model-container"),
-            #RF
-            html.H5("Random Forest Model", className="model-header"),
-            # Column for Real-Time Data
+            ], className="model-split-container"),
+        ], className="model-container"),
+
+        # RF Model Container (Repeat the structure as needed for other models)
+        html.Div([
+            html.H5("RF Model", className="model-header"),
             html.Div([
-                html.Img(src='assets/ar_real_time_plot.png', className="graph-image"),
-                html.Div([html.B("Real Time Data RMSE:"),
-                            html.P(f"{round(random_forest_results[1],3)}")],
-                            className="rmse-value")
-            ], className="graph-container"),
-            # Column for Vintage Data 
-            html.Div([
-                html.Img(src='assets/ar_real_time_plot.png', className="graph-image"),
-                html.Div([html.B("Real Time Data RMSE:"),
-                          html.P(f"{round(random_forest_results[4],3)}")],
-                         className="rmse-value")
+                # Real Time Data Column
+                html.Div([
+                    html.Img(src='assets/ar_real_time_plot.png', className="graph-image"),
+                    html.Div([
+                        html.B("Real Time Data RMSFE: ", style = {'color':'black'}),
+                        html.P(f"{round(random_forest_results[1], 3)}", className="rmse-value")
+                    ], className="rmse-box")
                 ], className="graph-container"),
-            ], className="model-container"),
-        ], className="evaluation-container")
-    style={'background-color': 'lightblue', 'padding': '20px', 'border-radius': '5px', 'margin': '20px','display': 'block'}
+
+                # Vintage Data Column
+                html.Div([
+                    html.Img(src='assets/ar_vintage_plot.png', className="graph-image"),
+                    html.Div([
+                        html.B("Vintage Data RMSFE: ", style = {'color':'black'}),
+                        html.P(f"{round(random_forest_results[4], 3)}", className="rmse-value")
+                    ], className="rmse-box")
+                ], className="graph-container"),
+            ], className="model-split-container"),
+        ], className="model-container"),
+        #Final part
+    ], className="evaluation-container", style={'background-color': 'lightblue', 'padding': '20px', 'border-radius': '5px', 'margin': '20px', 'display': 'flex', 'flex-direction': 'column', 'gap': '20px'})
+
     return evaluation, {'display': 'block'}
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)

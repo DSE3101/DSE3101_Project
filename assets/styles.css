@@ -17,14 +17,14 @@
   flex-direction: column;
   gap: 20px;
   padding: 20px;
-  background-color: lightcyan;
+  background-color: lightblue;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .model-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   gap: 10px;
   padding: 10px;
@@ -34,7 +34,6 @@
 }
 
 .model-header {
-  width: 100%;
   color: #333;
   text-align: center;
   margin-bottom: 10px;
@@ -42,28 +41,29 @@
 
 .model-split-container {
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
+  gap: 20px;
 }
 
 .graph-container {
-  width: 48%;
+  width: 50%;
   text-align: center;
 }
 
-.graph-container img {
+.graph-image {
   max-width: 100%;
   height: auto;
   border-radius: 5px;
 }
 
-.rmse-value {
-  font-size: 0.9em;
-  color: #333;
-  margin-top: 5px;
-  padding: 5px;
-  background-color: #f9f9f9;
-  border-radius: 5px;
+.rmse-box {
   text-align: center;
+  background-color: lightblue;
+  border-radius: 5px;
+  padding: 5px;
 }
 
+.rmse-value {
+  margin-top: 5px;
+  color: blue;
+}
