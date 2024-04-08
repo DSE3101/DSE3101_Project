@@ -105,41 +105,37 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
 
     ar_model_results = AR_MODEL(year, quarter)
     
-    evaluation = [
+    evaluation = html.Div([
         html.H3("Evaluating our models"),
-        html.P("We will use 2 tests to determine which model is the most appropriate"),
-        html.P("The tests are RMSE and Diebold-Mariano Test"),
-        html.H4("RMSE"),
-        html.P("RMSE is an extremely simple and easy to implement test"),
-        ##Insert 3 graphs, which are 3 fancharts, and with two lines on the same graph
-        html.H5("AR Model"),
-        #Graph 1
-        html.P("The AR model serves as our baseline model. Based on econometric theory, it should be the worst performing in terms of RMSE values"),
-        html.P(f"Running the AR model described above, the RMSE value using the real time data is: {ar_model_results[2]}"),
-        html.P(f"Compared to using the vintage data of 2024Q1, which AR Model results is : {ar_model_results[5]}"),
+        html.Div([
+            html.Div([
+                html.H5("AR Model"),
+                #dcc.Graph(figure=ar_model_graph['real_time']),
+                html.P(f"Real Time Data RMSE: {ar_model_results[2]}"),
+                #dcc.Graph(figure=ar_model_graph['vintage']),
+                html.P(f"Vintage Data RMSE: {ar_model_results[5]}")
+            ], className="model-container"),
+            # ADL Model Container
+            #html.Div([
+                #html.H5("ADL Model"),
+                #dcc.Graph(figure=adl_model_graph['real_time']),  # Placeholder for actual graph
+                #html.P(f"Real Time Data RMSE: {adl_model_rmse['real_time']}"),
+                #dcc.Graph(figure=adl_model_graph['vintage']),  # Placeholder for actual graph
+            #], className="model-container"),
+            # RF Model Container
+            #html.Div([
+            #    html.H5("Regression Forest Model"),
+            #    dcc.Graph(figure=rf_model_graph['real_time']),  # Placeholder for actual graph
+            #    html.P(f"Real Time Data RMSE: {rf_model_rmse['real_time']}"),
+            #    dcc.Graph(figure=rf_model_graph['vintage']),  # Placeholder for actual graph
+            #    html.P(f"Vintage Data RMSE: {rf_model_rmse['vintage']}")
+            #], className="model-container"),
+        ],
+        className="evaluation-container")
+    ], style={'background-color': 'lightblue', 'padding': '10px', 'border-radius': '5px'})
 
-        html.P("The value is quite high, so we will see how our next model fare"),
-        html.P("Based on our models, the model with the lowest RMSE is xxx"),
-        html.H5("ADL Model"),
-        #Graph 2
-        #html.P("The ADL model will return us a RMSE value of " + rmse_adl), #Text will be on the right
-        html.H5("Regression Forest Model"),
-        #Graph 3
-        #html.P("Last but not least, running our own regression model returns us the RMSE value of " + rmse_forest),
-        
-        html.P("But using the RMSE has its own issues,"),
-        html.P("For instance, RMSE are extremely sensitive to outliers, and is not as statistically sound as our other test."),
-        html.P("This is where our next test comes in"),
-
-        html.H4("Diebold-Mariano (DM) Test"),
-        html.P("We will now run the DM test between the ADL and regression forest model."), 
-        html.P("The reason why we are not running this on the AR model is because we have already established that the AR model is simply a benchmark model.")
-    ]
     
     return evaluation, {'display': 'block'}
-
-#ML Model
-
 
 
 if __name__ == '__main__':

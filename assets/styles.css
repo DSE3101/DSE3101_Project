@@ -11,3 +11,42 @@
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 4px;
 }
+
+.evaluation-container {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  padding: 20px;
+  background-color: lightcyan;
+  border-radius: 10px;  /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Soft shadow for depth */
+}
+
+/* Individual model containers for AR, ADL, RF models */
+.model-container {
+  display: flex;
+  flex-direction: row;  /* Arrange elements (graphs and RMSE values) horizontally */
+  gap: 20px;  /* Space between elements in the model container */
+  padding: 10px;  /* Padding inside each model container */
+  background-color: #fff;  /* White background for contrast */
+  border: 1px solid #ccc;  /* Light border around model containers */
+  border-radius: 5px;  /* Rounded corners */
+}
+
+.model-container h5 {
+  width: 100%;  /* Make the model title span the full width */
+  color: #333;  /* Dark grey color for text */
+  text-align: center;  /* Center-align the model title */
+  margin-bottom: 10px;  /* Space below the model title */
+}
+
+/* Styling for RMSE values for a cleaner look */
+.model-container p {
+  font-size: 0.9em;  /* Slightly smaller font size for RMSE values */
+  color: #333;  /* Dark grey color for text */
+  margin: 0;  /* Remove default margins */
+  padding: 5px;  /* Padding for space around the text */
+  background-color: #f9f9f9;  /* Very light background for the text */
+  border-radius: 5px;  /* Rounded corners for the text background */
+  text-align: center;  /* Center-align the text */
+}
