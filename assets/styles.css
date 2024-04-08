@@ -25,26 +25,45 @@
 .model-container {
   display: flex;
   flex-direction: row;
-  gap: 20px;
+  align-items: center;
+  gap: 10px;
   padding: 10px;
   background-color: #fff;
   border: 1px solid #ccc;
   border-radius: 5px;
 }
 
-.model-container h5 {
+.model-header {
   width: 100%;
   color: #333;
   text-align: center;
   margin-bottom: 10px;
 }
 
-.model-container p {
+.model-split-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.graph-container {
+  width: 48%;
+  text-align: center;
+}
+
+.graph-container img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 5px;
+}
+
+.rmse-value {
   font-size: 0.9em;
   color: #333;
-  margin: 0;
+  margin-top: 5px;
   padding: 5px;
   background-color: #f9f9f9;
   border-radius: 5px;
   text-align: center;
 }
+

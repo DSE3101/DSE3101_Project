@@ -104,34 +104,62 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
     random_forest_results = random_forest(year, quarter)
     
     evaluation = html.Div([
-        html.H3("Evaluating our models"),
+        html.H3("Evaluating our models", style={'text-align': 'center'}),
         html.Div([
+            html.H5("AR Model", className="model-header"),
             html.Div([
-                html.H5("AR Model"),
-                html.Img(src='assets/ar_real_time_plot.png'),
-                html.P(f"Real Time Data RMSE: {ar_model_results[2]}"),
-                html.Img(src='assets/ar_vintage_plot.png'),
-                html.P(f"Vintage Data RMSE: {ar_model_results[5]}")
+                # Column for Real-Time Data
+                html.Div([
+                    html.Img(src='assets/ar_real_time_plot.png', className="graph-image"),
+                    html.Div([html.B("Real Time Data RMSE:"),
+                              html.P(f"{round(ar_model_results[2],3)}")],
+                             className="rmse-value")
+                ], className="graph-container"),
+                # Column for Vintage Data 
+                html.Div([
+                    html.Img(src='assets/ar_vintage_plot.png', className="graph-image"),
+                    html.Div([html.B("Real Time Data RMSE:"),
+                              html.P(f"{round(ar_model_results[2],3)}")],
+                             className="rmse-value")
+                ], className="graph-container"),
             ], className="model-container"),
-            # ADL Model Container
-            #html.Div([
-                #html.H5("ADL Model"),
-                #dcc.Graph(figure=adl_model_graph['real_time']),  # Placeholder for actual graph
-                #html.P(f"Real Time Data RMSE: {adl_model_rmse['real_time']}"),
-                #dcc.Graph(figure=adl_model_graph['vintage']),  # Placeholder for actual graph
-            #], className="model-container"),
-            # RF Model Container
+            #ADL Model
+            html.H5("ADL Model", className="model-header"),
             html.Div([
-                html.H5("Regression Forest Model"),
-                #dcc.Graph(figure=random_forest_results[1])  # Placeholder for actual graph
-                html.P(f"Real Time Data RMSE: {random_forest_results[1]}"),
-                #dcc.Graph(figure=rf_model_graph['vintage']),  # Placeholder for actual graph
-                html.P(f"Vintage Data RMSE: {random_forest_results[4]}")
+                # Column for Real-Time Data
+                html.Div([
+                    html.Img(src='assets/ar_real_time_plot.png', className="graph-image"),
+                    html.Div([html.B("Real Time Data RMSE:"),
+                              html.P(f"{round(ar_model_results[2],3)}")],
+                             className="rmse-value")
+                ], className="graph-container"),
+                # Column for Vintage Data 
+                html.Div([
+                    html.Img(src='assets/ar_vintage_plot.png', className="graph-image"),
+                    html.Div([html.B("Real Time Data RMSE:"),
+                              html.P(f"{round(ar_model_results[2],3)}")],
+                             className="rmse-value")
+                ], className="graph-container"),
             ], className="model-container"),
-        ],
-        className="evaluation-container")
-    ], style={'background-color': 'lightblue', 'padding': '10px', 'border-radius': '5px'})
-
+            #RF
+            html.H5("Random Forest Model", className="model-header"),
+            # Column for Real-Time Data
+            html.Div([
+                html.Img(src='assets/ar_real_time_plot.png', className="graph-image"),
+                html.Div([html.B("Real Time Data RMSE:"),
+                            html.P(f"{round(random_forest_results[1],3)}")],
+                            className="rmse-value")
+            ], className="graph-container"),
+            # Column for Vintage Data 
+            html.Div([
+                html.Img(src='assets/ar_real_time_plot.png', className="graph-image"),
+                html.Div([html.B("Real Time Data RMSE:"),
+                          html.P(f"{round(random_forest_results[4],3)}")],
+                         className="rmse-value")
+                ], className="graph-container"),
+            ], className="model-container"),
+        ], className="evaluation-container")
+    style={'background-color': 'lightblue', 'padding': '20px', 'border-radius': '5px', 'margin': '20px','display': 'block'}
     return evaluation, {'display': 'block'}
 
 
