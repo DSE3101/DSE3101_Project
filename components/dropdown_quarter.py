@@ -15,8 +15,9 @@ def dropdown():
             {'label': 'Q3', 'value': 'Q3'},
             {'label': 'Q4', 'value': 'Q4'},
         ],
-        value='Q1',  # Default value
+        value="Q2",  # Default value
         clearable=False,
-        style={'width': '100%', 'color': 'black'},
+        style={'width': '50%', 'color': 'black'},
+        placeholder="Select Quarter for Training",
     )
     return dropdown

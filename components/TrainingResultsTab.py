@@ -5,7 +5,6 @@ import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
 import pandas as pd
 import numpy as np
-from components.checkbox import checkbox
 from components.dropdown_quarter import dropdown
 from components.dropdown_year import dropdown_year
 from data import mainplot
@@ -18,16 +17,19 @@ def TrainingResultsTab():
         html.P("In an attempt to make this project more interactive, we are going to allow users to select the training data's date and variables they wish to use"),
         html.P("The chosen time period will be used as the training period for all 3 models. The training variables selected will be used in the ADL and RNN model"),
         dcc.Graph(id='time-series-graph', figure =mainplot(), className="graphBorder"),
-        html.H4("Select training time period (Years)"),
+        html.H4("Select training time period"),
          html.Div([
+            html.H5("Select a year"),
             html.Div([dropdown_year()],className="dropdown-container"),
+            html.H5("Select a quarter"),
+
             html.Div([dropdown()], className="dropdown-container")
         ], style={'display': 'flex-grow', 'flex-direction': 'row', 'gap': '30px'}), 
 
         html.Strong(id = 'lag-caller'),
         html.P(),
         html.Button('Train the model!', id='train-model'),
-        html.Div(id='evaluation-results', style={'display': 'none', 'backgroundColor': 'lightblue', 'padding': '20px', 'margin': '10px 0', 'borderRadius': '5px'})
+        html.Div(id='evaluation-results')
         ])
     ]
     return training
