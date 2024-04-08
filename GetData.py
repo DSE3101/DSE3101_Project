@@ -63,14 +63,22 @@ def get_data(year_input, quarter_input):
     real_time_X, real_time_y = get_vintage_data(year_input, quarter_input, year_input, quarter_input, chosen_variable_name)
     latest_X, latest_y = get_vintage_data(curr_year, curr_quarter, h_step_year, h_step_quarter, chosen_variable_name)
     # In ROUTPUT, the vintages in 1992 did not revise values from 1947Q1 to 1958Q4
-    if year_input == "1992":
-        slice_before_1959 = real_time_X.index.get_loc("1959:Q1")
-        latest_X_train = latest_X.iloc[slice_before_1959:len(real_time_y), :]
-        latest_y_train = latest_y.iloc[slice_before_1959:len(real_time_y)]
+    if (year_input == "1992") or (year_input == "1999" and quarter_input == "4") or (year_input == "2000" and quarter_input == "1"):
+        slice_before_1959_Q1 = real_time_X.index.get_loc("1959:Q1")
+        latest_X_train = latest_X.iloc[slice_before_1959_Q1:len(real_time_y), :]
+        latest_y_train = latest_y.iloc[slice_before_1959_Q1:len(real_time_y)]
         latest_X_test = latest_X.iloc[len(real_time_y):, :]
         latest_y_test = latest_y.iloc[len(real_time_y):]
-        real_time_X = real_time_X.iloc[slice_before_1959:len(real_time_y), :]
-        real_time_y = real_time_y.iloc[slice_before_1959:len(real_time_y), :]
+        real_time_X = real_time_X.iloc[slice_before_1959_Q1:len(real_time_y), :]
+        real_time_y = real_time_y.iloc[slice_before_1959_Q1:len(real_time_y), :]
+    elif (year_input == "1996") or (year_input == "1997" and quarter_input == "1"):
+        slice_before_1959_Q3 = real_time_X.index.get_loc("1959:Q3")
+        latest_X_train = latest_X.iloc[slice_before_1959_Q3:len(real_time_y), :]
+        latest_y_train = latest_y.iloc[slice_before_1959_Q3:len(real_time_y)]
+        latest_X_test = latest_X.iloc[len(real_time_y):, :]
+        latest_y_test = latest_y.iloc[len(real_time_y):]
+        real_time_X = real_time_X.iloc[slice_before_1959_Q3:len(real_time_y), :]
+        real_time_y = real_time_y.iloc[slice_before_1959_Q3:len(real_time_y), :]
     else:
         latest_X_train = latest_X.iloc[:len(real_time_y), :]
         latest_y_train = latest_y.iloc[:len(real_time_y)]
