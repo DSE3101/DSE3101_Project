@@ -104,12 +104,13 @@ combined_data = converting_to_stationary(combined)
 #plot_individual_acf(combined_data)
 #plot_adl_autocorrelation(combined_data)
 #adf_test(combined_data)
-#print(best_model[1].forecast(steps=12))
 
-y = combined_data.iloc[:, 0]  # Assuming the endogenous variable is in the first column
+
+y = combined_data.iloc[:, 0]  
 x = combined_data.iloc[:, 1:]
 forecast_steps = 12
 forecast = best_model[1].predict(start=len(y), end=len(y) + forecast_steps - 1)
+#print(best_model[1].forecast(steps=12))
 
 # Plot the forecasted values along with the actual values
 plt.figure(figsize=(10, 6))
@@ -122,24 +123,9 @@ plt.legend()
 plt.grid(True)
 plt.xticks(rotation=45)
 
-'''
-# Define the start and end points for the forecast period
-start = len(real_time_y)
-end = start + 11  # Forecasting 12 steps ahead
 
-# Make the forecast
-forecast = best_model[1].predict(start=start, end=end, )
 
-# Plot the forecasted values
-plt.figure(figsize=(10, 6))
-plt.plot(real_time_y.index, real_time_y.values, label='Actual Data', color='blue')
-plt.plot(forecast.index, forecast.values, label='Forecast', color='red')
-plt.title('ARDL Forecast')
-plt.xlabel('Time')
-plt.ylabel('Value')
-plt.legend()
-plt.show()
-'''
+
 
 
 
@@ -161,20 +147,5 @@ def adf_test_(adl_results):
     for key, value in adf_result[4].items():
         print(f'   {key}: {value}')
 #adf_test(best_model[1])
-
-forecast_steps = 12
-def forecasting(optimal_model):
-    forecast = optimal_model.forecast(steps=forecast_steps)
-    return forecast
-
-def plot_real_time_forecast(forecast):
-    plt.figure(figsize=(10, 6))
-    plt.plot(real_time_data.index, real_time_data.values, label='Actual')
-    plt.plot(pd.date_range(start=real_time_data.index[-1], periods=forecast_steps+1, freq='Q')[1:], forecast, label='Forecast')
-    plt.xlabel('Year')
-    plt.ylabel('rGDP')
-    plt.title('Real Time ADL Model Forecast')
-    plt.legend()
-    plt.show()
 
 '''
