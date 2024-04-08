@@ -3,6 +3,12 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from GetData import get_data
+import matplotlib.pyplot as plt
+import plotly.tools as tls
+import base64
+from io import BytesIO
+from matplotlib.ticker import MaxNLocator
+import matplotlib.dates as mdates
 
 def random_forest(year, quarter):
     real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data(year, quarter)
@@ -71,4 +77,66 @@ def random_forest(year, quarter):
     latest_rmsfe = mean_squared_error(latest_y_test, latest_y_pred)**(0.5)
     print("\nRoot Mean Squared Forecast Error (RMSFE) with Latest Selected Variables:", latest_rmsfe)
 
-    return real_time_selected_variables, real_time_rmsfe, real_time_y_pred, latest_selected_variables, latest_rmsfe, latest_y_pred
+    # Plots
+    def plot_forecast_real_time(data, forecast, CI):
+        fig, ax = plt.subplots(figsize=(4,4))  # Create a new figure and set the size
+        ax.plot(data.index, data.values, label='Unrevised Real Time Data', color='blue')
+        ax.plot(forecast.index, forecast.values, label='Forecast', color='red')
+        for i, ci in enumerate(CI):
+            alpha = 0.5 * (i + 1) / len(CI)
+            lower_bound = forecast - ci * forecast.std()
+            upper_bound = forecast + ci * forecast.std()
+            ax.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
+        ax.xaxis.set_major_locator(MaxNLocator(5))
+        ax.set_title('AR Model Forecast with Real-Time Data')
+        ax.set_xlabel('Year:Quarter')
+        ax.set_ylabel('rGDP')
+        ax.legend()
+
+        buffer = BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.show()
+        plt.close(fig)
+        buffer.seek(0)
+        
+        image_png = buffer.getvalue()
+        base64_string = base64.b64encode(image_png).decode('utf-8')
+        buffer.close()
+        
+        return f"data:image/png;base64,{base64_string}"
+
+    def plot_forecast_vintage(data, forecast, CI):
+        fig, ax = plt.subplots(figsize=(4,4))  # Create a new figure and set the size
+        ax.plot(data.index, data.values, label='Revised Vintage Data', color='blue')
+        ax.plot(forecast.index, forecast.values, label='Forecast', color='red')
+        for i, ci in enumerate(CI):
+            alpha = 0.5 * (i + 1) / len(CI)
+            lower_bound = forecast - ci * forecast.std()
+            upper_bound = forecast + ci * forecast.std()
+            ax.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
+        ax.xaxis.set_major_locator(MaxNLocator(5))
+        ax.set_title('AR Model Forecast with Revised Vintage Data')
+        ax.set_xlabel('Year:Quarter')
+        ax.set_ylabel('rGDP')
+        ax.legend()
+        buffer = BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.show()
+        plt.close(fig)
+        buffer.seek(0)
+        
+        image_png = buffer.getvalue()
+        base64_string = base64.b64encode(image_png).decode('utf-8')
+        buffer.close()
+        
+        return f"data:image/png;base64,{base64_string}"
+    
+    CI = [0.57, 0.842, 1.282] #50, 60, 80% predictional interval
+    real_time_y_pred = pd.Series(real_time_y_pred)
+    real_time_y_pred.index = latest_y_test.index
+    latest_y_pred = pd.Series(latest_y_pred)
+    latest_y_pred.index = latest_y_test.index
+    real_time_plot = plot_forecast_real_time(real_time_y.iloc[1:], real_time_y_pred, CI)
+    latest_plot = plot_forecast_vintage(latest_y_train.iloc[1:], latest_y_pred, CI)
+
+    return real_time_selected_variables, real_time_rmsfe, real_time_y_pred, latest_selected_variables, latest_rmsfe, latest_y_pred, real_time_plot, latest_plot
