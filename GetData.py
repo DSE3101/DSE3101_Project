@@ -42,7 +42,7 @@ def get_data(year_input, quarter_input):
     # quarter_input = input("Choose a quarter from 1 to 4:\n")
     # quarter_input = "2"
     # h_step_input = int(input("Choose number of steps to forecast:\n")) - 1
-    h_step_input = 12
+    h_step_input = 8
     # curr_year = input("Choose latest time period (YYYY):\n")
     curr_year = "2020"
     # curr_quarter = input("Choose latest quarter (QQ):\n")

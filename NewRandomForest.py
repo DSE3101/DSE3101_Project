@@ -33,8 +33,29 @@ def random_forest(year, quarter):
 
     # Expanding window
     y_pred = []
+    mse_loocv_values = []
     # h step forecast
-    for i in range(12):
+    for i in range(8):
+
+        # MSE LOOCV for each model, but takes very long to train
+        # def mse_loocv(model, X, y):
+        #     n = X.shape[0]
+        #     mse_values = []
+        #     for i in range(n):
+        #         # Remove the i-th sample
+        #         X_train = X.drop(X.index[i])
+        #         y_train = y.drop(y.index[i])
+        #         # Fit the model on the training data
+        #         model.fit(X_train, y_train.values.ravel())
+        #         # Predict the removed sample
+        #         y_pred = model.predict(X.iloc[[i]])
+        #         # Calculate the squared error for this sample
+        #         mse_values.append((y_pred - y.iloc[i])**2)
+        #         print((y_pred - y.iloc[i])**2)
+        #     # Calculate the mean of squared errors
+        #     mse_loocv = np.mean(mse_values)
+        #     return mse_loocv
+        
         real_time_X_loop, real_time_y_loop, latest_X_train_loop, latest_y_train_loop, latest_X_test_loop, latest_y_test_loop, curr_year, curr_quarter = get_data(year, quarter)
         # Adjust selected variables names to match each next quarter and year
         temp = []
@@ -50,8 +71,13 @@ def random_forest(year, quarter):
         if quarter > "4":
             year = str(int(year) + 1)
             quarter = "1"
+        
+        # MSE LOOCV for each iterated model but takes very long to run
+        # mse_loocv_values.append(mse_loocv(rf_model_selected, real_time_X_loop[selected_variables], real_time_y_loop))
+        # print(mse_loocv)
+        
 
-    # MSFE
+    # RMSFE of 1 step ahead forecast
     rmsfe = mean_squared_error(y_pred, latest_y_test) ** 0.5
     print(f'RMSFE: {rmsfe}')
     '''
@@ -108,3 +134,5 @@ def random_forest(year, quarter):
     importance_values = feature_importance_df["Importance"].tolist()
     selected_variables_importance_dict = dict(zip(selected_variables_final, importance_values))
     return selected_variables_importance_dict, rmsfe, real_time_plot, latest_plot
+
+random_forest("2012", "2")
