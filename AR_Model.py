@@ -15,6 +15,7 @@ from io import BytesIO
 from matplotlib.ticker import MaxNLocator
 import matplotlib.dates as mdates
 from PlotGraphs import *
+from dm import *
 
 
 
@@ -92,8 +93,14 @@ def AR_MODEL(year_input, quarter_input):
     adfuller_stats(vintage_data)
     vintage_table_of_forecasts = forecasted_values_data(vintage_data, vintage_AR_model)
     h_vintage = h_step_forecast(forecasted_values_data(vintage_data, vintage_AR_model)) 
-    vintage_plot = plot_forecast_vintage(vintage_data, vintage_table_of_forecasts, CI, "AR Model")
+    vintage_plot = plot_forecast_vintage(vintage_data, vintage_table_of_forecasts, CI)
     vintage_rmsfe = calculating_rmsfe(latest_y_test,h_vintage)
+
+    ###### Run a dm test ######
+    dm_results = DM(h_realtime, h_vintage, real_time_y, latest_y_test)
+    dm_t_hln = dm_results[1]
+    dm_p = dm_results[2]
+
     
     print('Lags chosen for real time AR model:',real_time_optimal_lags)
     print('Forecasted values for real time AR model:',h_realtime)
@@ -102,7 +109,7 @@ def AR_MODEL(year_input, quarter_input):
     print('Forecasted values for vintage AR model:',h_vintage)
     print('Vintage RMSFE:',vintage_rmsfe)
 
-    return real_time_optimal_lags, h_realtime, real_time_rmsfe, vintage_optimal_lags, h_vintage, vintage_rmsfe, real_time_plot, vintage_plot
+    return real_time_optimal_lags, h_realtime, real_time_rmsfe, vintage_optimal_lags, h_vintage, vintage_rmsfe, real_time_plot, vintage_plot, dm_t_hln, dm_p
 
 # Example usage
 # AR_MODEL("2012","2")

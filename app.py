@@ -114,6 +114,8 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
         ar_lower_model = "vintage data model"
         ar_higher_model = "real-time data model"
 
+    #ADL model implementation
+
     #RF implementation
     random_forest_results = random_forest(year, quarter)
     if random_forest_results[1] < random_forest_results[4]:
@@ -126,7 +128,7 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
     evaluation = html.Div([
         html.Div([
             html.H3("Evaluating our models"),
-            html.P("Using the training data selected above, we will now use 3 different forecasting methods to forecast the next 8 quarters."),
+            html.P("Using the training data selected above, we will now use 3 different forecasting methods to forecast the next 12  quarters."),
             html.P("The three methods used will be the AR model, ADL model, and the Random Forest."),
             html.P("We will be using both the RMSFE and DM to evaluate the models and determine which is the most suitable given the training period."),
             html.H4("RMSFE Evaluation"),
@@ -161,6 +163,7 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
                     html.P(f"We have trained the AR model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
                     html.P(f" Comparing the two separate AR Models produced by the real time data and the revised vintage data, the {ar_lower_model} has a lower RMSFE than the {ar_higher_model}."
                            f" With a lower RMSFE, this indicates that the {ar_lower_model} has been more accurate in predicting values than the {ar_higher_model}", style={'color': 'black'}),
+                    html.P(f"p-value = {ar_model_results[8]}"),
                 ], className="write-up-container"),
             ], className="model-container"),
 
@@ -219,7 +222,6 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
             ], className="model-split-container"),
             
             # Write-up Section
-                 # Write-up Section
                 html.Div([
                     html.P(f"We have trained the Random Forest model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
                     html.P(f" Comparing the two separate RF Models produced by the real time data and the revised vintage data, the {rf_lower_model} has a lower RMSFE than the {rf_higher_model}."
