@@ -6,15 +6,17 @@ from scipy.stats import t
 
 #Use DM to compare
 def DM(model1_values, model2_values, test_values, h =12):
-    model1_values, model2_values, test_values = map(pd.Series, [model1_values, model2_values, test_values])
     
+    test_values = (test_values.iloc[:,0])
     # Calculate forecast errors
     e1 = test_values - model1_values
     e2 = test_values - model2_values
+    eps = 0.0000000001
+
 
     d = np.abs(e1) - np.abs(e2)
     var_d = np.var(d)
-    t_dm = np.mean(d)/np.sqrt((1/len(d))*var_d)
+    t_dm = np.mean(d)/np.sqrt((1/len(d))*(var_d+eps))
     
     dof = len(d)-1
     data_size = len(test_values)
