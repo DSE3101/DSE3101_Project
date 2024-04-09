@@ -125,8 +125,9 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
         rf_lower_model = "vintage data model"
         rf_higher_model = "real-time data model"
     
-    #
-
+    #DM explainer
+    low_p_value ="Since the p-value is less than 0.05, it means that there is significant predictive capabilities between the two models."
+    high_p_value = "Since the p-value of the DM test is more than 0.05, it means that both models have similar predictive capabilities. Thus, it is okay to use the real-time data to predict future values and vice-versa"
 
     evaluation = html.Div([
         html.Div([
@@ -166,7 +167,8 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
                     html.P(f"We have trained the AR model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
                     html.P(f" Comparing the two separate AR Models produced by the real time data and the revised vintage data, the {ar_lower_model} has a lower RMSFE than the {ar_higher_model}."
                            f" With a lower RMSFE, this indicates that the {ar_lower_model} has been more accurate in predicting values than the {ar_higher_model}", style={'color': 'black'}),
-                    html.P(f"Running a DM test, we observe that our p-value = {ar_dm_p}",
+                    html.P(f"Running a DM test, we observe that our p-value = {round(ar_dm_p,3)}",
+                           f"##Put the explainer here",
                            style={'color': 'black'}),
                 ], className="write-up-container"),
             ], className="model-container"),
