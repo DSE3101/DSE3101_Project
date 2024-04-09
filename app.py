@@ -13,32 +13,33 @@ from statsmodels.tsa.stattools import adfuller
 from dash import html
 from dash import dcc
 from dash.dependencies import Input, Output, State
+import pickle
+from sklearn.metrics import mean_squared_error
+import base64
+from io import BytesIO
+
+
 from components.ARTab import ARTab
 from components.TrainingResultsTab import TrainingResultsTab
 from components.ADLTab import ADLTab
 from components.MLTab import *
-from data import mainplot
-import pickle
+from data import mainplot #Main graph on landing
 from GetData import get_data
-from sklearn.metrics import mean_squared_error
 from AR_Model import AR_MODEL
 from RandomForest import *
-import base64
-from io import BytesIO
 
 
 routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
 routput['DATE'] = routput['DATE'].str.replace(':', '', regex=True)
 routput['DATE'] = pd.PeriodIndex(routput['DATE'], freq='Q').to_timestamp()
 routput = routput[routput['DATE'].dt.year >= 1965]
-
 date_range_yearly = pd.date_range(start='1947-01-01', end='2023-12-31', freq='YS')
-app = dash.Dash(__name__, external_stylesheets= [dbc.themes.DARKLY])
 
+app = dash.Dash(__name__, external_stylesheets= [dbc.themes.DARKLY])
 app.layout = html.Div([
     dcc.Tabs(id='tabs', value='model-training', children=[
         dcc.Tab(label='Model Training', value='model-training', className="tab", children=TrainingResultsTab()),
-        dcc.Tab(label='AR', value='ar', className="tab", children=ARTab()),
+        dcc.Tab(label='AR', value='ar', className="tab", children=ARTab()), #explainer, AC plots, AIC
         dcc.Tab(label='ADL', value='adl', className="tab", children=ADLTab()),
         dcc.Tab(label='ML', value='ml', className="tab", children=MLTab()),
 ]),
@@ -46,7 +47,8 @@ app.layout = html.Div([
     dcc.Store(id = 'year-quarter')
 ])
 
-#Slider elements will update the graph
+### SERVER
+#Dropdown elements will update the graph
 @app.callback(
     Output('time-series-graph', 'figure'),
     [Input('dropdown-year', 'value'), Input('dropdown-quarter', 'value')]
