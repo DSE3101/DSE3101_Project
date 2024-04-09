@@ -117,6 +117,7 @@ def calculating_rmsfe(y_predicted):
     print('rmsfe:',rmsfe)
     return rmsfe
 
+####### real time #######
 real_time_X.index = real_time_X.index.map(convert_to_datetime)
 real_time_y.index = real_time_y.index.map(convert_to_datetime)
 candidate_vars = ['CPI', 'RUC', 'M1', 'HSTARTS', 'IPM', 'OPH']
@@ -124,12 +125,11 @@ best_model, best_x_cols = best_adl_model(candidate_vars,real_time_X,real_time_y)
 variables_in_realtime_model = best_model[2]
 real_time_optimal_lags = best_model[3]
 forecast_steps = 12
-forecast = best_model[1].forecast(steps=12, exog=latest_X_test.loc[:, best_x_cols])
-print(forecast)
-calculating_rmsfe(forecast)
-plot_forecast_real_time(real_time_y,forecast)
-
-## acf & adf ##
+real_time_forecast = best_model[1].forecast(steps=12, exog=latest_X_test.loc[:, best_x_cols])
+print(real_time_forecast)
+calculating_rmsfe(real_time_forecast)
+plot_forecast_real_time(real_time_y,real_time_forecast)
+    ## acf & adf ##
 combined = combining_data(real_time_X,real_time_y,variables_in_realtime_model)
 combined_data = converting_to_stationary(combined)
 #plot_individual_acf(combined_data)
