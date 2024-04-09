@@ -105,40 +105,64 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
     year = year_quarter_data['year']
     quarter = year_quarter_data['quarter'].replace("Q", "")
 
+    #AR Model implementation
     ar_model_results = AR_MODEL(year, quarter)
+    if ar_model_results[2] < ar_model_results[5]:
+        ar_lower_model = "real-time data model"
+        ar_higher_model = "vintage data model"
+    else:
+        ar_lower_model = "vintage data model"
+        ar_higher_model = "real-time data model"
+
+    #RF implementation
     random_forest_results = random_forest(year, quarter)
+    if random_forest_results[1] < random_forest_results[4]:
+        rf_lower_model = "real-time data model"
+        rf_higher_model = "vintage data model"
+    else:
+        rf_lower_model = "vintage data model"
+        rf_higher_model = "real-time data model"
     
     evaluation = html.Div([
-        html.H3("Evaluating our models", style={'text-align': 'center', 'color' :"black"}),
-        # AR Model Container
-    html.Div([
-        html.H5("AR Model", className="model-header"),
-        # Model Split Container for graphs and metrics
         html.Div([
-            # Real Time Data Column
+            html.H3("Evaluating our models"),
+            html.P("Using the training data selected above, we will now use 3 different forecasting methods to forecast the next 8 quarters."),
+            html.P("The three methods used will be the AR model, ADL model, and the Random Forest."),
+            html.P("We will be using both the RMSFE and DM to evaluate the models and determine which is the most suitable given the training period."),
+            html.H4("RMSFE Evaluation"),
+            html.P("A lower RMSFE indicates that the model fits the histroical closely, making it more accurate for future prediction."),
+        ], style={'text-align': 'center', 'color' :"black"}),
+        # AR Model Container
+        html.Div([
+            html.H5("AR Model", className="model-header"),
+            # Model Split Container for graphs and metrics
             html.Div([
-                html.Img(src=ar_model_results[6], className="graph-image"),
+                # Real Time Data Column
                 html.Div([
-                    html.B("Real Time Data RMSFE: ", style={'color': 'black'}),
-                    html.P(f"{round(ar_model_results[2], 3)}", className="rmse-value")
-                ], className="rmse-box")
-            ], className="graph-container"),
+                    html.Img(src=ar_model_results[6], className="graph-image"),
+                    html.Div([
+                        html.B("Real Time Data RMSFE: ", style={'color': 'black'}),
+                        html.P(f"{round(ar_model_results[2], 3)}", className="rmse-value")
+                    ], className="rmse-box")
+                ], className="graph-container"),
 
-            # Vintage Data Column
-            html.Div([
-                html.Img(src=ar_model_results[7], className="graph-image"),
+                # Vintage Data Column
                 html.Div([
-                    html.B("Vintage Data RMSFE: ", style={'color': 'black'}),
-                    html.P(f"{round(ar_model_results[5], 3)}", className="rmse-value")
-                ], className="rmse-box")
-            ], className="graph-container"),
-        ], className="model-split-container"),
+                    html.Img(src=ar_model_results[7], className="graph-image"),
+                    html.Div([
+                        html.B("Vintage Data RMSFE: ", style={'color': 'black'}),
+                        html.P(f"{round(ar_model_results[5], 3)}", className="rmse-value")
+                    ], className="rmse-box")
+                ], className="graph-container"),
+            ], className="model-split-container"),
         
         # Write-up Section
-        html.Div([
-            html.P(f"Here is an insightful analysis based on the AR model results. This analysis provides an in-depth look at how the model performs with real-time and vintage data, highlighting the key takeaways and implications for future forecasting.", style={'color': 'black'}),
-        ], className="write-up-container"),
-    ], className="model-container"),
+                html.Div([
+                    html.P(f"We have trained the AR model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
+                    html.P(f" Comparing the two separate AR Models produced by the real time data and the revised vintage data, the {ar_lower_model} has a lower RMSFE than the {ar_higher_model}."
+                           f" With a lower RMSFE, this indicates that the {ar_lower_model} has been more accurate in predicting values than the {ar_higher_model}", style={'color': 'black'}),
+                ], className="write-up-container"),
+            ], className="model-container"),
 
         # ADL Model Container (Repeat the structure as needed for other models)
         html.Div([
@@ -163,19 +187,21 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
                 ], className="graph-container"),
             ], className="model-split-container"),
 
-            # Write-up Section
-        html.Div([
-            html.P(f"Here is an insightful analysis based on the AR model results. This analysis provides an in-depth look at how the model performs with real-time and vintage data, highlighting the key takeaways and implications for future forecasting.", style={'color': 'black'}),
-        ], className="write-up-container"),
-    ], className="model-container"),
+             # Write-up Section
+                html.Div([
+                    html.P(f"We have trained the ADL model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
+                    html.P(f" Comparing the two separate AR Models produced by the real time data and the revised vintage data, the {ar_lower_model} has a lower RMSFE than the {ar_higher_model}."
+                           f" With a lower RMSFE, this indicates that the {ar_lower_model} has been more accurate in predicting values than the {ar_higher_model}", style={'color': 'black'}),
+                ], className="write-up-container"),
+            ], className="model-container"),
         
-        # RF Model Container (Repeat the structure as needed for other models)
+        # RF Model Container
         html.Div([
             html.H5("RF Model", className="model-header"),
             html.Div([
                 # Real Time Data Column
                 html.Div([
-                    html.Img(src='assets/ar_real_time_plot.png', className="graph-image"),
+                    html.Img(src=random_forest_results[6], className="graph-image"),
                     html.Div([
                         html.B("Real Time Data RMSFE: ", style = {'color':'black'}),
                         html.P(f"{round(random_forest_results[1], 3)}", className="rmse-value")
@@ -184,7 +210,7 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
 
                 # Vintage Data Column
                 html.Div([
-                    html.Img(src='assets/ar_vintage_plot.png', className="graph-image"),
+                    html.Img(src=random_forest_results[7], className="graph-image"),
                     html.Div([
                         html.B("Vintage Data RMSFE: ", style = {'color':'black'}),
                         html.P(f"{round(random_forest_results[4], 3)}", className="rmse-value")
@@ -193,10 +219,13 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
             ], className="model-split-container"),
             
             # Write-up Section
-        html.Div([
-            html.P(f"Here is an insightful analysis based on the AR model results. This analysis provides an in-depth look at how the model performs with real-time and vintage data, highlighting the key takeaways and implications for future forecasting.", style={'color': 'black'}),
-        ], className="write-up-container"),
-    ], className="model-container"),
+                 # Write-up Section
+                html.Div([
+                    html.P(f"We have trained the Random Forest model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
+                    html.P(f" Comparing the two separate AR Models produced by the real time data and the revised vintage data, the {rf_lower_model} has a lower RMSFE than the {rf_higher_model}."
+                           f" With a lower RMSFE, this indicates that the {rf_lower_model} has been more accurate in predicting values than the {rf_higher_model}", style={'color': 'black'}),
+                ], className="write-up-container"),
+            ], className="model-container"),
         #Final part
     ], className="evaluation-container", style={'background-color': 'lightblue', 'padding': '20px', 'border-radius': '5px', 'margin': '20px', 'display': 'flex', 'flex-direction': 'column', 'gap': '20px'})
 
