@@ -83,7 +83,7 @@ def AR_MODEL(year_input, quarter_input):
     adfuller_stats(real_time_data)
     realtime_table_of_forecasts = forecasted_values_data(testing_data, real_time_AR_model)
     h_realtime = h_step_forecast(forecasted_values_data(testing_data, real_time_AR_model)) 
-    real_time_plot = plot_forecast_real_time(real_time_data, realtime_table_of_forecasts, CI)
+    real_time_plot = plot_forecast_real_time(real_time_data, realtime_table_of_forecasts, CI, "AR MODEL")
     real_time_rmsfe = calculating_rmsfe(latest_y_test,h_realtime)
     
     ###### for vintage data ######
@@ -94,15 +94,8 @@ def AR_MODEL(year_input, quarter_input):
     adfuller_stats(vintage_data)
     vintage_table_of_forecasts = forecasted_values_data(vintage_data, vintage_AR_model)
     h_vintage = h_step_forecast(forecasted_values_data(vintage_data, vintage_AR_model)) 
-    vintage_plot = plot_forecast_vintage(vintage_data, vintage_table_of_forecasts, CI)
+    vintage_plot = plot_forecast_vintage(vintage_data, vintage_table_of_forecasts, CI, "AR MODEL")
     vintage_rmsfe = calculating_rmsfe(latest_y_test,h_vintage)
-
-    ###### Run a dm test ######
-    dm_results = DM(h_realtime, h_vintage, real_time_y, latest_y_test)
-    dm_t_hln = dm_results[1]
-    dm_p = dm_results[2]
-    print("dm_t_hln value is: ", dm_t_hln)
-    print("p value is: ", dm_p)
 
     print('Lags chosen for real time AR model:',real_time_optimal_lags)
     print('Forecasted values for real time AR model:',h_realtime)
@@ -110,6 +103,15 @@ def AR_MODEL(year_input, quarter_input):
     print('Lags chosen for vintage AR model:',vintage_optimal_lags)
     print('Forecasted values for vintage AR model:',h_vintage)
     print('Vintage RMSFE:',vintage_rmsfe)
+    
+    ###### Run a dm test ######
+    dm_results = DM(h_realtime, h_vintage, real_time_y, latest_y_test)
+    dm_t_hln = dm_results[1]
+    dm_p = dm_results[2]
+    print("dm_t_hln value is: ", dm_t_hln)
+    print("p value is: ", dm_p)
+
+
 
     return real_time_optimal_lags, h_realtime, real_time_rmsfe, vintage_optimal_lags, h_vintage, vintage_rmsfe, real_time_plot, vintage_plot, dm_t_hln, dm_p
 
