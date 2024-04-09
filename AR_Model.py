@@ -62,7 +62,7 @@ def AR_MODEL(year_input, quarter_input):
             print('\t%s: %.3f' % (key, value))
 
     def forecasted_values_data(y_data, ar_model_fit):
-        forecasted_values = ar_model_fit.predict(start=len(y_data)-1, end=len(y_data)+10) #forecasting 12 periods ahead
+        forecasted_values = ar_model_fit.predict(start=len(y_data), end=len(y_data)+11) #forecasting 12 periods ahead
         return forecasted_values
 
     def h_step_forecast(forecast_data):
@@ -107,11 +107,11 @@ def AR_MODEL(year_input, quarter_input):
     print('Vintage RMSFE:',vintage_rmsfe)
 
     ###### Run a dm test ######
-    #dm_results = DM(h_realtime, h_vintage, real_time_y, latest_y_test)
-    #dm_t_hln = dm_results[1]
+    dm_results = DM(h_realtime, h_vintage, latest_y_test, h=12)
+    dm_t_hln = dm_results[1]
     #dm_p = dm_results[2]
     
-    #print("dm_t_hln value is: ", dm_t_hln)
+    print("dm_t_hln value is: ", dm_t_hln)
     #print("p value is: ", dm_p)
 
     return real_time_optimal_lags, h_realtime, real_time_rmsfe, vintage_optimal_lags, h_vintage, vintage_rmsfe, real_time_plot, vintage_plot
