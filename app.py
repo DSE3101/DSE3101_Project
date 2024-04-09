@@ -222,7 +222,7 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
                  # Write-up Section
                 html.Div([
                     html.P(f"We have trained the Random Forest model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
-                    html.P(f" Comparing the two separate AR Models produced by the real time data and the revised vintage data, the {rf_lower_model} has a lower RMSFE than the {rf_higher_model}."
+                    html.P(f" Comparing the two separate RF Models produced by the real time data and the revised vintage data, the {rf_lower_model} has a lower RMSFE than the {rf_higher_model}."
                            f" With a lower RMSFE, this indicates that the {rf_lower_model} has been more accurate in predicting values than the {rf_higher_model}", style={'color': 'black'}),
                 ], className="write-up-container"),
             ], className="model-container"),
