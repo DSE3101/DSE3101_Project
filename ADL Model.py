@@ -19,10 +19,14 @@ real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_
 # This is to allow the ARDL model to match column names
 year_input='2017'
 quarter_input = '1'
-
-latest_X_test.columns = real_time_X.columns
-latest_y_test.columns = real_time_y.columns
-
+print(latest_X_test)
+print(latest_y_test)
+print(real_time_X)
+print(real_time_y)
+print(latest_X_train)
+print(latest_y_train)
+latest_X_test.columns = latest_X_train.columns
+latest_y_test.columns = latest_y_train.columns
 
 def convert_to_datetime(year_quarter_str):
     year, quarter = year_quarter_str.split(':')    # Split year and quarter
@@ -118,14 +122,15 @@ def calculating_rmsfe(y_predicted):
     return rmsfe
 
 ####### real time #######
+'''
 real_time_X.index = real_time_X.index.map(convert_to_datetime)
 real_time_y.index = real_time_y.index.map(convert_to_datetime)
 candidate_vars = ['CPI', 'RUC', 'M1', 'HSTARTS', 'IPM', 'OPH']
-best_model, best_x_cols = best_adl_model(candidate_vars,real_time_X,real_time_y)
-variables_in_realtime_model = best_model[2]
-real_time_optimal_lags = best_model[3]
+best_realtime_model, best_x_cols_realtime = best_adl_model(candidate_vars,real_time_X,real_time_y)
+variables_in_realtime_model = best_realtime_model[2]
+real_time_optimal_lags = best_realtime_model[3]
 forecast_steps = 12
-real_time_forecast = best_model[1].forecast(steps=12, exog=latest_X_test.loc[:, best_x_cols])
+real_time_forecast = best_realtime_model[1].forecast(steps=12, exog=latest_X_test.loc[:, best_x_cols_realtime])
 print(real_time_forecast)
 calculating_rmsfe(real_time_forecast)
 plot_forecast_real_time(real_time_y,real_time_forecast)
@@ -135,6 +140,26 @@ combined_data = converting_to_stationary(combined)
 #plot_individual_acf(combined_data)
 #plot_adl_autocorrelation(combined_data)
 #adf_test(combined_data)
+'''
+
+####### vintage data #######
+latest_X_train.index = latest_X_train.index.map(convert_to_datetime)
+latest_y_train.index = latest_y_train.map(convert_to_datetime)
+candidate_vars = ['CPI', 'RUC', 'M1', 'HSTARTS', 'IPM', 'OPH']
+best_vintage_model, best_x_cols_vintage = best_adl_model(candidate_vars,latest_X_train,latest_y_train)
+variables_in_vintage_model = best_vintage_model[2]
+vintage_optimal_lags = best_vintage_model[3]
+forecast_steps = 12
+vintage_forecast = best_vintage_model[1].forecast(steps=12, exog=latest_X_test.loc[:, best_x_cols_vintage])
+print(vintage_forecast)
+calculating_rmsfe(vintage_forecast)
+plot_forecast_real_time(latest_y_train,vintage_forecast)
+    ## acf & adf ##
+combined_vintage = combining_data(latest_X_train,latest_y_train,variables_in_vintage_model)
+combined_data_vintage = converting_to_stationary(combined_vintage)
+#plot_individual_acf(combined_data_vintage)
+#plot_adl_autocorrelation(combined_data_vintage)
+#adf_test(combined_data_vintage)
 
 
 
