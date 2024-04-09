@@ -77,6 +77,8 @@ def random_forest(year, quarter):
     latest_rmsfe = mean_squared_error(latest_y_test, latest_y_pred)**(0.5)
     print("\nRoot Mean Squared Forecast Error (RMSFE) with Latest Selected Variables:", latest_rmsfe)
 
+    print(real_time_y_pred, latest_y_pred)
+
     # Plots
     def plot_forecast_real_time(data, forecast, CI):
         fig, ax = plt.subplots(figsize=(4,4))  # Create a new figure and set the size
@@ -88,13 +90,14 @@ def random_forest(year, quarter):
             upper_bound = forecast + ci * forecast.std()
             ax.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
         ax.xaxis.set_major_locator(MaxNLocator(5))
-        ax.set_title('Random Forest Model Forecast with Real-Time Data')
+        ax.set_title('Random Model Forecast with Real-Time Data')
         ax.set_xlabel('Year:Quarter')
         ax.set_ylabel('rGDP')
         ax.legend()
 
         buffer = BytesIO()
         fig.savefig(buffer, format="png")
+        plt.show()
         plt.close(fig)
         buffer.seek(0)
         
@@ -120,6 +123,7 @@ def random_forest(year, quarter):
         ax.legend()
         buffer = BytesIO()
         fig.savefig(buffer, format="png")
+        plt.show()
         plt.close(fig)
         buffer.seek(0)
         
@@ -138,3 +142,5 @@ def random_forest(year, quarter):
     latest_plot = plot_forecast_vintage(latest_y_train.iloc[1:], latest_y_pred, CI)
 
     return real_time_selected_variables, real_time_rmsfe, real_time_y_pred, latest_selected_variables, latest_rmsfe, latest_y_pred, real_time_plot, latest_plot
+
+random_forest("1970", "2")

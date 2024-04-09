@@ -14,6 +14,8 @@ import base64
 from io import BytesIO
 from matplotlib.ticker import MaxNLocator
 import matplotlib.dates as mdates
+from PlotGraphs import *
+from dm import *
 
 
 
@@ -68,61 +70,6 @@ def AR_MODEL(year_input, quarter_input):
 
     CI = [0.57, 0.842, 1.282] #50, 60, 80% predictional interval
 
-    def plot_forecast_real_time(data, forecast, CI):
-        fig, ax = plt.subplots(figsize=(4,4))  # Create a new figure and set the size
-        ax.plot(data.index, data.values, label='Unrevised Real Time Data', color='blue')
-        ax.plot(forecast.index, forecast.values, label='Forecast', color='red')
-        for i, ci in enumerate(CI):
-            alpha = 0.5 * (i + 1) / len(CI)
-            lower_bound = forecast - ci * forecast.std()
-            upper_bound = forecast + ci * forecast.std()
-            ax.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
-        ax.xaxis.set_major_locator(MaxNLocator(5))
-        ax.set_title('AR Model Forecast with Real-Time Data')
-        ax.set_xlabel('Year:Quarter')
-        ax.set_ylabel('rGDP')
-        ax.legend()
-
-        buffer = BytesIO()
-        fig.savefig(buffer, format="png")
-        plt.close(fig)
-        buffer.seek(0)
-        
-        image_png = buffer.getvalue()
-        base64_string = base64.b64encode(image_png).decode('utf-8')
-        buffer.close()
-        
-        return f"data:image/png;base64,{base64_string}"
-
-
-    def plot_forecast_vintage(data, forecast, CI):
-        fig, ax = plt.subplots(figsize=(4,4))  # Create a new figure and set the size
-        ax.plot(data.index, data.values, label='Revised Vintage Data', color='blue')
-        ax.plot(forecast.index, forecast.values, label='Forecast', color='red')
-        for i, ci in enumerate(CI):
-            alpha = 0.5 * (i + 1) / len(CI)
-            lower_bound = forecast - ci * forecast.std()
-            upper_bound = forecast + ci * forecast.std()
-            ax.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
-        ax.xaxis.set_major_locator(MaxNLocator(5))
-        ax.set_title('AR Model Forecast with Revised Vintage Data')
-        ax.set_xlabel('Year:Quarter')
-        ax.set_ylabel('rGDP')
-        ax.legend()
-        buffer = BytesIO()
-        fig.savefig(buffer, format="png")
-        plt.close(fig)
-        buffer.seek(0)
-        
-        image_png = buffer.getvalue()
-        base64_string = base64.b64encode(image_png).decode('utf-8')
-        buffer.close()
-        
-        return f"data:image/png;base64,{base64_string}"
-
-
-
-
     def calculating_rmsfe(y_true, y_predicted):
         rmsfe = mean_squared_error(y_true,y_predicted)**(0.5)
         return rmsfe
@@ -135,7 +82,7 @@ def AR_MODEL(year_input, quarter_input):
     adfuller_stats(real_time_data)
     realtime_table_of_forecasts = forecasted_values_data(real_time_data, real_time_AR_model)
     h_realtime = h_step_forecast(forecasted_values_data(real_time_data, real_time_AR_model)) 
-    real_time_plot = plot_forecast_real_time(real_time_data, realtime_table_of_forecasts, CI)
+    real_time_plot = plot_forecast_real_time(real_time_data, realtime_table_of_forecasts, CI, "AR Model")
     real_time_rmsfe = calculating_rmsfe(latest_y_test,h_realtime)
     
     ###### for vintage data ######
@@ -148,6 +95,12 @@ def AR_MODEL(year_input, quarter_input):
     h_vintage = h_step_forecast(forecasted_values_data(vintage_data, vintage_AR_model)) 
     vintage_plot = plot_forecast_vintage(vintage_data, vintage_table_of_forecasts, CI)
     vintage_rmsfe = calculating_rmsfe(latest_y_test,h_vintage)
+
+    ###### Run a dm test ######
+    dm_results = DM(h_realtime, h_vintage, real_time_y, latest_y_test)
+    dm_t_hln = dm_results[1]
+    dm_p = dm_results[2]
+
     
     print('Lags chosen for real time AR model:',real_time_optimal_lags)
     print('Forecasted values for real time AR model:',h_realtime)
@@ -156,7 +109,7 @@ def AR_MODEL(year_input, quarter_input):
     print('Forecasted values for vintage AR model:',h_vintage)
     print('Vintage RMSFE:',vintage_rmsfe)
 
-    return real_time_optimal_lags, h_realtime, real_time_rmsfe, vintage_optimal_lags, h_vintage, vintage_rmsfe, real_time_plot, vintage_plot
+    return real_time_optimal_lags, h_realtime, real_time_rmsfe, vintage_optimal_lags, h_vintage, vintage_rmsfe, real_time_plot, vintage_plot, dm_t_hln, dm_p
 
 # Example usage
 # AR_MODEL("2012","2")
