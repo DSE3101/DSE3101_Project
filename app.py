@@ -106,8 +106,8 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
     quarter = year_quarter_data['quarter'].replace("Q", "")
 
     #AR Model implementation
-    ar_model_results = AR_MODEL(year, quarter)
-    if ar_model_results[2] < ar_model_results[5]:
+    ar_real_time_optimal_lags, ar_h_realtime, ar_real_time_rmsfe, ar_vintage_optimal_lags, ar_h_vintage, ar_vintage_rmsfe, ar_real_time_plot, ar_vintage_plot, ar_dm_t_hln, ar_dm_p = AR_MODEL(year, quarter)
+    if ar_real_time_rmsfe < ar_vintage_rmsfe:
         ar_lower_model = "real-time data model"
         ar_higher_model = "vintage data model"
     else:
@@ -117,14 +117,17 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
     #ADL model implementation
 
     #RF implementation
-    random_forest_results = random_forest(year, quarter)
-    if random_forest_results[1] < random_forest_results[4]:
+    rf_real_time_selected_variables, rf_real_time_rmsfe, rf_real_time_y_pred, rf_latest_selected_variables, rf_latest_rmsfe, rf_latest_y_pred, rf_real_time_plot, rf_latest_plot = random_forest(year, quarter)
+    if rf_real_time_rmsfe < rf_latest_rmsfe:
         rf_lower_model = "real-time data model"
         rf_higher_model = "vintage data model"
     else:
         rf_lower_model = "vintage data model"
         rf_higher_model = "real-time data model"
     
+    #
+
+
     evaluation = html.Div([
         html.Div([
             html.H3("Evaluating our models"),
@@ -141,19 +144,19 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
             html.Div([
                 # Real Time Data Column
                 html.Div([
-                    html.Img(src=ar_model_results[6], className="graph-image"),
+                    html.Img(src=ar_real_time_plot, className="graph-image"),
                     html.Div([
                         html.B("Real Time Data RMSFE: ", style={'color': 'black'}),
-                        html.P(f"{round(ar_model_results[2], 3)}", className="rmse-value")
+                        html.P(f"{round(ar_real_time_rmsfe, 3)}", className="rmse-value")
                     ], className="rmse-box")
                 ], className="graph-container"),
 
                 # Vintage Data Column
                 html.Div([
-                    html.Img(src=ar_model_results[7], className="graph-image"),
+                    html.Img(src=ar_vintage_plot, className="graph-image"),
                     html.Div([
                         html.B("Vintage Data RMSFE: ", style={'color': 'black'}),
-                        html.P(f"{round(ar_model_results[5], 3)}", className="rmse-value")
+                        html.P(f"{round(ar_vintage_rmsfe, 3)}", className="rmse-value")
                     ], className="rmse-box")
                 ], className="graph-container"),
             ], className="model-split-container"),
@@ -163,7 +166,8 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
                     html.P(f"We have trained the AR model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
                     html.P(f" Comparing the two separate AR Models produced by the real time data and the revised vintage data, the {ar_lower_model} has a lower RMSFE than the {ar_higher_model}."
                            f" With a lower RMSFE, this indicates that the {ar_lower_model} has been more accurate in predicting values than the {ar_higher_model}", style={'color': 'black'}),
-                    #html.P(f"p-value = {ar_model_results[8]}"),
+                    html.P(f"Running a DM test, we observe that our p-value = {ar_dm_p}",
+                           style={'color': 'black'}),
                 ], className="write-up-container"),
             ], className="model-container"),
 
@@ -176,7 +180,7 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
                     html.Img(src='assets/ar_real_time_plot.png', className="graph-image"),
                     html.Div([
                         html.B("Real Time Data RMSFE: ", style = {'color':'black'}),
-                        html.P(f"{round(ar_model_results[2], 3)}", className="rmse-value")
+                        html.P(f"{round(ar_real_time_rmsfe, 3)}", className="rmse-value")
                     ], className="rmse-box")
                 ], className="graph-container"),
 
@@ -185,7 +189,7 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
                     html.Img(src='assets/ar_vintage_plot.png', className="graph-image"),
                     html.Div([
                         html.B("Vintage Data RMSFE: ", style = {'color':'black'}),
-                        html.P(f"{round(ar_model_results[5], 3)}", className="rmse-value")
+                        html.P(f"{round(ar_vintage_rmsfe, 3)}", className="rmse-value")
                     ], className="rmse-box")
                 ], className="graph-container"),
             ], className="model-split-container"),
@@ -204,19 +208,19 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
             html.Div([
                 # Real Time Data Column
                 html.Div([
-                    html.Img(src=random_forest_results[6], className="graph-image"),
+                    html.Img(src=rf_real_time_plot, className="graph-image"),
                     html.Div([
                         html.B("Real Time Data RMSFE: ", style = {'color':'black'}),
-                        html.P(f"{round(random_forest_results[1], 3)}", className="rmse-value")
+                        html.P(f"{round(rf_real_time_rmsfe, 3)}", className="rmse-value")
                     ], className="rmse-box")
                 ], className="graph-container"),
 
                 # Vintage Data Column
                 html.Div([
-                    html.Img(src=random_forest_results[7], className="graph-image"),
+                    html.Img(src=rf_latest_plot, className="graph-image"),
                     html.Div([
                         html.B("Vintage Data RMSFE: ", style = {'color':'black'}),
-                        html.P(f"{round(random_forest_results[4], 3)}", className="rmse-value")
+                        html.P(f"{round(rf_latest_rmsfe, 3)}", className="rmse-value")
                     ], className="rmse-box")
                 ], className="graph-container"),
             ], className="model-split-container"),

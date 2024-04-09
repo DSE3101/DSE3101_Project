@@ -109,13 +109,11 @@ def AR_MODEL(year_input, quarter_input):
     ###### Run a dm test ######
 
     dm_results = DM(h_realtime, h_vintage, latest_y_test, h=12)
-    dm_t_hln = dm_results[1]
-    dm_p = dm_results[2]
+    ar_dm_t_hln = dm_results[1]
+    ar_dm_p = dm_results[2]
     
-    print("dm_t_hln value is: ", dm_t_hln)
-    print("p value is: ", dm_p)
 
-    return real_time_optimal_lags, h_realtime, real_time_rmsfe, vintage_optimal_lags, h_vintage, vintage_rmsfe, real_time_plot, vintage_plot
+    return real_time_optimal_lags, h_realtime, real_time_rmsfe, vintage_optimal_lags, h_vintage, vintage_rmsfe, real_time_plot, vintage_plot, ar_dm_t_hln, ar_dm_p
 
 # Example usage
 AR_MODEL("2012","2")
