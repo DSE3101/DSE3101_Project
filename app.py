@@ -163,7 +163,7 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
                     html.P(f"We have trained the AR model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
                     html.P(f" Comparing the two separate AR Models produced by the real time data and the revised vintage data, the {ar_lower_model} has a lower RMSFE than the {ar_higher_model}."
                            f" With a lower RMSFE, this indicates that the {ar_lower_model} has been more accurate in predicting values than the {ar_higher_model}", style={'color': 'black'}),
-                    html.P(f"p-value = {ar_model_results[8]}"),
+                    #html.P(f"p-value = {ar_model_results[8]}"),
                 ], className="write-up-container"),
             ], className="model-container"),
 
