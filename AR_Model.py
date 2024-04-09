@@ -77,12 +77,13 @@ def AR_MODEL(year_input, quarter_input):
     ###### for real time data ######
     real_time_data = converting_to_stationary(real_time_y)
     real_time_optimal_lags = finding_minimum_aic(real_time_data)
-    real_time_AR_model = forming_AR_model(real_time_data,real_time_optimal_lags)
+    testing_data = converting_to_stationary(latest_y_train)
+    real_time_AR_model = forming_AR_model(testing_data,real_time_optimal_lags)
     autocorrelation_plot(real_time_data)
     adfuller_stats(real_time_data)
-    realtime_table_of_forecasts = forecasted_values_data(real_time_data, real_time_AR_model)
-    h_realtime = h_step_forecast(forecasted_values_data(real_time_data, real_time_AR_model)) 
-    real_time_plot = plot_forecast_real_time(real_time_data, realtime_table_of_forecasts, CI, "AR Model")
+    realtime_table_of_forecasts = forecasted_values_data(testing_data, real_time_AR_model)
+    h_realtime = h_step_forecast(forecasted_values_data(testing_data, real_time_AR_model)) 
+    real_time_plot = plot_forecast_real_time(real_time_data, realtime_table_of_forecasts, CI)
     real_time_rmsfe = calculating_rmsfe(latest_y_test,h_realtime)
     
     ###### for vintage data ######
@@ -100,8 +101,9 @@ def AR_MODEL(year_input, quarter_input):
     dm_results = DM(h_realtime, h_vintage, real_time_y, latest_y_test)
     dm_t_hln = dm_results[1]
     dm_p = dm_results[2]
+    print("dm_t_hln value is: ", dm_t_hln)
+    print("p value is: ", dm_p)
 
-    
     print('Lags chosen for real time AR model:',real_time_optimal_lags)
     print('Forecasted values for real time AR model:',h_realtime)
     print('Real time RMSFE:',real_time_rmsfe)
@@ -112,4 +114,4 @@ def AR_MODEL(year_input, quarter_input):
     return real_time_optimal_lags, h_realtime, real_time_rmsfe, vintage_optimal_lags, h_vintage, vintage_rmsfe, real_time_plot, vintage_plot, dm_t_hln, dm_p
 
 # Example usage
-# AR_MODEL("2012","2")
+AR_MODEL("2012","2")
