@@ -25,38 +25,28 @@ latest_y_test.columns = real_time_y.columns
 
 
 def convert_to_datetime(year_quarter_str):
-    # Split year and quarter
-    year, quarter = year_quarter_str.split(':')
-    # Map quarter to month
-    quarter_to_month = {'Q1': "1", 'Q2': "4", 'Q3': "7", 'Q4': "10"}
+    year, quarter = year_quarter_str.split(':')    # Split year and quarter
+    quarter_to_month = {'Q1': "1", 'Q2': "4", 'Q3': "7", 'Q4': "10"}    # Map quarter to month
     month = quarter_to_month[quarter]
-    # Create datetime object
-    datetime_obj = pd.to_datetime(f'{year}-{month}-01')
-    # Specify frequency as quarterly
-    datetime_obj = pd.Period(datetime_obj, freq='Q')
+    datetime_obj = pd.to_datetime(f'{year}-{month}-01')    # Create datetime object
+    datetime_obj = pd.Period(datetime_obj, freq='Q')     # Specify frequency as quarterly
     return datetime_obj
 
-def best_adl_model(variables):
+def best_adl_model(variables,x_data,y_data):
     max_lag = 8
     best_model = None
     best_aic = float('inf')
     for num_vars in range(1, len(variables) + 1):
         for vars_combination in combinations(variables, num_vars):
-            # Generate column names for the combination
-            x_columns = [f'{var}{year_input[-2:]}Q{quarter_input}' for var in vars_combination]
-            
-            # Filter real_time_X for selected columns
-            x_data_subset = real_time_X.loc[:, x_columns]
-            #x_data_subset = x_data_subset.iloc[1:,:]
-            
-            # Fit ARDL model with different lag orders
-            for lag in range(1, max_lag + 1):
-                ardl_model = ARDL(endog=real_time_y, lags=lag, exog=x_data_subset, order=lag)
+            x_columns = [f'{var}{year_input[-2:]}Q{quarter_input}' for var in vars_combination] # Generate column names for the combination
+            x_data_subset = x_data.loc[:, x_columns]            # Filter real_time_X for selected columns
+        
+            for lag in range(1, max_lag + 1):             # Fit ARDL model with different lag orders
+                ardl_model = ARDL(endog=y_data, lags=lag, exog=x_data_subset, order=lag)
                 ardl_results = ardl_model.fit()
                 aic = ardl_results.aic
                 
-                # Update best model if current model has lower AIC
-                if aic < best_aic:
+                if aic < best_aic:                # Update best model if current model has lower AIC
                     best_aic = aic
                     best_model = (ardl_model, ardl_results, vars_combination, lag)
                     best_x_cols = x_data_subset.columns
@@ -130,7 +120,7 @@ def calculating_rmsfe(y_predicted):
 real_time_X.index = real_time_X.index.map(convert_to_datetime)
 real_time_y.index = real_time_y.index.map(convert_to_datetime)
 candidate_vars = ['CPI', 'RUC', 'M1', 'HSTARTS', 'IPM', 'OPH']
-best_model, best_x_cols = best_adl_model(candidate_vars)
+best_model, best_x_cols = best_adl_model(candidate_vars,real_time_X,real_time_y)
 variables_in_realtime_model = best_model[2]
 real_time_optimal_lags = best_model[3]
 forecast_steps = 12
@@ -138,6 +128,7 @@ forecast = best_model[1].forecast(steps=12, exog=latest_X_test.loc[:, best_x_col
 print(forecast)
 calculating_rmsfe(forecast)
 plot_forecast_real_time(real_time_y,forecast)
+
 ## acf & adf ##
 combined = combining_data(real_time_X,real_time_y,variables_in_realtime_model)
 combined_data = converting_to_stationary(combined)
