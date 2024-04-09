@@ -19,14 +19,9 @@ real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_
 # This is to allow the ARDL model to match column names
 year_input='2017'
 quarter_input = '1'
-print(latest_X_test)
-print(latest_y_test)
-print(real_time_X)
-print(real_time_y)
-print(latest_X_train)
-print(latest_y_train)
-latest_X_test.columns = latest_X_train.columns
-latest_y_test.columns = latest_y_train.columns
+
+latest_X_test.columns = real_time_X.columns
+latest_y_test.columns = real_time_y.columns
 
 def convert_to_datetime(year_quarter_str):
     year, quarter = year_quarter_str.split(':')    # Split year and quarter
@@ -143,6 +138,7 @@ combined_data = converting_to_stationary(combined)
 '''
 
 ####### vintage data #######
+
 latest_X_train.index = latest_X_train.index.map(convert_to_datetime)
 latest_y_train.index = latest_y_train.map(convert_to_datetime)
 candidate_vars = ['CPI', 'RUC', 'M1', 'HSTARTS', 'IPM', 'OPH']
