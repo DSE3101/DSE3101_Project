@@ -173,5 +173,5 @@ def ADL_MODEL(year_input,quarter_input):
     
     return lags_dict, y_pred, rmsfe, adl_plot
 
-ADL_MODEL("2012","2")
+#ADL_MODEL("2012","2")
 
