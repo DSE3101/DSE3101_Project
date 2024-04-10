@@ -17,6 +17,7 @@ import pickle
 from sklearn.metrics import mean_squared_error
 import base64
 from io import BytesIO
+from dm import *
 
 
 from components.ARTab import ARTab
@@ -26,7 +27,7 @@ from components.MLTab import *
 from data import mainplot #Main graph on landing
 from GetData import get_data
 from AR_Model import AR_MODEL
-from RandomForest import *
+from NewRandomForest import *
 
 
 routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
@@ -75,7 +76,6 @@ def update_graph(year_value, quarter_value):
     Output('lag-caller', 'children'),
     [Input('dropdown-year', 'value'), Input('dropdown-quarter', 'value')]
     )
-
 def update_output(year_value, quarter_value):
     return f'Your training data will be from 1947 Q1 to {year_value} {quarter_value}'
 
@@ -105,25 +105,20 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
     year = year_quarter_data['year']
     quarter = year_quarter_data['quarter'].replace("Q", "")
 
+    #get_data
+    real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data(year, quarter)
+
     #AR Model implementation
-    ar_real_time_optimal_lags, ar_h_realtime, ar_real_time_rmsfe, ar_vintage_optimal_lags, ar_h_vintage, ar_vintage_rmsfe, ar_real_time_plot, ar_vintage_plot, ar_dm_t_hln, ar_dm_p = AR_MODEL(year, quarter)
-    if ar_real_time_rmsfe < ar_vintage_rmsfe:
-        ar_lower_model = "real-time data model"
-        ar_higher_model = "vintage data model"
-    else:
-        ar_lower_model = "vintage data model"
-        ar_higher_model = "real-time data model"
+    #ar_real_time_optimal_lags, ar_h_realtime, ar_real_time_rmsfe, ar_vintage_optimal_lags, ar_h_vintage, ar_vintage_rmsfe, ar_real_time_plot, ar_vintage_plot, ar_dm_t_hln, ar_dm_p = AR_MODEL(year, quarter)
 
     #ADL model implementation
 
     #RF implementation
-    rf_real_time_selected_variables, rf_real_time_rmsfe, rf_real_time_y_pred, rf_latest_selected_variables, rf_latest_rmsfe, rf_latest_y_pred, rf_real_time_plot, rf_latest_plot = random_forest(year, quarter)
-    if rf_real_time_rmsfe < rf_latest_rmsfe:
-        rf_lower_model = "real-time data model"
-        rf_higher_model = "vintage data model"
-    else:
-        rf_lower_model = "vintage data model"
-        rf_higher_model = "real-time data model"
+    rf_selected_variables_importance_dict, rf_rmsfe, rf_real_time_plot, rf_latest_plot, rf_y_pred = random_forest(year, quarter)
+
+    #DM test
+    #ar_adl_dm = DM(ar_h_realtime, adl_h_realtime, real_time_y)
+    #ar_rf_dm = DM(ar_h_realtime, rf_y_pred, real_time_y)
     
     #DM explainer
     low_p_value ="Since the p-value is less than 0.05, it means that there is significant predictive capabilities between the two models."
@@ -145,19 +140,19 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
             html.Div([
                 # Real Time Data Column
                 html.Div([
-                    html.Img(src=ar_real_time_plot, className="graph-image"),
+                    #html.Img(src=ar_real_time_plot, className="graph-image"),
                     html.Div([
                         html.B("Real Time Data RMSFE: ", style={'color': 'black'}),
-                        html.P(f"{round(ar_real_time_rmsfe, 3)}", className="rmse-value")
-                    ], className="rmse-box")
+                        #html.P(f"{round(ar_real_time_rmsfe, 3)}", className="rmse-value")
+                    ], className="rmse-b ox")
                 ], className="graph-container"),
 
                 # Vintage Data Column
                 html.Div([
-                    html.Img(src=ar_vintage_plot, className="graph-image"),
+                    #html.Img(src=ar_vintage_plot, className="graph-image"),
                     html.Div([
                         html.B("Vintage Data RMSFE: ", style={'color': 'black'}),
-                        html.P(f"{round(ar_vintage_rmsfe, 3)}", className="rmse-value")
+                        #html.P(f"{round(ar_vintage_rmsfe, 3)}", className="rmse-value")
                     ], className="rmse-box")
                 ], className="graph-container"),
             ], className="model-split-container"),
@@ -165,11 +160,8 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
         # Write-up Section
                 html.Div([
                     html.P(f"We have trained the AR model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
-                    html.P(f" Comparing the two separate AR Models produced by the real time data and the revised vintage data, the {ar_lower_model} has a lower RMSFE than the {ar_higher_model}."
-                           f" With a lower RMSFE, this indicates that the {ar_lower_model} has been more accurate in predicting values than the {ar_higher_model}", style={'color': 'black'}),
-                    html.P(f"Running a DM test, we observe that our p-value = {round(ar_dm_p,3)}",
-                           f"##Put the explainer here",
-                           style={'color': 'black'}),
+                    #html.P(f" Comparing the two separate AR Models produced by the real time data and the revised vintage data, the {ar_lower_model} has a lower RMSFE than the {ar_higher_model}."
+                           #f" With a lower RMSFE, this indicates that the {ar_lower_model} has been more accurate in predicting values than the {ar_higher_model}", style={'color': 'black'}),
                 ], className="write-up-container"),
             ], className="model-container"),
 
@@ -179,10 +171,10 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
             html.Div([
                 # Real Time Data Column
                 html.Div([
-                    html.Img(src='assets/ar_real_time_plot.png', className="graph-image"),
+                    #html.Img(src='assets/ar_real_time_plot.png', className="graph-image"),
                     html.Div([
-                        html.B("Real Time Data RMSFE: ", style = {'color':'black'}),
-                        html.P(f"{round(ar_real_time_rmsfe, 3)}", className="rmse-value")
+                        #html.B("Real Time Data RMSFE: ", style = {'color':'black'}),
+                        #html.P(f"{round(ar_real_time_rmsfe, 3)}", className="rmse-value")
                     ], className="rmse-box")
                 ], className="graph-container"),
 
@@ -190,17 +182,17 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
                 html.Div([
                     html.Img(src='assets/ar_vintage_plot.png', className="graph-image"),
                     html.Div([
-                        html.B("Vintage Data RMSFE: ", style = {'color':'black'}),
-                        html.P(f"{round(ar_vintage_rmsfe, 3)}", className="rmse-value")
+                        #html.B("Vintage Data RMSFE: ", style = {'color':'black'}),
+                        #html.P(f"{round(ar_vintage_rmsfe, 3)}", className="rmse-value")
                     ], className="rmse-box")
                 ], className="graph-container"),
             ], className="model-split-container"),
 
              # Write-up Section
                 html.Div([
-                    html.P(f"We have trained the ADL model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
-                    html.P(f" Comparing the two separate AR Models produced by the real time data and the revised vintage data, the {ar_lower_model} has a lower RMSFE than the {ar_higher_model}."
-                           f" With a lower RMSFE, this indicates that the {ar_lower_model} has been more accurate in predicting values than the {ar_higher_model}", style={'color': 'black'}),
+                    #html.P(f"We have trained the ADL model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
+                    #html.P(f" Comparing the two separate AR Models produced by the real time data and the revised vintage data, the {ar_lower_model} has a lower RMSFE than the {ar_higher_model}."
+                           #f" With a lower RMSFE, this indicates that the {ar_lower_model} has been more accurate in predicting values than the {ar_higher_model}", style={'color': 'black'}),
                 ], className="write-up-container"),
             ], className="model-container"),
         
@@ -208,21 +200,11 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
         html.Div([
             html.H5("RF Model", className="model-header"),
             html.Div([
-                # Real Time Data Column
                 html.Div([
                     html.Img(src=rf_real_time_plot, className="graph-image"),
                     html.Div([
-                        html.B("Real Time Data RMSFE: ", style = {'color':'black'}),
-                        html.P(f"{round(rf_real_time_rmsfe, 3)}", className="rmse-value")
-                    ], className="rmse-box")
-                ], className="graph-container"),
-
-                # Vintage Data Column
-                html.Div([
-                    html.Img(src=rf_latest_plot, className="graph-image"),
-                    html.Div([
-                        html.B("Vintage Data RMSFE: ", style = {'color':'black'}),
-                        html.P(f"{round(rf_latest_rmsfe, 3)}", className="rmse-value")
+                        html.B("Model RMSFE: ", style = {'color':'black'}),
+                        html.P(f"{round(rf_rmsfe, 3)}", className="rmse-value")
                     ], className="rmse-box")
                 ], className="graph-container"),
             ], className="model-split-container"),
@@ -230,11 +212,12 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
             # Write-up Section
                 html.Div([
                     html.P(f"We have trained the Random Forest model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
-                    html.P(f" Comparing the two separate RF Models produced by the real time data and the revised vintage data, the {rf_lower_model} has a lower RMSFE than the {rf_higher_model}."
-                           f" With a lower RMSFE, this indicates that the {rf_lower_model} has been more accurate in predicting values than the {rf_higher_model}", style={'color': 'black'}),
+                    html.P(f" Using a rolling window average to train our model, our 8 step forecast has indicated that the RMSFE is {rf_rmsfe}."
+                           , style={'color': 'black'}),
                 ], className="write-up-container"),
             ], className="model-container"),
-        #Final part
+        #DM Evaluation
+        ##Insert a table here, make it to show the benchmark of ar vs rf and ar vs adl
     ], className="evaluation-container", style={'background-color': 'lightblue', 'padding': '20px', 'border-radius': '5px', 'margin': '20px', 'display': 'flex', 'flex-direction': 'column', 'gap': '20px'})
 
     return evaluation, {'display': 'block'}
