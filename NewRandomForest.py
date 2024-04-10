@@ -92,8 +92,8 @@ def random_forest(year, quarter):
     
     y_pred = pd.Series(y_pred) #adding this into output
     y_pred.index = latest_y_test.index
-    real_time_plot = plot_forecast_real_time(real_time_y[1:], y_pred, CI, "RF Model")
-    latest_plot = plot_forecast_vintage(latest_y_train[1:], latest_y_test.iloc[:, 0], CI, "RF Model")
+    real_time_plot = plot_forecast_real_time(real_time_y[1:], y_pred, latest_y_test, CI, "RF Model")
+    latest_plot = 1
 
     selected_variables_final = [var[:-4] for var in selected_variables]
     importance_values = feature_importance_df["Importance"].tolist()

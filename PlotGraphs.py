@@ -15,10 +15,16 @@ from io import BytesIO
 from matplotlib.ticker import MaxNLocator
 import matplotlib.dates as mdates
 
-def plot_forecast_real_time(data, forecast, CI, modelName):
+def plot_forecast_real_time(data, forecast, actual, CI, modelName):
+        actual = (actual.iloc[:,0])
         fig, ax = plt.subplots(figsize=(4,4))  # Create a new figure and set the size
+
+        # Plotting the unrevised real-time data
         ax.plot(data.index, data.values, label='Unrevised Real Time Data', color='blue')
+        # Plotting the forecast
         ax.plot(forecast.index, forecast.values, label='Forecast', color='red')
+        # Plotting the actual data
+        ax.plot(actual.index, actual.values, color='green', label='Actual Data', alpha=0.6)
         for i, ci in enumerate(CI):
             alpha = 0.5 * (i + 1) / len(CI)
             lower_bound = forecast - ci * forecast.std()
@@ -29,7 +35,7 @@ def plot_forecast_real_time(data, forecast, CI, modelName):
         ax.xaxis.set_major_locator(MaxNLocator(5))
         ax.set_title(f'{modelName} Forecast with Real-Time Data')
         ax.set_xlabel('Year:Quarter')
-        ax.set_ylabel('rGDP')
+        ax.set_ylabel('Change in growth rate')
         ax.legend()
 
         buffer = BytesIO()
@@ -44,7 +50,7 @@ def plot_forecast_real_time(data, forecast, CI, modelName):
         return f"data:image/png;base64,{base64_string}"
 
 
-def plot_forecast_vintage(data, forecast, CI, modelName):
+def plot_forecast_vintage(data, forecast, actual, CI, modelName):
     fig, ax = plt.subplots(figsize=(4,4))  # Create a new figure and set the size
     ax.plot(data.index, data.values, label='Revised Vintage Data', color='blue')
     ax.plot(forecast.index, forecast.values, label='Forecast', color='red')
@@ -58,7 +64,7 @@ def plot_forecast_vintage(data, forecast, CI, modelName):
     ax.xaxis.set_major_locator(MaxNLocator(5))
     ax.set_title(f'{modelName} Forecast with Revised Vintage Data')
     ax.set_xlabel('Year:Quarter')
-    ax.set_ylabel('rGDP')
+    ax.set_ylabel('Change in growth rate')
     ax.legend()
     buffer = BytesIO()
     fig.savefig(buffer, format="png")

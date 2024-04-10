@@ -508,8 +508,8 @@ HSTARTS.fillna(-999, inplace=True)
 
 # Real GNP/GDP (ROUTPUT)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/routput
-ROUTPUT = pd.read_excel("./data/project data/ROUTPUTQvQd.xlsx", index_col="DATE").diff().fillna(-999)
-
+ROUTPUT = pd.read_excel("./data/project data/ROUTPUTQvQd.xlsx", index_col="DATE").pct_change().fillna(-999)
+print(ROUTPUT)
 macro_variables = [RCON, rcong, RCONND, RCOND, RCONS, rconshh, rconsnp, rinvbf, rinvresid,
                    rinvchi, RNX, REX, RIMP, RG, RGF, RGSL, rconhh, WSD, OLI, PROPI, RENTI,
                    DIV, PINTI, TRANR, SSCONTRIB, NPI, PTAX, NDPI, NCON, PINTPAID, TRANPF,
