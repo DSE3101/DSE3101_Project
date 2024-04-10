@@ -10,7 +10,7 @@ from matplotlib.ticker import MaxNLocator
 
 def random_forest(year, quarter):
     real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data(year, quarter)
-    top_n_variables = len(real_time_X.columns) // 3
+    top_n_variables = len(real_time_X.columns) // 10
 
     '''
     No need train test split because we are comparing against actual values from latest vintage directly
@@ -93,11 +93,10 @@ def random_forest(year, quarter):
     y_pred = pd.Series(y_pred) #adding this into output
     y_pred.index = latest_y_test.index
     real_time_plot = plot_forecast_real_time(real_time_y[1:], y_pred, latest_y_test, CI, "RF Model")
-    latest_plot = 1
 
     selected_variables_final = [var[:-4] for var in selected_variables]
     importance_values = feature_importance_df["Importance"].tolist()
     selected_variables_importance_dict = dict(zip(selected_variables_final, importance_values))
-    return selected_variables_importance_dict, rmsfe, real_time_plot, latest_plot, y_pred
+    return selected_variables_importance_dict, rmsfe, real_time_plot, y_pred
 
-#random_forest("2012", "2")
+random_forest("1970", "2")

@@ -93,47 +93,10 @@ def AR_MODEL(year_input, quarter_input):
     y_pred = pd.Series(y_pred)
     y_pred.index = latest_y_test.index
 
-    def plot_forecast_real_time(data, forecast, CI, modelName):
-        fig, ax = plt.subplots(figsize=(4,4))  # Create a new figure and set the size
-        ax.plot(data.index, data.values, label='Unrevised Real Time Data', color='blue')
-        ax.plot(forecast.index, forecast.values, label='Forecast', color='red')
-        for i, ci in enumerate(CI):
-            alpha = 0.5 * (i + 1) / len(CI)
-            lower_bound = forecast - ci * forecast.std()
-            upper_bound = forecast + ci * forecast.std()
-            ax.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
-
-        ax.set_xlim([data.index[-20], forecast.index[-1]])
-        ax.xaxis.set_major_locator(MaxNLocator(5))
-        ax.set_title(f'{modelName} Forecast with Real-Time Data')
-        ax.set_xlabel('Year:Quarter')
-        ax.set_ylabel('rGDP')
-        ax.legend()
-        plt.show()
-        plt.close(fig)
-    def plot_forecast_vintage(data, forecast, CI, modelName):
-        fig, ax = plt.subplots(figsize=(4,4))  # Create a new figure and set the size
-        ax.plot(data.index, data.values, label='Revised Vintage Data', color='blue')
-        ax.plot(forecast.index, forecast.values, label='Forecast', color='red')
-        for i, ci in enumerate(CI):
-            alpha = 0.5 * (i + 1) / len(CI)
-            lower_bound = forecast - ci * forecast.std()
-            upper_bound = forecast + ci * forecast.std()
-            ax.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
-        
-        ax.set_xlim([data.index[-20], forecast.index[-1]])
-        ax.xaxis.set_major_locator(MaxNLocator(5))
-        ax.set_title(f'{modelName} Forecast with Revised Vintage Data')
-        ax.set_xlabel('Year:Quarter')
-        ax.set_ylabel('rGDP')
-        ax.legend()
-        plt.show()
-        plt.close(fig)
-
     CI = [0.57, 0.842, 1.282] #50, 60, 80% predictional interval
-    real_time_plot = plot_forecast_real_time(real_time_data, y_pred, CI, "AR Model")
+    real_time_plot = plot_forecast_real_time(real_time_data, y_pred, latest_y_test, CI, "AR Model")
     real_time_rmsfe = calculating_rmsfe(y_pred, latest_y_test)
-    latest_plot = plot_forecast_vintage(pd.Series(latest_y_train.iloc[1:, 0]), pd.Series(latest_y_test.iloc[1:, 0]), CI, "AR Model")
+    #latest_plot = plot_forecast_vintage(la, latest_y_test, CI, "AR Model")
     print('Lags chosen for real time AR model:',real_time_optimal_lags)
     print('Forecasted values for real time AR model:\n',y_pred)
     print('Real time RMSFE:',real_time_rmsfe)
@@ -144,7 +107,7 @@ def AR_MODEL(year_input, quarter_input):
     # ar_dm_t_hln = dm_results[1]
     # ar_dm_p = dm_results[2]
     
-    return real_time_optimal_lags, real_time_rmsfe, real_time_plot, latest_plot
+    return real_time_optimal_lags, real_time_rmsfe, real_time_plot, y_pred
 
 # Example usage
-AR_MODEL("2012","2")
+#AR_MODEL("2012","2")

@@ -26,8 +26,8 @@ from components.ADLTab import ADLTab
 from components.MLTab import *
 from data import mainplot #Main graph on landing
 from GetData import get_data
-from AR_Model import AR_MODEL
 from NewRandomForest import *
+from NewARModel import *
 
 
 routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
@@ -130,26 +130,6 @@ def update_shared_data(year_value, quarter_value):
 
 #Run ADL
 
-#Run RF
-@app.callback(
-    Output('rf-results', 'data')
-    [Input('train-model', 'n_clicks')],
-    [State('year-quarter', 'data')]
-)
-def rf_model(n_clicks, year_quarter_data):
-     year = year_quarter_data['year']
-     quarter = year_quarter_data['quarter'].replace("Q", "")
-     rf_selected_variables_importance_dict, rf_rmsfe, rf_real_time_plot, rf_latest_plot, rf_y_pred = random_forest(year, quarter)
-     rf_results = {
-        'selected_variables_importance_dict': rf_selected_variables_importance_dict,
-        'rmsfe': rf_rmsfe,
-        'real_time_plot': rf_real_time_plot,
-        'latest_plot': rf_latest_plot,
-        'y_pred': rf_y_pred 
-    }
-
-     return rf_results
-
 #Train model button
 @app.callback(
     [Output('evaluation-results', 'children'),  
@@ -168,16 +148,16 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
     real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data(year, quarter)
 
     #AR Model implementation
-    #ar_real_time_optimal_lags, ar_h_realtime, ar_real_time_rmsfe, ar_vintage_optimal_lags, ar_h_vintage, ar_vintage_rmsfe, ar_real_time_plot, ar_vintage_plot, ar_dm_t_hln, ar_dm_p = AR_MODEL(year, quarter)
+    ar_real_time_optimal_lags, ar_real_time_rmsfe,ar_real_time_plot, ar_y_pred = AR_MODEL(year, quarter)
 
     #ADL model implementation
 
     #RF implementation
-    rf_selected_variables_importance_dict, rf_rmsfe, rf_real_time_plot, rf_latest_plot, rf_y_pred = random_forest(year, quarter)
+    rf_selected_variables_importance_dict, rf_rmsfe, rf_real_time_plot, rf_y_pred = random_forest(year, quarter)
 
     #DM test
     #ar_adl_dm = DM(ar_h_realtime, adl_h_realtime, real_time_y, h = 8)
-    #ar_rf_dm = DM(ar_h_realtime, rf_y_pred, real_time_y, h = 8)
+    ar_rf_dm = DM(ar_y_pred, rf_y_pred, real_time_y, h = 8)
     
     #DM explainer
     low_p_value ="Since the p-value is less than 0.05, it means that there is significant predictive capabilities between the two models."
@@ -198,13 +178,13 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
         # AR Model Container
         html.Div([
             html.H5("AR Model", className="model-header"),
-            html.Img(src=rf_real_time_plot, className="graph-image graphBorder"),
+            html.Img(src=ar_real_time_plot, className="graph-image graphBorder"),
             html.P("AR Model RMSFE: ", style={'color': 'black'}),
-            html.P(f"{round(rf_rmsfe, 3)}", className="rmse-value"),
+            html.P(f"{round(ar_real_time_rmsfe, 3)}", className="rmse-value"),
             # AR Model Write-up Section
             html.Div([
                 html.P(f"We have trained the AR model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
-                html.P(f" Using a rolling window average to train our model, our 8 step forecast has indicated that the RMSFE is {rf_rmsfe}.", style={'color': 'black'}),
+                html.P(f" Using a rolling window average to train our model, our 8 step forecast has indicated that the RMSFE is {ar_real_time_rmsfe}.", style={'color': 'black'}),
             ], className="write-up-container"),
         ], className="model-container"),
         
@@ -231,6 +211,7 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
             html.Div([
                 html.P(f"We have trained the RF model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
                 html.P(f" Using a rolling window average to train our model, our 8 step forecast has indicated that the RMSFE is {rf_rmsfe}.", style={'color': 'black'}),
+                html.P(f"{ar_rf_dm}", style={'color': 'black'})
             ], className="write-up-container"),
         ], className="model-container"),
     ], className="model-split-container", style={'display': 'flex', 'justify-content': 'space-around'}),

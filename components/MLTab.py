@@ -14,8 +14,6 @@ import pickle
 from NewRandomForest import *
 from app import app
 
-selected_variables_importance_dict, rmsfe, real_time_plot, latest_plot, y_pred = random_forest(year, quarter)
-
 def MLTab():
     MLTab = html.Div([
         html.H3("Machine Learning Analysis"),
