@@ -40,6 +40,7 @@ routput = routput[routput['DATE'].dt.year >= 1965]
 date_range_yearly = pd.date_range(start='1947-01-01', end='2023-12-31', freq='YS')
 
 app = dash.Dash(__name__, external_stylesheets= [dbc.themes.DARKLY], suppress_callback_exceptions=True)
+server = app.server
 navbar = dbc.NavbarSimple(
     children=[
         dbc.NavItem(dbc.NavLink("Training and Evaluating the Model", href="/model-training")),
