@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 from GetData import get_data
-# from PlotGraphs import *
+from PlotGraphs import *
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
@@ -89,43 +89,8 @@ def random_forest(year, quarter):
 
     # Plots
     CI = [0.57, 0.842, 1.282] # 50, 60, 80% predictional interval
-    def plot_forecast_real_time(data, forecast, CI, modelName):
-        fig, ax = plt.subplots(figsize=(4,4))  # Create a new figure and set the size
-        ax.plot(data.index, data.values, label='Unrevised Real Time Data', color='blue')
-        ax.plot(forecast.index, forecast.values, label='Forecast', color='red')
-        for i, ci in enumerate(CI):
-            alpha = 0.5 * (i + 1) / len(CI)
-            lower_bound = forecast - ci * forecast.std()
-            upper_bound = forecast + ci * forecast.std()
-            ax.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
-
-        ax.set_xlim([data.index[-20], forecast.index[-1]])
-        ax.xaxis.set_major_locator(MaxNLocator(5))
-        ax.set_title(f'{modelName} Forecast with Real-Time Data')
-        ax.set_xlabel('Year:Quarter')
-        ax.set_ylabel('rGDP')
-        ax.legend()
-        plt.show()
-        plt.close(fig)
-    def plot_forecast_vintage(data, forecast, CI, modelName):
-        fig, ax = plt.subplots(figsize=(4,4))  # Create a new figure and set the size
-        ax.plot(data.index, data.values, label='Revised Vintage Data', color='blue')
-        ax.plot(forecast.index, forecast.values, label='Forecast', color='red')
-        for i, ci in enumerate(CI):
-            alpha = 0.5 * (i + 1) / len(CI)
-            lower_bound = forecast - ci * forecast.std()
-            upper_bound = forecast + ci * forecast.std()
-            ax.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
-        
-        ax.set_xlim([data.index[-20], forecast.index[-1]])
-        ax.xaxis.set_major_locator(MaxNLocator(5))
-        ax.set_title(f'{modelName} Forecast with Revised Vintage Data')
-        ax.set_xlabel('Year:Quarter')
-        ax.set_ylabel('rGDP')
-        ax.legend()
-        plt.show()
-        plt.close(fig)
-    y_pred = pd.Series(y_pred)
+    
+    y_pred = pd.Series(y_pred) #adding this into output
     y_pred.index = latest_y_test.index
     real_time_plot = plot_forecast_real_time(real_time_y[1:], y_pred, CI, "RF Model")
     latest_plot = plot_forecast_vintage(latest_y_train[1:], latest_y_test.iloc[:, 0], CI, "RF Model")
@@ -133,6 +98,6 @@ def random_forest(year, quarter):
     selected_variables_final = [var[:-4] for var in selected_variables]
     importance_values = feature_importance_df["Importance"].tolist()
     selected_variables_importance_dict = dict(zip(selected_variables_final, importance_values))
-    return selected_variables_importance_dict, rmsfe, real_time_plot, latest_plot
+    return selected_variables_importance_dict, rmsfe, real_time_plot, latest_plot, y_pred
 
 random_forest("2012", "2")

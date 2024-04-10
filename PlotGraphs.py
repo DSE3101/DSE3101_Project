@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from statsmodels.tsa.ar_model import AutoReg
@@ -34,7 +34,7 @@ def plot_forecast_real_time(data, forecast, CI, modelName):
 
         buffer = BytesIO()
         fig.savefig(buffer, format="png")
-        plt.close(fig)
+        plt.show()
         buffer.seek(0)
         
         image_png = buffer.getvalue()
@@ -62,7 +62,7 @@ def plot_forecast_vintage(data, forecast, CI, modelName):
     ax.legend()
     buffer = BytesIO()
     fig.savefig(buffer, format="png")
-    plt.close(fig)
+    plt.show()
     buffer.seek(0)
     
     image_png = buffer.getvalue()
