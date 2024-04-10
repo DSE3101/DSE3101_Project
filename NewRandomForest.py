@@ -99,4 +99,4 @@ def random_forest(year, quarter):
     selected_variables_importance_dict = dict(zip(selected_variables_final, importance_values))
     return selected_variables_importance_dict, rmsfe, real_time_plot, y_pred
 
-random_forest("1970", "2")
+#random_forest("1970", "2")

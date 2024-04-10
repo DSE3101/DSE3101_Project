@@ -105,4 +105,4 @@ def AR_MODEL(year_input, quarter_input):
     return real_time_optimal_lags, real_time_rmsfe, real_time_plot, y_pred
 
 # Example usage
-AR_MODEL("2012","2")
+#AR_MODEL("2012","2")
