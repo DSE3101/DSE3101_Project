@@ -157,7 +157,11 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
 
     #DM test
     #ar_adl_dm = DM(ar_h_realtime, adl_h_realtime, real_time_y, h = 8)
-    ar_rf_dm = DM(ar_y_pred, rf_y_pred, real_time_y, h = 8)
+    
+    print(type(ar_y_pred))
+    print(type(rf_y_pred))
+    print(type(latest_y_test))
+    rf_p_value = DM(ar_y_pred, rf_y_pred, latest_y_test, h = 8)[2]
     
     #DM explainer
     low_p_value ="Since the p-value is less than 0.05, it means that there is significant predictive capabilities between the two models."
@@ -211,7 +215,7 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
             html.Div([
                 html.P(f"We have trained the RF model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
                 html.P(f" Using a rolling window average to train our model, our 8 step forecast has indicated that the RMSFE is {rf_rmsfe}.", style={'color': 'black'}),
-                html.P(f"{ar_rf_dm}", style={'color': 'black'})
+                html.P(f"{rf_p_value}", style={'color': 'black'})
             ], className="write-up-container"),
         ], className="model-container"),
     ], className="model-split-container", style={'display': 'flex', 'justify-content': 'space-around'}),

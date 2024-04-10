@@ -17,7 +17,7 @@ from matplotlib.ticker import MaxNLocator
 import matplotlib.dates as mdates
 from PlotGraphs import *
 from dm import *
-
+matplotlib.use('Agg')
 
 
 #need to run GetData.py first
@@ -75,8 +75,8 @@ def AR_MODEL(year_input, quarter_input):
     real_time_data = pd.Series(real_time_data.iloc[:, 0])
     real_time_optimal_lags = finding_minimum_aic(real_time_data)
 
-    autocorrelation_plot(real_time_data)
-    adfuller_stats(real_time_data)
+    #autocorrelation_plot(real_time_data)
+    #adfuller_stats(real_time_data)
 
     # Expanding window
     y_pred = []
@@ -97,17 +97,12 @@ def AR_MODEL(year_input, quarter_input):
     real_time_plot = plot_forecast_real_time(real_time_data, y_pred, latest_y_test, CI, "AR Model")
     real_time_rmsfe = calculating_rmsfe(y_pred, latest_y_test)
     #latest_plot = plot_forecast_vintage(la, latest_y_test, CI, "AR Model")
-    print('Lags chosen for real time AR model:',real_time_optimal_lags)
-    print('Forecasted values for real time AR model:\n',y_pred)
-    print('Real time RMSFE:',real_time_rmsfe)
+    #print('Lags chosen for real time AR model:',real_time_optimal_lags)
+    #print('Forecasted values for real time AR model:\n',y_pred)
+    #print('Real time RMSFE:',real_time_rmsfe)
 
-    ###### Run a dm test ######
-
-    # dm_results = DM(h_realtime, h_vintage, latest_y_test, h=12)
-    # ar_dm_t_hln = dm_results[1]
-    # ar_dm_p = dm_results[2]
-    
+    print(type(y_pred))
     return real_time_optimal_lags, real_time_rmsfe, real_time_plot, y_pred
 
 # Example usage
-#AR_MODEL("2012","2")
+AR_MODEL("2012","2")
