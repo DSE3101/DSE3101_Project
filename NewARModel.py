@@ -50,7 +50,7 @@ def AR_MODEL(year_input, quarter_input):
 
     def autocorrelation_plot(y_data):
         plot_acf(y_data, lags=8) # depends how many lags do yall want to display, chosen via max lags used
-        #plt.show()
+        plt.show()
 
     def adfuller_stats(y_data):
         result = adfuller(y_data)
@@ -98,11 +98,11 @@ def AR_MODEL(year_input, quarter_input):
     real_time_plot = plot_forecast_real_time(real_time_data, y_pred, latest_y_test, CI, "AR Model")
     real_time_rmsfe = calculating_rmsfe(y_pred, latest_y_test)
     #latest_plot = plot_forecast_vintage(la, latest_y_test, CI, "AR Model")
-    #print('Lags chosen for real time AR model:',real_time_optimal_lags)
-    #print('Forecasted values for real time AR model:\n',y_pred)
-    #print('Real time RMSFE:',real_time_rmsfe)
+    print('Lags chosen for real time AR model:',real_time_optimal_lags)
+    print('Forecasted values for real time AR model:\n',y_pred)
+    print('Real time RMSFE:',real_time_rmsfe)
 
     return real_time_optimal_lags, real_time_rmsfe, real_time_plot, y_pred
 
 # Example usage
-#AR_MODEL("2012","2")
+AR_MODEL("2012","2")

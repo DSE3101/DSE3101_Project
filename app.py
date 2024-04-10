@@ -18,9 +18,11 @@ from sklearn.metrics import mean_squared_error
 import base64
 from io import BytesIO
 from dm import *
+from dash import dash_table
 
 
-from components.ARTab import ARTab
+
+from components.ARTab import *
 from components.TrainingResultsTab import TrainingResultsTab
 from components.ADLTab import ADLTab
 from components.MLTab import *
@@ -133,7 +135,7 @@ def update_shared_data(year_value, quarter_value):
     [State('year-quarter', 'data')]
 )
 def ar_results(n_clicks, year_quarter_data):
-    if not year_quarter_data:
+    if n_clicks is None or not year_quarter_data:
         return dash.no_update
     year = year_quarter_data['year']
     quarter = year_quarter_data['quarter'].replace("Q", "")
@@ -155,7 +157,7 @@ def ar_results(n_clicks, year_quarter_data):
     [State('year-quarter', 'data')]
 )
 def rf_results(n_clicks, year_quarter_data):
-    if not year_quarter_data:
+    if n_clicks is None or not year_quarter_data:
         return dash.no_update
     year = year_quarter_data['year']
     quarter = year_quarter_data['quarter'].replace("Q", "")
@@ -188,75 +190,75 @@ def update_evaluation_results_and_show(ar_results, rf_results, year_quarter_data
     real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data(year, quarter)
 
     #DM test
-    #ar_adl_dm = DM(ar_h_realtime, adl_h_realtime, real_time_y, h = 8)
-    rf_p_value = DM(ar_results['y_pred'], rf_results['y_pred'], latest_y_test, h = 8)[2]
+    #ar_adl_dm = round(DM(ar_h_realtime, adl_h_realtime, real_time_y, h = 8)[2],3)
+    ar_rf_dm = round(DM(ar_results['y_pred'], rf_results['y_pred'], latest_y_test, h =8)[2],3)
     
     #DM explainer
-    low_p_value ="Since the p-value is less than 0.05, it means that there is significant predictive capabilities between the two models."
-    high_p_value = "Since the p-value of the DM test is more than 0.05, it means that both models have similar predictive capabilities. Thus, it is okay to use the real-time data to predict future values and vice-versa"
+    low_p_value ="Since the p-value is less than 0.05, it means that there is significant predictive capabilities between the AR model and this model."
+    high_p_value = "Since the p-value of the DM test is more than 0.05, there is no significant predictive capabilities of the AR model and this model."
+
+    #adl_p_value_explanation = low_p_value if adl_p_value < 0.05 else high_p_value
+    rf_p_value_explanation = low_p_value if ar_rf_dm < 0.05 else high_p_value
 
     evaluation = html.Div([
+        #Intro
         html.Div([
             html.H3("Evaluating our models", style={'text-align': 'center', 'color': "black"}),
-            html.P("Using the training data selected above, we will now use 3 different forecasting methods to forecast the next 12 quarters.", style={'text-align': 'center', 'color': "black"}),
-            html.P("The three methods used will be the AR model, ADL model, and the Random Forest.", style={'text-align': 'center', 'color': "black"}),
-            html.P("We will be using both the RMSFE and DM to evaluate the models and determine which is the most suitable given the training period.", style={'text-align': 'center', 'color': "black"}),
+            html.P("Using the training data selected above, we will now use 3 different forecasting methods to forecast the next 12 quarters."),
+            html.P("The three methods used will be the AR model, ADL model, and the Random Forest."),
+            html.P("We will be using both the RMSFE and DM to evaluate the models and determine which is the most suitable given the training period."),
         ], className= "evaluation-container"),
     
-    #RMSE Section
-    html.Div([
+        #RMSE Section
         html.Div([
-            html.H4("RMSFE Evaluation"),
-            html.P("A lower RMSFE indicates that the model fits the historical closely, making it more accurate for future prediction."),
-        # AR Model Container
-            html.Div([
-                html.H5("AR Model", className="model-header"),
-                html.Img(src=ar_results['plot'], className="graph-image graphBorder"),
-                html.P("AR Model RMSFE: ", style={'color': 'black'}),
-                html.P(f"{round(ar_results['rmsfe'], 3)}", className="rmse-value"),
-                # AR Model Write-up Section
-                html.Div([
-                    html.P(f"We have trained the AR model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
-                    html.P(f" Using a rolling window average to train our model, our 8 step forecast has indicated that the RMSFE is {ar_results['rmsfe']}.", style={'color': 'black'}),
-                ], className="write-up-container"),
-            ], className="model-container"),
-            
-            # ADL Model Container
-            html.Div([
-                html.H5("ADL Model", className="model-header"),
-                html.Img(src=rf_results['plot'], className="graph-image graphBorder"),
-                html.P("ADL Model RMSFE: ", style={'color': 'black'}),
-                html.P(f"{round(rf_results['rmsfe'], 3)}", className="rmse-value"),
-                # ADL Model Write-up
-                html.Div([
-                    html.P(f"We have trained the ADL model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
-                    html.P(f" Using a rolling window average to train our model, our 8 step forecast has indicated that the RMSFE is {rf_results['rmsfe']}.", style={'color': 'black'}),
-                ], className="write-up-container"),
-            ], className="model-container"),
-            
-            # RF Model Container
-            html.Div([
-                html.H5("RF Model", className="model-header"),
-                html.Img(src=rf_results['plot'], className="graph-image graphBorder"),
-                html.P("RF Model RMSFE: ", style={'color': 'black'}),
-                html.P(f"{round(rf_results['rmsfe'], 3)}", className="rmse-value"),
-                # RF Model Write-up Section
-                html.Div([
-                    html.P(f"We have trained the RF model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
-                    html.P(f" Using a rolling window average to train our model, our 8 step forecast has indicated that the RMSFE is {rf_results['rmsfe']}.", style={'color': 'black'}),
-                    html.P(f"{rf_p_value}", style={'color': 'black'})
-                    ], className="write-up-container"),
-                ], className="model-container"),
-            ], className="model-split-container", style={'display': 'flex', 'justify-content': 'space-around'})
-        ],className="evaluation-container", style={'background-color': 'lightblue', 'padding': '20px', 'border-radius': '5px', 'margin': '20px', 'display': 'flex', 'flex-direction': 'column', 'gap': '20px'}),
-    
+            dbc.Row([
+                dbc.Col(html.Div([
+                    html.H4("RMSFE Evaluation"),
+                    html.P("A lower RMSFE indicates that the model fits the historical data closely, making it more accurate for future predictions."),
+                ]), width=12),
+            ]),
+            dbc.Row([
+                dbc.Col(html.Div([
+                    html.H5("AR Model"),
+                    html.Img(src=ar_results['plot'], className="graph-image"),
+                    html.P(f"AR Model RMSFE: {round(ar_results['rmsfe'], 3)}"),
+                    html.P(f"We have trained the AR model using your selection of training data of {year} Q{quarter}. Using a rolling window average to train our model, our 8 step forecast has indicated that the RMSFE is {ar_results['rmsfe']}."),
+                ]), width=4),
+                dbc.Col(html.Div([
+                    # Add ADL Model details when you have them
+                ]), width=4),
+                dbc.Col(html.Div([
+                    html.H5("RF Model"),
+                    html.Img(src=rf_results['plot'], className="graph-image"),
+                    html.P(f"RF Model RMSFE: {round(rf_results['rmsfe'], 3)}"),
+                    html.P(f"We have trained the RF model using your selection of training data of {year} Q{quarter}. Using a rolling window average to train our model, our 8 step forecast has indicated that the RMSFE is {round(rf_results['rmsfe'],3)}."),
+                    ]), width=4),
+                ]),
+            ], className= 'evaluation-container'),
+
     #DM Section    
-    html.Div([
         html.Div([
-            html.H4("Diebold-Mariano (DM) Test"),
-            html.P("A DM test is especially useful when it comes to comparing the performance between two models")
-            ])],
-             className="evaluation-container", style={'background-color': 'lightblue', 'padding': '20px', 'border-radius': '5px', 'margin': '20px', 'display': 'flex', 'flex-direction': 'column', 'gap': '20px'})
+            dbc.Row([
+                dbc.Col(html.Div([
+                    html.H4("Diebold-Mariano (DM) Test"),
+                    html.P(f"A DM test is especially useful when it comes to comparing the performance between two models. "
+                        f"We will be using the AR model as our benchmark to determine if our ADL and RF models will outperform the AR model."),
+                ]), width=12),
+            ]),
+            dbc.Row([
+                dbc.Col(html.Div([
+                    html.H5("ADL Model"),
+                    html.P(f"ADL Model p-value: 0.03"),
+                    html.P("Short write-up for the ADL Model."),
+                ]), width=6),
+                dbc.Col(html.Div([
+                    html.H5("RF Model"),
+                    html.P(f"RF Model p-value: {ar_rf_dm}"),
+                    # Here you can insert a short write-up for the RF Model
+                    html.P(rf_p_value_explanation),
+                ]), width=6),
+            ]),
+        ], className="evaluation-container")
     ])
 
     return evaluation, {'display': 'block'}

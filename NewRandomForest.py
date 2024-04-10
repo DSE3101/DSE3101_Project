@@ -24,12 +24,12 @@ def random_forest(year, quarter):
     feature_importance = rf_model.feature_importances_
     feature_importance_df = pd.DataFrame({'Feature': real_time_X.columns, 'Importance': feature_importance})
     feature_importance_df = feature_importance_df.sort_values(by='Importance', ascending=False)
-    print(feature_importance_df)
+    #print(feature_importance_df)
 
     # Choose top N most important variables
     selected_variables = feature_importance_df.head(top_n_variables)['Feature'].tolist()
-    print(f"Top {top_n_variables} Variables Selected:")
-    print(selected_variables)
+    #print(f"Top {top_n_variables} Variables Selected:")
+    #print(selected_variables)
 
     # Expanding window
     y_pred = []
@@ -79,7 +79,7 @@ def random_forest(year, quarter):
 
     # RMSFE of 1 step ahead forecast
     rmsfe = round(mean_squared_error(y_pred, latest_y_test) ** 0.5,3)
-    print(f'RMSFE: {rmsfe}')
+    #print(f'RMSFE: {rmsfe}')
     '''
     We are making one-step ahead forecasts iteratively, where each prediction depends only on the previous data and not on the entire dataset.
     LOOCV typically involves training the model on all but one data point and then validating on the omitted data point.
