@@ -78,7 +78,7 @@ def random_forest(year, quarter):
         
 
     # RMSFE of 1 step ahead forecast
-    rmsfe = mean_squared_error(y_pred, latest_y_test) ** 0.5
+    rmsfe = round(mean_squared_error(y_pred, latest_y_test) ** 0.5,3)
     print(f'RMSFE: {rmsfe}')
     '''
     We are making one-step ahead forecasts iteratively, where each prediction depends only on the previous data and not on the entire dataset.
@@ -100,4 +100,4 @@ def random_forest(year, quarter):
     selected_variables_importance_dict = dict(zip(selected_variables_final, importance_values))
     return selected_variables_importance_dict, rmsfe, real_time_plot, latest_plot, y_pred
 
-random_forest("2012", "2")
+#random_forest("2012", "2")

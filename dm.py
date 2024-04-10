@@ -7,7 +7,7 @@ from scipy.stats import t
 #Use DM to compare
 def DM(model1_values, model2_values, test_values, h =12):
     
-    test_values = (test_values.iloc[:,0])
+    test_values = test_values.iloc[:,0]
     # Calculate forecast errors
     e1 = test_values - model1_values
     e2 = test_values - model2_values

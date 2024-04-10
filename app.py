@@ -61,7 +61,10 @@ app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     navbar,
     html.Div(id='page-content'),
-    dcc.Store(id='year-quarter')
+    dcc.Store(id='year-quarter'),
+    dcc.Store(id='rf-results'),
+    dcc.Store(id='ar-results'),
+    dcc.Store(id='adl-results'),
 ])
 
 ### SERVER
@@ -122,6 +125,30 @@ def update_shared_data(year_value, quarter_value):
         'quarter': str(quarter_value)
     }
     return data
+
+#Run AR
+
+#Run ADL
+
+#Run RF
+@app.callback(
+    Output('rf-results', 'data')
+    [Input('train-model', 'n_clicks')],
+    [State('year-quarter', 'data')]
+)
+def rf_model(n_clicks, year_quarter_data):
+     year = year_quarter_data['year']
+     quarter = year_quarter_data['quarter'].replace("Q", "")
+     rf_selected_variables_importance_dict, rf_rmsfe, rf_real_time_plot, rf_latest_plot, rf_y_pred = random_forest(year, quarter)
+     rf_results = {
+        'selected_variables_importance_dict': rf_selected_variables_importance_dict,
+        'rmsfe': rf_rmsfe,
+        'real_time_plot': rf_real_time_plot,
+        'latest_plot': rf_latest_plot,
+        'y_pred': rf_y_pred 
+    }
+
+     return rf_results
 
 #Train model button
 @app.callback(
