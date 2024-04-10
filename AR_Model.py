@@ -111,4 +111,4 @@ def AR_MODEL(year_input, quarter_input):
     return real_time_optimal_lags, h_realtime, real_time_rmsfe, vintage_optimal_lags, h_vintage, vintage_rmsfe, real_time_plot, vintage_plot, ar_dm_t_hln, ar_dm_p
 
 # Example usage
-# AR_MODEL("2012","2")
+#AR_MODEL("2012","2")
