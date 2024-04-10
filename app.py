@@ -36,19 +36,51 @@ routput['DATE'] = pd.PeriodIndex(routput['DATE'], freq='Q').to_timestamp()
 routput = routput[routput['DATE'].dt.year >= 1965]
 date_range_yearly = pd.date_range(start='1947-01-01', end='2023-12-31', freq='YS')
 
-app = dash.Dash(__name__, external_stylesheets= [dbc.themes.DARKLY])
+app = dash.Dash(__name__, external_stylesheets= [dbc.themes.DARKLY], suppress_callback_exceptions=True)
+navbar = dbc.NavbarSimple(
+    children=[
+        dbc.NavItem(dbc.NavLink("Training and Explaining the Model", href="/model-training")),
+        dbc.DropdownMenu(
+            children=[
+                dbc.DropdownMenuItem("AR", href="/ar"),
+                dbc.DropdownMenuItem("ADL", href="/adl"),
+                dbc.DropdownMenuItem("ML", href="/ml"),
+            ],
+            nav=False,
+            in_navbar=True,
+            label="How the models worked",
+        ),
+    ],
+    brand="Economics Forecasting",
+    brand_href="#",
+    color="primary",
+    dark=True,
+)
+
 app.layout = html.Div([
-    dcc.Tabs(id='tabs', value='model-training', children=[
-        dcc.Tab(label='Model Training', value='model-training', className="tab", children=TrainingResultsTab()),
-        dcc.Tab(label='AR', value='ar', className="tab", children=ARTab()), #explainer, AC plots, AIC
-        dcc.Tab(label='ADL', value='adl', className="tab", children=ADLTab()),
-        dcc.Tab(label='ML', value='ml', className="tab", children=MLTab()),
-]),
-    html.Div(id='tabs-content'),
-    dcc.Store(id = 'year-quarter')
+    dcc.Location(id='url', refresh=False),
+    navbar,
+    html.Div(id='page-content'),
+    dcc.Store(id='year-quarter')
 ])
 
 ### SERVER
+#Navbar
+@app.callback(Output('page-content', 'children'),
+              [Input('url', 'pathname')])
+def display_page(pathname):
+    if pathname == '/model-training':
+        return TrainingResultsTab()  # Replace with your function for Model Training
+    elif pathname == '/ar':
+        return ARTab()  # Replace with your function for AR
+    elif pathname == '/adl':
+        return ADLTab()  # Replace with your function for ADL
+    elif pathname == '/ml':
+        return MLTab()  # Replace with your function for ML
+    else:
+        # If the user tries to reach a different page, redirect them to the home page
+        return TrainingResultsTab()
+
 #Dropdown elements will update the graph
 @app.callback(
     Output('time-series-graph', 'figure'),
@@ -117,111 +149,70 @@ def update_evaluation_results_and_show(n_clicks, year_quarter_data):
     rf_selected_variables_importance_dict, rf_rmsfe, rf_real_time_plot, rf_latest_plot, rf_y_pred = random_forest(year, quarter)
 
     #DM test
-    #ar_adl_dm = DM(ar_h_realtime, adl_h_realtime, real_time_y)
-    #ar_rf_dm = DM(ar_h_realtime, rf_y_pred, real_time_y)
+    #ar_adl_dm = DM(ar_h_realtime, adl_h_realtime, real_time_y, h = 8)
+    #ar_rf_dm = DM(ar_h_realtime, rf_y_pred, real_time_y, h = 8)
     
     #DM explainer
     low_p_value ="Since the p-value is less than 0.05, it means that there is significant predictive capabilities between the two models."
     high_p_value = "Since the p-value of the DM test is more than 0.05, it means that both models have similar predictive capabilities. Thus, it is okay to use the real-time data to predict future values and vice-versa"
 
     evaluation = html.Div([
-        html.Div([
-            html.H3("Evaluating our models"),
-            html.P("Using the training data selected above, we will now use 3 different forecasting methods to forecast the next 12  quarters."),
-            html.P("The three methods used will be the AR model, ADL model, and the Random Forest."),
-            html.P("We will be using both the RMSFE and DM to evaluate the models and determine which is the most suitable given the training period."),
-            html.H4("RMSFE Evaluation"),
-            html.P("A lower RMSFE indicates that the model fits the histroical closely, making it more accurate for future prediction."),
-        ], style={'text-align': 'center', 'color' :"black"}),
+    html.Div([
+        html.H3("Evaluating our models", style={'text-align': 'center', 'color': "black"}),
+        html.P("Using the training data selected above, we will now use 3 different forecasting methods to forecast the next 12 quarters.", style={'text-align': 'center', 'color': "black"}),
+        html.P("The three methods used will be the AR model, ADL model, and the Random Forest.", style={'text-align': 'center', 'color': "black"}),
+        html.P("We will be using both the RMSFE and DM to evaluate the models and determine which is the most suitable given the training period.", style={'text-align': 'center', 'color': "black"}),
+        html.H4("RMSFE Evaluation", style={'text-align': 'center', 'color': "black"}),
+        html.P("A lower RMSFE indicates that the model fits the historical closely, making it more accurate for future prediction.", style={'text-align': 'center', 'color': "black"}),
+    ], style={'text-align': 'center', 'color': "black"}),
+    
+    # Models side by side
+    html.Div([
         # AR Model Container
         html.Div([
             html.H5("AR Model", className="model-header"),
-            # Model Split Container for graphs and metrics
+            html.Img(src=rf_real_time_plot, className="graph-image graphBorder"),
+            html.P("AR Model RMSFE: ", style={'color': 'black'}),
+            html.P(f"{round(rf_rmsfe, 3)}", className="rmse-value"),
+            # AR Model Write-up Section
             html.Div([
-                # Real Time Data Column
-                html.Div([
-                    #html.Img(src=ar_real_time_plot, className="graph-image"),
-                    html.Div([
-                        html.B("Real Time Data RMSFE: ", style={'color': 'black'}),
-                        #html.P(f"{round(ar_real_time_rmsfe, 3)}", className="rmse-value")
-                    ], className="rmse-b ox")
-                ], className="graph-container"),
-
-                # Vintage Data Column
-                html.Div([
-                    #html.Img(src=ar_vintage_plot, className="graph-image"),
-                    html.Div([
-                        html.B("Vintage Data RMSFE: ", style={'color': 'black'}),
-                        #html.P(f"{round(ar_vintage_rmsfe, 3)}", className="rmse-value")
-                    ], className="rmse-box")
-                ], className="graph-container"),
-            ], className="model-split-container"),
+                html.P(f"We have trained the AR model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
+                html.P(f" Using a rolling window average to train our model, our 8 step forecast has indicated that the RMSFE is {rf_rmsfe}.", style={'color': 'black'}),
+            ], className="write-up-container"),
+        ], className="model-container"),
         
-        # Write-up Section
-                html.Div([
-                    html.P(f"We have trained the AR model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
-                    #html.P(f" Comparing the two separate AR Models produced by the real time data and the revised vintage data, the {ar_lower_model} has a lower RMSFE than the {ar_higher_model}."
-                           #f" With a lower RMSFE, this indicates that the {ar_lower_model} has been more accurate in predicting values than the {ar_higher_model}", style={'color': 'black'}),
-                ], className="write-up-container"),
-            ], className="model-container"),
-
-        # ADL Model Container (Repeat the structure as needed for other models)
+        # ADL Model Container
         html.Div([
             html.H5("ADL Model", className="model-header"),
+            html.Img(src=rf_real_time_plot, className="graph-image graphBorder"),
+            html.P("ADL Model RMSFE: ", style={'color': 'black'}),
+            html.P(f"{round(rf_rmsfe, 3)}", className="rmse-value"),
+            # ADL Model Write-up
             html.Div([
-                # Real Time Data Column
-                html.Div([
-                    #html.Img(src='assets/ar_real_time_plot.png', className="graph-image"),
-                    html.Div([
-                        #html.B("Real Time Data RMSFE: ", style = {'color':'black'}),
-                        #html.P(f"{round(ar_real_time_rmsfe, 3)}", className="rmse-value")
-                    ], className="rmse-box")
-                ], className="graph-container"),
-
-                # Vintage Data Column
-                html.Div([
-                    html.Img(src='assets/ar_vintage_plot.png', className="graph-image"),
-                    html.Div([
-                        #html.B("Vintage Data RMSFE: ", style = {'color':'black'}),
-                        #html.P(f"{round(ar_vintage_rmsfe, 3)}", className="rmse-value")
-                    ], className="rmse-box")
-                ], className="graph-container"),
-            ], className="model-split-container"),
-
-             # Write-up Section
-                html.Div([
-                    #html.P(f"We have trained the ADL model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
-                    #html.P(f" Comparing the two separate AR Models produced by the real time data and the revised vintage data, the {ar_lower_model} has a lower RMSFE than the {ar_higher_model}."
-                           #f" With a lower RMSFE, this indicates that the {ar_lower_model} has been more accurate in predicting values than the {ar_higher_model}", style={'color': 'black'}),
-                ], className="write-up-container"),
-            ], className="model-container"),
+                html.P(f"We have trained the ADL model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
+                html.P(f" Using a rolling window average to train our model, our 8 step forecast has indicated that the RMSFE is {rf_rmsfe}.", style={'color': 'black'}),
+            ], className="write-up-container"),
+        ], className="model-container"),
         
         # RF Model Container
         html.Div([
             html.H5("RF Model", className="model-header"),
+            html.Img(src=rf_real_time_plot, className="graph-image graphBorder"),
+            html.P("RF Model RMSFE: ", style={'color': 'black'}),
+            html.P(f"{round(rf_rmsfe, 3)}", className="rmse-value"),
+            # RF Model Write-up Section
             html.Div([
-                html.Div([
-                    html.Img(src=rf_real_time_plot, className="graph-image"),
-                    html.Div([
-                        html.B("Model RMSFE: ", style = {'color':'black'}),
-                        html.P(f"{round(rf_rmsfe, 3)}", className="rmse-value")
-                    ], className="rmse-box")
-                ], className="graph-container"),
-            ], className="model-split-container"),
-            
-            # Write-up Section
-                html.Div([
-                    html.P(f"We have trained the Random Forest model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
-                    html.P(f" Using a rolling window average to train our model, our 8 step forecast has indicated that the RMSFE is {rf_rmsfe}."
-                           , style={'color': 'black'}),
-                ], className="write-up-container"),
-            ], className="model-container"),
-        #DM Evaluation
-        ##Insert a table here, make it to show the benchmark of ar vs rf and ar vs adl
-    ], className="evaluation-container", style={'background-color': 'lightblue', 'padding': '20px', 'border-radius': '5px', 'margin': '20px', 'display': 'flex', 'flex-direction': 'column', 'gap': '20px'})
-
+                html.P(f"We have trained the RF model using your selection of training data of {year} Q{quarter}.", style={'color': 'black'}),
+                html.P(f" Using a rolling window average to train our model, our 8 step forecast has indicated that the RMSFE is {rf_rmsfe}.", style={'color': 'black'}),
+            ], className="write-up-container"),
+        ], className="model-container"),
+    ], className="model-split-container", style={'display': 'flex', 'justify-content': 'space-around'}),
+    
+    # DM Evaluation
+    ## Insert DM evaluation table and write-up here
+], className="evaluation-container", style={'background-color': 'lightblue', 'padding': '20px', 'border-radius': '5px', 'margin': '20px', 'display': 'flex', 'flex-direction': 'column', 'gap': '20px'})
     return evaluation, {'display': 'block'}
 
 
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True)

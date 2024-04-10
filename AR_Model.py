@@ -106,14 +106,9 @@ def AR_MODEL(year_input, quarter_input):
     print('Forecasted values for vintage AR model:',h_vintage)
     print('Vintage RMSFE:',vintage_rmsfe)
 
-    ###### Run a dm test ######
-
-    dm_results = DM(h_realtime, h_vintage, latest_y_test, h=12)
-    ar_dm_t_hln = dm_results[1]
-    ar_dm_p = dm_results[2]
     
 
     return real_time_optimal_lags, h_realtime, real_time_rmsfe, vintage_optimal_lags, h_vintage, vintage_rmsfe, real_time_plot, vintage_plot, ar_dm_t_hln, ar_dm_p
 
 # Example usage
-AR_MODEL("2012","2")
+# AR_MODEL("2012","2")

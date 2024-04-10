@@ -34,7 +34,7 @@ def plot_forecast_real_time(data, forecast, CI, modelName):
 
         buffer = BytesIO()
         fig.savefig(buffer, format="png")
-        plt.show()
+        #plt.show()
         buffer.seek(0)
         
         image_png = buffer.getvalue()
@@ -62,7 +62,7 @@ def plot_forecast_vintage(data, forecast, CI, modelName):
     ax.legend()
     buffer = BytesIO()
     fig.savefig(buffer, format="png")
-    plt.show()
+    #plt.show()
     buffer.seek(0)
     
     image_png = buffer.getvalue()
