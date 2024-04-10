@@ -95,7 +95,7 @@ def AR_MODEL(year_input, quarter_input):
 
     # Plots
     CI = [0.57, 0.842, 1.282] #50, 60, 80% predictional interval
-    real_time_plot = plot_forecast_real_time(real_time_data, y_pred, latest_y_test, CI, "AR Model")
+    real_time_plot = plot_forecast_real_time(real_time_y[1:], y_pred, latest_y_test, CI, "AR Model")
     real_time_rmsfe = calculating_rmsfe(y_pred, latest_y_test)
     #latest_plot = plot_forecast_vintage(la, latest_y_test, CI, "AR Model")
     print('Lags chosen for real time AR model:',real_time_optimal_lags)
@@ -105,4 +105,4 @@ def AR_MODEL(year_input, quarter_input):
     return real_time_optimal_lags, real_time_rmsfe, real_time_plot, y_pred
 
 # Example usage
-AR_MODEL("2012","2")
+#AR_MODEL("2012","2")

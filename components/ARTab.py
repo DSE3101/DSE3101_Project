@@ -8,7 +8,7 @@ import numpy as np
 
 def ARTab():
     ar_model_content = html.Div([
-        html.H3("AR MODEL"),
+        html.H3("AR MODEL", style={'color' : 'lightblue'}),
         html.P("We will be using the 2012 Q2 prediction to explain our models"),
 
         html.H4("How does the model work"),
@@ -24,6 +24,6 @@ def ARTab():
 
         html.H4("Calculating RMSFE"),
         html.P("We then calculated the RMSFE using the root mean squared error between the true y values and the predicted y values. In the case of 2012 Q2, the returned RMSFE value was 0.00534.")
-        ],style={'text-align': 'justify'})
+        ],style={'text-align': 'center'})
 
     return ar_model_content

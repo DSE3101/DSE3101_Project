@@ -30,6 +30,7 @@ from data import mainplot #Main graph on landing
 from GetData import get_data
 from NewRandomForest import *
 from NewARModel import *
+from NewADLModel import *
 
 
 routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
@@ -41,7 +42,7 @@ date_range_yearly = pd.date_range(start='1947-01-01', end='2023-12-31', freq='YS
 app = dash.Dash(__name__, external_stylesheets= [dbc.themes.DARKLY], suppress_callback_exceptions=True)
 navbar = dbc.NavbarSimple(
     children=[
-        dbc.NavItem(dbc.NavLink("Training and Explaining the Model", href="/model-training")),
+        dbc.NavItem(dbc.NavLink("Training and Evaluating the Model", href="/model-training")),
         dbc.DropdownMenu(
             children=[
                 dbc.DropdownMenuItem("AR", href="/ar"),
@@ -149,6 +150,24 @@ def ar_results(n_clicks, year_quarter_data):
     return ar_results
 
 #Run ADL
+@app.callback(
+    Output('adl-results', 'data'),
+    [Input('train-model', 'n_clicks')],
+    [State('year-quarter', 'data')]
+)
+def adl_results(n_clicks, year_quarter_data):
+    if n_clicks is None or not year_quarter_data:
+        return dash.no_update
+    year = year_quarter_data['year']
+    quarter = year_quarter_data['quarter'].replace("Q", "")
+    lags_dict, y_pred, rmsfe, adl_plot = ADL_MODEL(year, quarter)
+    adl_results = {
+            'optimal_lags': lags_dict,
+            'rmsfe': rmsfe,
+            'plot': adl_plot,
+            'y_pred': y_pred
+        }
+    return adl_results
 
 #Run RF
 @app.callback(
@@ -175,11 +194,11 @@ def rf_results(n_clicks, year_quarter_data):
     [Output('evaluation-results', 'children'),  
      Output('evaluation-results', 'style')],   
     [Input('ar-results', 'data'), 
-     #Input('adl-results', 'data'), 
+     Input('adl-results', 'data'), 
      Input('rf-results', 'data'),
      Input('year-quarter', 'data')]
 )
-def update_evaluation_results_and_show(ar_results, rf_results, year_quarter_data):
+def update_evaluation_results_and_show(ar_results, adl_results, rf_results, year_quarter_data):
     if not ar_results or not rf_results:
         return [], {'display': 'none'}
 
@@ -190,21 +209,21 @@ def update_evaluation_results_and_show(ar_results, rf_results, year_quarter_data
     real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data(year, quarter)
 
     #DM test
-    #ar_adl_dm = round(DM(ar_h_realtime, adl_h_realtime, real_time_y, h = 8)[2],3)
+    ar_adl_dm = round(DM(ar_results['y_pred'], adl_results['y_pred'], latest_y_test, h = 8)[2],3)
     ar_rf_dm = round(DM(ar_results['y_pred'], rf_results['y_pred'], latest_y_test, h =8)[2],3)
     
     #DM explainer
     low_p_value ="Since the p-value is less than 0.05, it means that there is significant predictive capabilities between the AR model and this model."
     high_p_value = "Since the p-value of the DM test is more than 0.05, there is no significant predictive capabilities of the AR model and this model."
 
-    #adl_p_value_explanation = low_p_value if adl_p_value < 0.05 else high_p_value
+    adl_p_value_explanation = low_p_value if ar_adl_dm < 0.05 else high_p_value
     rf_p_value_explanation = low_p_value if ar_rf_dm < 0.05 else high_p_value
 
     evaluation = html.Div([
         #Intro
         html.Div([
             html.H3("Evaluating our models", style={'text-align': 'center', 'color': "black"}),
-            html.P("Using the training data selected above, we will now use 3 different forecasting methods to forecast the next 12 quarters."),
+            html.P("Using the training data selected above, we will now use 3 different forecasting methods to forecast the next 8 quarters."),
             html.P("The three methods used will be the AR model, ADL model, and the Random Forest."),
             html.P("We will be using both the RMSFE and DM to evaluate the models and determine which is the most suitable given the training period."),
         ], className= "evaluation-container"),
@@ -221,17 +240,20 @@ def update_evaluation_results_and_show(ar_results, rf_results, year_quarter_data
                 dbc.Col(html.Div([
                     html.H5("AR Model"),
                     html.Img(src=ar_results['plot'], className="graph-image"),
-                    html.P(f"AR Model RMSFE: {round(ar_results['rmsfe'], 3)}"),
-                    html.P(f"We have trained the AR model using your selection of training data of {year} Q{quarter}. Using a rolling window average to train our model, our 8 step forecast has indicated that the RMSFE is {ar_results['rmsfe']}."),
+                    html.B(f"AR Model RMSFE: {round(ar_results['rmsfe'], 3)}"),
+                    html.P(f"We have trained the AR model using your selection of training data of {year} Q{quarter}. Using an expanding window approach to train and backtest our model, our 8 step forecast has indicated that the RMSFE is {round(ar_results['rmsfe'], 3)}."),
                 ]), width=4),
                 dbc.Col(html.Div([
-                    # Add ADL Model details when you have them
+                    html.H5("ARDL Model"),
+                    html.Img(src=adl_results['plot'], className="graph-image"),
+                    html.B(f"ARDL Model RMSFE: {round(adl_results['rmsfe'], 3)}"),
+                    html.P(f"We have trained the ARDL model using your selection of training data of {year} Q{quarter}. Using an expanding window approach to train and backtest our model, our 8 step forecast has indicated that the RMSFE is {round(adl_results['rmsfe'],3)}."),
                 ]), width=4),
                 dbc.Col(html.Div([
                     html.H5("RF Model"),
                     html.Img(src=rf_results['plot'], className="graph-image"),
-                    html.P(f"RF Model RMSFE: {round(rf_results['rmsfe'], 3)}"),
-                    html.P(f"We have trained the RF model using your selection of training data of {year} Q{quarter}. Using a rolling window average to train our model, our 8 step forecast has indicated that the RMSFE is {round(rf_results['rmsfe'],3)}."),
+                    html.B(f"RF Model RMSFE: {round(rf_results['rmsfe'], 3)}"),
+                    html.P(f"We have trained the RF model using your selection of training data of {year} Q{quarter}. Using an expanding window approach to train and backtest our model, our 8 step forecast has indicated that the RMSFE is {round(rf_results['rmsfe'],3)}."),
                     ]), width=4),
                 ]),
             ], className= 'evaluation-container'),
@@ -248,13 +270,12 @@ def update_evaluation_results_and_show(ar_results, rf_results, year_quarter_data
             dbc.Row([
                 dbc.Col(html.Div([
                     html.H5("ADL Model"),
-                    html.P(f"ADL Model p-value: 0.03"),
-                    html.P("Short write-up for the ADL Model."),
+                    html.B(f"ADL Model p-value: {ar_adl_dm}"),
+                    html.P(adl_p_value_explanation),
                 ]), width=6),
                 dbc.Col(html.Div([
                     html.H5("RF Model"),
-                    html.P(f"RF Model p-value: {ar_rf_dm}"),
-                    # Here you can insert a short write-up for the RF Model
+                    html.B(f"RF Model p-value: {ar_rf_dm}"),
                     html.P(rf_p_value_explanation),
                 ]), width=6),
             ]),
@@ -265,4 +286,4 @@ def update_evaluation_results_and_show(ar_results, rf_results, year_quarter_data
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)
