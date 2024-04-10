@@ -23,8 +23,6 @@ matplotlib.use('Agg')
 #need to run GetData.py first
 
 def AR_MODEL(year_input, quarter_input):
-    real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data(year_input, quarter_input)
-
     def converting_to_stationary(y_data):
         y_data[y_data.columns[0]] = y_data[y_data.columns[0]].replace(-999,np.nan)
         data = y_data.dropna()
@@ -66,15 +64,15 @@ def AR_MODEL(year_input, quarter_input):
         rmsfe = mean_squared_error(y_true,y_predicted)**(0.5)
         return rmsfe
 
+    # Get real time data
+    real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data(year_input, quarter_input)
+
     # Get optimal number of lags
-    warnings.filterwarnings("ignore", message="An unsupported index was provided and will be ignored when e.g. forecasting.")
-    warnings.filterwarnings("ignore", message="Only PeriodIndexes, DatetimeIndexes with a frequency set, RangesIndexes, and Index with a unit increment support extending. The index is set will contain the position relative to the data length.")
-    warnings.filterwarnings("ignore", message="No supported index is available. In the next version, calling this method in a model without a supported index will result in an exception.")
-    warnings.filterwarnings("ignore", message="No supported index is available. Prediction results will be given with an integer index beginning at `start`.")
     real_time_data = converting_to_stationary(real_time_y)
+    real_time_data.reset_index(inplace=True)
+    real_time_data = real_time_data.drop("index", axis=1)
     real_time_data = pd.Series(real_time_data.iloc[:, 0])
     real_time_optimal_lags = finding_minimum_aic(real_time_data)
-
     #autocorrelation_plot(real_time_data)
     #adfuller_stats(real_time_data)
 
@@ -83,6 +81,8 @@ def AR_MODEL(year_input, quarter_input):
     for i in range(8):
         # Train and predict the AR Model
         real_time_X_loop, real_time_y_loop, latest_X_train_loop, latest_y_train_loop, latest_X_test_loop, latest_y_test_loop, curr_year, curr_quarter = get_data(year_input, quarter_input)
+        real_time_y_loop.reset_index(inplace=True)
+        real_time_y_loop = real_time_y_loop.drop("index", axis=1)
         ar_model = forming_AR_model(real_time_y_loop, real_time_optimal_lags)
         y_pred.append(ar_model.predict(start=len(real_time_y_loop), end=len(real_time_y_loop)).iloc[0])
         # 1 step forward
@@ -93,6 +93,7 @@ def AR_MODEL(year_input, quarter_input):
     y_pred = pd.Series(y_pred)
     y_pred.index = latest_y_test.index
 
+    # Plots
     CI = [0.57, 0.842, 1.282] #50, 60, 80% predictional interval
     real_time_plot = plot_forecast_real_time(real_time_data, y_pred, latest_y_test, CI, "AR Model")
     real_time_rmsfe = calculating_rmsfe(y_pred, latest_y_test)
@@ -101,7 +102,6 @@ def AR_MODEL(year_input, quarter_input):
     #print('Forecasted values for real time AR model:\n',y_pred)
     #print('Real time RMSFE:',real_time_rmsfe)
 
-    print(type(y_pred))
     return real_time_optimal_lags, real_time_rmsfe, real_time_plot, y_pred
 
 # Example usage
