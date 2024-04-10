@@ -11,26 +11,26 @@ from data import mainplot
 
 def TrainingResultsTab():
     training = [
-        html.Div(id='training', children = [
-        html.H1("Benchmarking Time Series Graph using models"),
-        html.H2("Make your own time series graph"),
-        html.P("In an attempt to make this project more interactive, we are going to allow users to select the training data's date and variables they wish to use"),
-        html.P("The chosen time period will be used as the training period for all 3 models. The training variables selected will be used in the ADL and RNN model"),
-        dcc.Graph(id='time-series-graph', figure =mainplot(), className="graphBorder"),
-        html.H4("Select training time period"),
-         html.Div([
-            html.H5("Select a year"),
-            html.Div([dropdown_year()],className="dropdown-container"),
-            html.H5("Select a quarter"),
-
-            html.Div([dropdown()], className="dropdown-container")
-        ], style={'display': 'flex-grow', 'flex-direction': 'row', 'gap': '30px'}), 
-
-        html.Strong(id = 'lag-caller'),
-        html.P(),
-        html.Button('Train the model!', id='train-model'),
-        html.Div(id='evaluation-results')
-        ])
-    ]
+        html.Div(id='training',
+                 children = [
+                     html.H2("Benchmarking Time Series Graph using models", style={'text-align': 'center', 'color': "white"}),
+                     html.H3("Make your own time series graph", style={'text-align': 'center', 'color': "white"}),
+                     html.P("In an attempt to make this project more interactive, we are going to allow users to select the training data's date.", style={'text-align': 'center', 'color': "white"}),
+                     html.P("The chosen time period will be used as the training data for our Auto Regressive (AR), ADL, and Regression Forest (RF) model.", style={'text-align': 'center', 'color': "white"}),
+                     dcc.Graph(id='time-series-graph', figure =mainplot(), className="graphBorder"),
+                     html.H5("Select training time period"),
+                     html.Div([
+                         html.H6("Select a year"),
+                         html.Div([dropdown_year()],className="dropdown-container"),
+                         html.P(),
+                         html.H6("Select a quarter"),
+                         html.Div([dropdown()], className="dropdown-container")
+                         ]), 
+                     html.Strong(id = 'lag-caller'),
+                     html.P(),
+                     html.Button('Train the model!', id='train-model'),
+                     html.Div(id='evaluation-results')
+                     ])
+                ]
     return training
 
