@@ -167,9 +167,11 @@ def ADL_MODEL(year_input,quarter_input):
 
     variables_in_realtime_model = ["ROUTPUT"] + list(variables_in_realtime_model)
     lags_dict = dict(zip(variables_in_realtime_model, real_time_optimal_lags))
+    print(y_pred)
+    print(rmsfe)
     print(lags_dict)
     
     return lags_dict, y_pred, rmsfe, adl_plot
 
-#ADL_MODEL("2012","1")
+ADL_MODEL("2012","2")
 
