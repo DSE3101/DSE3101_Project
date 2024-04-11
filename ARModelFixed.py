@@ -6,6 +6,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 from PlotGraphs import plot_forecast_real_time
 
+
 def AR_MODEL(year_input, quarter_input):
     h_step_forecast = []
     h_step_lag = []
