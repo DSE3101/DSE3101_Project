@@ -30,7 +30,7 @@ from data import mainplot #Main graph on landing
 from GetData import get_data
 from RandomForestFixed import *   
 from ARModelFixed import *
-from NewADLModel import *
+from ADLModelFixed import *
 
 
 routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
@@ -161,12 +161,11 @@ def adl_results(n_clicks, year_quarter_data):
         return dash.no_update
     year = year_quarter_data['year']
     quarter = year_quarter_data['quarter'].replace("Q", "")
-    lags_dict, y_pred, rmsfe, adl_plot = ADL_MODEL(year, quarter)
+    adl_plot, y_pred = ADL_MODEL(year, quarter)
     adl_results = {
-            'optimal_lags': lags_dict,
-            'rmsfe': rmsfe,
-            'plot': adl_plot,
-            'y_pred': y_pred
+        'rmsfe': 100,
+        'y_pred': y_pred,
+        'plot': adl_plot,
         }
     return adl_results
 
