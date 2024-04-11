@@ -80,8 +80,6 @@ def ADL_MODEL(year_input, quarter_input):
         # Prepare lagged target variable (Yt)
         y_lagged_valid = real_time_y.shift(lag_X).dropna()
 
-        print(y_lagged_valid.iloc[max_lag-1:], X_lagged_valid)
-
         # Fit the model using OLS
         model_lagged = sm.OLS(y_lagged_valid.iloc[len(y_lagged_valid)-len(X_lagged_valid):], X_lagged_valid).fit()
 
@@ -166,4 +164,4 @@ def ADL_MODEL(year_input, quarter_input):
     print(y_pred)
     return plot, y_pred
         
-ADL_MODEL("2012", "2")
+#ADL_MODEL("2012", "2")
