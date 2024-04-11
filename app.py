@@ -201,6 +201,20 @@ def rf_results(n_clicks, year_quarter_data):
 def update_evaluation_results_and_show(ar_results, adl_results, rf_results, year_quarter_data):
     if not ar_results or not rf_results:
         return [], {'display': 'none'}
+    
+    def model_name(model_name, background_color):
+        return html.Span(model_name, style={
+            'background-color': background_color,
+            'color': 'black',
+            'padding': '8px 12px',
+            'margin-right': '5px',
+            'border-radius': '10px',
+            'font-weight': 'bold',
+            'text-align': 'center',
+        })
+    armodel = model_name("AR Model", '#FF7F7F')
+    adlmodel = model_name("ADL Model", '#FDFD96') 
+    rfmodel = model_name("RF Model", '#90EE90')
 
     year = year_quarter_data['year']
     quarter = year_quarter_data['quarter'].replace("Q", "")
@@ -224,7 +238,7 @@ def update_evaluation_results_and_show(ar_results, adl_results, rf_results, year
         html.Div([
             html.H3("Evaluating our models", style={'text-align': 'center', 'color': "black"}),
             html.P("Using the training data selected above, we will now use 3 different forecasting methods to forecast the next 8 quarters."),
-            html.P("The three methods used will be the AR model, ADL model, and the Random Forest."),
+            html.P(["The three methods used will be the " , armodel , ", " , adlmodel , ", and ",  rfmodel ,"."]),
             html.P("We will be using both the RMSFE and DM to evaluate the models and determine which is the most suitable given the training period."),
         ], className= "evaluation-container"),
     
@@ -238,22 +252,23 @@ def update_evaluation_results_and_show(ar_results, adl_results, rf_results, year
             ]),
             dbc.Row([
                 dbc.Col(html.Div([
-                    html.H5("AR Model"),
-                    html.Img(src=ar_results['plot'], className="graph-image"),
-                    html.B(f"AR Model RMSFE: {round(ar_results['rmsfe'], 3)}"),
-                    html.P(f"We have trained the AR model using your selection of training data of {year} Q{quarter}. Using an expanding window approach to train and backtest our model, our 8 step forecast has indicated that the RMSFE is {round(ar_results['rmsfe'], 3)}."),
+                    html.P([armodel]),
+                    html.P(""),
+                    html.Img(src=ar_results['plot'], className="graph-image", style={'display': 'block', 'margin-left': 'auto', 'margin-right': 'auto'}),
+                    html.B(f"AR Model RMSFE: {round(ar_results['rmsfe'], 3)}",style={'text-align': 'center', 'color': "black"}),
+                    html.P(f"We have trained the AR Model using your selection of training data of {year} Q{quarter}. Using a fixed window approach to train and backtest our model, our 8 step forecast has indicated that the RMSFE is {round(ar_results['rmsfe'], 3)}."),
                 ]), width=4),
                 dbc.Col(html.Div([
-                    html.H5("ARDL Model"),
-                    html.Img(src=adl_results['plot'], className="graph-image"),
-                    html.B(f"ARDL Model RMSFE: {round(adl_results['rmsfe'], 3)}"),
-                    html.P(f"We have trained the ARDL model using your selection of training data of {year} Q{quarter}. Using an expanding window approach to train and backtest our model, our 8 step forecast has indicated that the RMSFE is {round(adl_results['rmsfe'],3)}."),
+                    html.P([adlmodel]),
+                    html.Img(src=adl_results['plot'], className="graph-image",style={'display': 'block', 'margin-left': 'auto', 'margin-right': 'auto'}),
+                    html.B(f"ADL Model RMSFE: {round(adl_results['rmsfe'], 3)}",style={'text-align': 'center', 'color': "black"}),
+                    html.P(f"We have trained the ADL Model using your selection of training data of {year} Q{quarter}. Using a fixed window approach to train and backtest our model, our 8 step forecast has indicated that the RMSFE is {round(adl_results['rmsfe'],3)}."),
                 ]), width=4),
                 dbc.Col(html.Div([
-                    html.H5("RF Model"),
-                    html.Img(src=rf_results['plot'], className="graph-image"),
-                    html.B(f"RF Model RMSFE: {round(rf_results['rmsfe'], 3)}"),
-                    html.P(f"We have trained the RF model using your selection of training data of {year} Q{quarter}. Using an expanding window approach to train and backtest our model, our 8 step forecast has indicated that the RMSFE is {round(rf_results['rmsfe'],3)}."),
+                    html.P([rfmodel]),
+                    html.Img(src=rf_results['plot'], className="graph-image",style={'display': 'block', 'margin-left': 'auto', 'margin-right': 'auto'}),
+                    html.B(f"RF Model RMSFE: {round(rf_results['rmsfe'], 3)}",style={'text-align': 'center', 'color': "black"}),
+                    html.P(f"We have trained the RF Model using your selection of training data of {year} Q{quarter}. Using a fixed window approach to train and backtest our model, our 8 step forecast has indicated that the RMSFE is {round(rf_results['rmsfe'],3)}."),
                     ]), width=4),
                 ]),
             ], className= 'evaluation-container'),
@@ -264,18 +279,18 @@ def update_evaluation_results_and_show(ar_results, adl_results, rf_results, year
                 dbc.Col(html.Div([
                     html.H4("Diebold-Mariano (DM) Test"),
                     html.P(f"A DM test is especially useful when it comes to comparing the performance between two models. "
-                        f"We will be using the AR model as our benchmark to determine if our ADL and RF models will outperform the AR model."),
+                        f"We will be using the AR Model as our benchmark to determine if our ADL Model and RF Model will perform similarly in terms of predictive capability."),
                 ]), width=12),
             ]),
             dbc.Row([
                 dbc.Col(html.Div([
                     html.H5("ADL Model"),
-                    html.B(f"ADL Model p-value: {ar_adl_dm}"),
+                    html.B(f"ADL Model p-value: {ar_adl_dm}", style={'text-align': 'center', 'color': "black"}),
                     html.P(adl_p_value_explanation),
                 ]), width=6),
                 dbc.Col(html.Div([
                     html.H5("RF Model"),
-                    html.B(f"RF Model p-value: {ar_rf_dm}"),
+                    html.B(f"RF Model p-value: {ar_rf_dm}", style={'text-align': 'center', 'color': "black"}),
                     html.P(rf_p_value_explanation),
                 ]), width=6),
             ]),
