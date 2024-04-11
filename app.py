@@ -77,15 +77,14 @@ app.layout = html.Div([
               [Input('url', 'pathname')])
 def display_page(pathname):
     if pathname == '/model-training':
-        return TrainingResultsTab()  # Replace with your function for Model Training
+        return TrainingResultsTab() 
     elif pathname == '/ar':
-        return ARTab()  # Replace with your function for AR
+        return ARTab() 
     elif pathname == '/adl':
-        return ADLTab()  # Replace with your function for ADL
+        return ADLTab()
     elif pathname == '/ml':
-        return MLTab()  # Replace with your function for ML
+        return MLTab() 
     else:
-        # If the user tries to reach a different page, redirect them to the home page
         return TrainingResultsTab()
 
 #Dropdown elements will update the graph
