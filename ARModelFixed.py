@@ -81,4 +81,4 @@ def AR_MODEL(year_input, quarter_input):
 
     return h_step_forecast, h_step_lag, rmsfe, real_time_plot
 
-AR_MODEL("1981", "2")
+#AR_MODEL("1981", "2")
