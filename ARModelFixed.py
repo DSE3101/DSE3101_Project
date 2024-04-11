@@ -10,6 +10,7 @@ from PlotGraphs import plot_forecast_real_time
 def AR_MODEL(year_input, quarter_input):
     h_step_forecast = []
     h_step_lag = []
+    rmsfe = []
     for h_step in range(8):
         real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data(year_input, quarter_input)
         real_time_y.reset_index(inplace=True)
@@ -47,6 +48,7 @@ def AR_MODEL(year_input, quarter_input):
             mse_list.append(avg_mse)
         # Find the lag value with the minimum average MSE
         optimal_lag = mse_list.index(min(mse_list)) + 1
+        h_step_lag.append(optimal_lag)
         #print("Optimal number of lags:", optimal_lag)
 
         # Forecast Yt+i
@@ -54,25 +56,17 @@ def AR_MODEL(year_input, quarter_input):
         linear_model.fit(real_time_y.iloc[:, 1:optimal_lag+1], real_time_y.iloc[:, 0])
         X_predict = real_time_y.iloc[-1:, 1:optimal_lag+1]
         h_step_forecast.append(linear_model.predict(X_predict)[0])
-        h_step_lag.append(optimal_lag)
-        #print(h_step_forecast, h_step_lag)
+        print(real_time_y, latest_y_train.iloc[9+h_step:, 0])
 
-        # Using AR Model would be wrong as it cannot lag 
-        # ar_model = AutoReg(real_time_y['yt'], lags=optimal_lag)
-        # ar_model = ar_model.fit()
-        # forecast = ar_model.predict(start=len(real_time_y), end=len(real_time_y), dynamic=False)
-        # print(f"Forecast for Yt+{h_step+1}: {forecast}")
-        # h_step_forecast.append(forecast.iloc[0])
-        # h_step_lag.append(optimal_lag)
-        # print(h_step_forecast, h_step_lag)
+        # Backtesting
+        backtest_predictions = []
+        for i in range(len(real_time_y)):
+            backtest_X = real_time_y.iloc[i:i+1, 1:optimal_lag+1]
+            backtest_predictions.append(linear_model.predict(backtest_X)[0])
+        backtest_actual = latest_y_train.iloc[9+h_step:, 0].to_list()
+        rmsfe.append(mean_squared_error(backtest_predictions, backtest_actual) ** 0.5)
+    print(rmsfe)
 
-
-    # Forecast error
-    latest_y_test_flat = latest_y_test.values.flatten()
-    abs_error = []
-    for i in range(len(h_step_forecast)):
-        abs_error.append(abs(latest_y_test_flat[i] - h_step_forecast[i]))
-        
     # Plots
     CI = [0.57, 0.842, 1.282] # 50, 60, 80% predictional interval
     h_step_forecast = pd.Series(h_step_forecast) #adding this into output
@@ -85,6 +79,6 @@ def AR_MODEL(year_input, quarter_input):
 
     real_time_plot = plot_forecast_real_time(y_plot, h_step_forecast, latest_y_test, CI, "AR Model")
 
-    return h_step_forecast, h_step_lag, abs_error, real_time_plot
+    return h_step_forecast, h_step_lag, rmsfe, real_time_plot
 
 AR_MODEL("1981", "2")
