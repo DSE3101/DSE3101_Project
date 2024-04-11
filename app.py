@@ -140,11 +140,10 @@ def ar_results(n_clicks, year_quarter_data):
         return dash.no_update
     year = year_quarter_data['year']
     quarter = year_quarter_data['quarter'].replace("Q", "")
-    h_step_forecast, h_step_lag, abs_error, real_time_plot = AR_MODEL(year, quarter)
+    h_step_forecast, h_step_lag, rmsfe, real_time_plot = AR_MODEL(year, quarter)
     ar_results = {
             'lag': h_step_lag,
-            'abs_error' : abs_error,
-            'rmsfe': 0.1,
+            'rmsfe': rmsfe,
             'plot': real_time_plot,
             'y_pred': h_step_forecast
         }
@@ -180,11 +179,11 @@ def rf_results(n_clicks, year_quarter_data):
         return dash.no_update
     year = year_quarter_data['year']
     quarter = year_quarter_data['quarter'].replace("Q", "")
-    rf_rmsfe, rf_real_time_plot, rf_y_pred = random_forest(year, quarter)    
+    rmsfe, real_time_plot, y_pred = random_forest(year, quarter)    
     rf_results = {
-            'rmsfe': rf_rmsfe,
-            'plot': rf_real_time_plot,
-            'y_pred': rf_y_pred
+            'rmsfe': rmsfe,
+            'plot': real_time_plot,
+            'y_pred': y_pred
         }
     return rf_results
 

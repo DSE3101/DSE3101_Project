@@ -159,11 +159,15 @@ def ADL_MODEL(year_input, quarter_input):
     CI = [0.57, 0.842, 1.282] #50, 60, 80% predictional interval
     y_pred = pd.Series(y_pred)
     y_pred.index = latest_y_test.index
-    #print(y_pred)
+    print(y_pred)
     real_time_y.index = latest_y_train.index
     plot = plot_forecast_real_time(real_time_y[1:], y_pred, latest_y_test, CI, "ADL Model")
     
     print(y_pred)
     return plot, y_pred
         
+<<<<<<< HEAD
 ADL_MODEL("2012", "2")
+=======
+ADL_MODEL("2023", "4")
+>>>>>>> 0cd145c860fa15d05983c61ed13097f3860d206e
