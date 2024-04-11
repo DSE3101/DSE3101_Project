@@ -70,12 +70,12 @@ def ADL_MODEL(year_input, quarter_input):
     final_model = sm.OLS(final_real_time_y, sm.add_constant(final_lagged_X)).fit()
 
     # Display the model summary
-    print(final_model.summary())
+    #print(final_model.summary())
 
     # Display the optimal lags
-    print("Optimal lags for each variable:")
-    for var, lag in optimal_lags.items():
-        print(f"{var}: {lag}")
+    #print("Optimal lags for each variable:")
+    #for var, lag in optimal_lags.items():
+    #    print(f"{var}: {lag}")
 
     forecast_results = {}
 
@@ -111,12 +111,12 @@ def ADL_MODEL(year_input, quarter_input):
     y_pred = []
     for forecast_horizon, value in forecast_results.items():
         y_pred.append(value)
-        print(f"{forecast_horizon}: {value}")
+        #print(f"{forecast_horizon}: {value}")
         
     CI = [0.57, 0.842, 1.282] #50, 60, 80% predictional interval
     y_pred = pd.Series(y_pred)
     y_pred.index = latest_y_test.index
-    print(y_pred)
+    #print(y_pred)
     real_time_y.index = latest_y_train.index
     plot = plot_forecast_real_time(real_time_y[1:], y_pred, latest_y_test, CI, "ADL Model")
     

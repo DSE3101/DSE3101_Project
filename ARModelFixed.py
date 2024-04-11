@@ -47,7 +47,7 @@ def AR_MODEL(year_input, quarter_input):
             mse_list.append(avg_mse)
         # Find the lag value with the minimum average MSE
         optimal_lag = mse_list.index(min(mse_list)) + 1
-        print("Optimal number of lags:", optimal_lag)
+        #print("Optimal number of lags:", optimal_lag)
 
         # Forecast Yt+i
         linear_model = LinearRegression()
@@ -55,7 +55,7 @@ def AR_MODEL(year_input, quarter_input):
         X_predict = real_time_y.iloc[-1:, 1:optimal_lag+1]
         h_step_forecast.append(linear_model.predict(X_predict)[0])
         h_step_lag.append(optimal_lag)
-        print(h_step_forecast, h_step_lag)
+        #print(h_step_forecast, h_step_lag)
 
         # Using AR Model would be wrong as it cannot lag 
         # ar_model = AutoReg(real_time_y['yt'], lags=optimal_lag)
@@ -87,4 +87,4 @@ def AR_MODEL(year_input, quarter_input):
 
     return h_step_forecast, h_step_lag, abs_error, real_time_plot
 
-#AR_MODEL("1981", "2")
+AR_MODEL("1981", "2")

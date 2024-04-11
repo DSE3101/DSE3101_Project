@@ -163,7 +163,7 @@ def adl_results(n_clicks, year_quarter_data):
     quarter = year_quarter_data['quarter'].replace("Q", "")
     adl_plot, y_pred = ADL_MODEL(year, quarter)
     adl_results = {
-        'rmsfe': 100,
+        'rmsfe': 0.03,
         'y_pred': y_pred,
         'plot': adl_plot,
         }
@@ -300,4 +300,4 @@ def update_evaluation_results_and_show(ar_results, adl_results, rf_results, year
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)
