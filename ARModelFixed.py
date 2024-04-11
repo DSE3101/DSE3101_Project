@@ -56,7 +56,6 @@ def AR_MODEL(year_input, quarter_input):
         linear_model.fit(real_time_y.iloc[:, 1:optimal_lag+1], real_time_y.iloc[:, 0])
         X_predict = real_time_y.iloc[-1:, 1:optimal_lag+1]
         h_step_forecast.append(linear_model.predict(X_predict)[0])
-        print(real_time_y, latest_y_train.iloc[9+h_step:, 0])
 
         # Backtesting
         backtest_predictions = []
