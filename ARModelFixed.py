@@ -75,7 +75,6 @@ def AR_MODEL(year_input, quarter_input):
     temp = real_time_X.iloc[len(latest_y_test)*2:, 0]
     y_plot = real_time_y.iloc[:, 0]
     y_plot.index = temp.index
-    h_step_forecast = h_step_forecast
 
     real_time_plot = plot_forecast_real_time(y_plot, h_step_forecast, latest_y_test, CI, "AR Model")
 
