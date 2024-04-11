@@ -5,7 +5,7 @@ from statsmodels.stats.diagnostic import acorr_ljungbox
 from scipy.stats import t
 
 #Use DM to compare
-def DM(model1_values, model2_values, test_values, h =12):
+def DM(model1_values, model2_values, test_values, h =8, p =8):
     
     test_values = test_values.iloc[:,0]
     # Calculate forecast errors
@@ -19,11 +19,10 @@ def DM(model1_values, model2_values, test_values, h =12):
     t_dm = np.mean(d)/np.sqrt((1/len(d))*(var_d+eps))
     
     dof = len(d)-1
-    data_size = len(test_values)
-    correction_factor = np.sqrt(1+ data_size**(-1) * (1-2*h) + data_size**(-2) * h*(h-1))
+    correction_factor = np.sqrt(1+ p**(-1) * (1-2*h) + p**(-2) * h*(h-1))
     t_hln = correction_factor * t_dm
     
-    p_value = 2* t.cdf(-np.abs(t_dm), df = dof)
+    p_value = 2* t.cdf(-np.abs(t_hln), df = dof)
     
     return t_dm, t_hln, p_value
     

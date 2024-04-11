@@ -28,7 +28,7 @@ from components.ADLTab import ADLTab
 from components.MLTab import *
 from data import mainplot #Main graph on landing
 from GetData import get_data
-from NewRandomForest import *
+from RandomForestFixed import *
 from NewARModel import *
 from NewADLModel import *
 
@@ -181,9 +181,8 @@ def rf_results(n_clicks, year_quarter_data):
         return dash.no_update
     year = year_quarter_data['year']
     quarter = year_quarter_data['quarter'].replace("Q", "")
-    rf_selected_variables_importance_dict, rf_rmsfe, rf_real_time_plot, rf_y_pred = random_forest(year, quarter)    
+    rf_rmsfe, rf_real_time_plot, rf_y_pred = random_forest(year, quarter)    
     rf_results = {
-            'selected_variables': rf_selected_variables_importance_dict,
             'rmsfe': rf_rmsfe,
             'plot': rf_real_time_plot,
             'y_pred': rf_y_pred
@@ -287,4 +286,4 @@ def update_evaluation_results_and_show(ar_results, adl_results, rf_results, year
 
 
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True)
