@@ -59,6 +59,7 @@ def ADL_MODEL(year_input, quarter_input):
 
     # Loop over each lag to build separate models and perform forecasts
     y_pred = []
+    rmsfe = []
     for lag_X in range(1, 9):
         # Initialize lagged features DataFrame
         X_lagged_valid = pd.DataFrame(index=real_time_X.index)
@@ -88,6 +89,15 @@ def ADL_MODEL(year_input, quarter_input):
 
         # Perform the forecast
         y_pred.append(model_lagged.predict(X_recent)[0])
+
+        # Backtesting
+        backtesting_predictions = []
+        for row in range(len(X_lagged_valid)):
+            X_row = X_lagged_valid.iloc[row].to_frame().T
+            backtesting_predictions.append(model_lagged.predict(X_row)[0])
+        backtesting_actual = latest_y_train.iloc[8+lag_X:, 0].to_list()
+        rmsfe.append(mean_squared_error(backtesting_predictions, backtesting_actual) ** 0.5)
+    print(rmsfe)
 
     # region 
     # Now that you have the optimal lags for each variable, create the final lagged DataFrame
@@ -157,11 +167,10 @@ def ADL_MODEL(year_input, quarter_input):
     CI = [0.57, 0.842, 1.282] #50, 60, 80% predictional interval
     y_pred = pd.Series(y_pred)
     y_pred.index = latest_y_test.index
-    #print(y_pred)
+    print(y_pred)
     real_time_y.index = latest_y_train.index
     plot = plot_forecast_real_time(real_time_y[1:], y_pred, latest_y_test, CI, "ADL Model")
     
-    print(y_pred)
-    return plot, y_pred
+    return plot, y_pred, rmsfe
         
-#ADL_MODEL("2012", "2")
+ADL_MODEL("2012", "2")
