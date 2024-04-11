@@ -173,4 +173,4 @@ def ADL_MODEL(year_input, quarter_input):
     
     return plot, y_pred, rmsfe
         
-ADL_MODEL("2012", "2")
+# ADL_MODEL("2012", "2")
