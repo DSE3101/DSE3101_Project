@@ -92,12 +92,14 @@ def ADL_MODEL(year_input, quarter_input):
 
         # Backtesting
         backtesting_predictions = []
+        # print(X_lagged_valid, y_lagged_valid)
         for row in range(len(X_lagged_valid)):
             X_row = X_lagged_valid.iloc[row].to_frame().T
             backtesting_predictions.append(model_lagged.predict(X_row)[0])
-        backtesting_actual = latest_y_train.iloc[8+lag_X:, 0].to_list()
+        # print(latest_y_train.iloc[len(y_lagged_valid)-len(X_lagged_valid):, 0])
+        backtesting_actual = latest_y_train.iloc[len(y_lagged_valid)-len(X_lagged_valid)+lag_X:, 0].to_list()
         rmsfe.append(mean_squared_error(backtesting_predictions, backtesting_actual) ** 0.5)
-    #print(rmsfe)
+    print(rmsfe)
 
     # region 
     # Now that you have the optimal lags for each variable, create the final lagged DataFrame
@@ -173,4 +175,4 @@ def ADL_MODEL(year_input, quarter_input):
     
     return plot, y_pred, rmsfe
         
-# ADL_MODEL("2012", "2")
+#ADL_MODEL("1987", "2")
