@@ -96,7 +96,7 @@ def ADL_MODEL(year_input, quarter_input):
             X_row = X_lagged_valid.iloc[row].to_frame().T
             backtesting_predictions.append(model_lagged.predict(X_row)[0])
         backtesting_actual = latest_y_train.iloc[8+lag_X:, 0].to_list()
-        rmsfe.append(mean_squared_error(backtesting_predictions, backtesting_actual) ** 0.5)
+        rmsfe.append(round(mean_squared_error(backtesting_predictions, backtesting_actual) ** 0.5,3))
     print(rmsfe)
 
     # region 
