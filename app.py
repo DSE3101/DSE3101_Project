@@ -237,15 +237,15 @@ def update_evaluation_results_and_show(ar_results, adl_results, rf_results, year
             html.H3("Evaluating our models", style={'text-align': 'center', 'color': "black"}),
             html.P("Using the training data selected above, we will now use 3 different forecasting methods to forecast the next 8 quarters."),
             html.P(["The three methods used will be the " , armodel , ", " , adlmodel , ", and ",  rfmodel ,"."]),
-            html.P("We will be using both the RMSFE and DM to evaluate the models and determine which is the most suitable given the training period."),
+            html.P("We will be using both the RMSE and DM to evaluate the models and determine which is the most suitable given the training period."),
         ], className= "evaluation-container"),
     
         #RMSE Section
         html.Div([
             dbc.Row([
                 dbc.Col(html.Div([
-                    html.H4("RMSFE Evaluation"),
-                    html.P("A lower RMSFE indicates that the model fits the historical data closely, making it more accurate for future predictions."),
+                    html.H4("RMSE Evaluation"),
+                    html.P("A lower RMSE indicates that the model fits the historical data closely, making it more accurate for future predictions."),
                 ]), width=12),
             ]),
             dbc.Row([
@@ -253,19 +253,19 @@ def update_evaluation_results_and_show(ar_results, adl_results, rf_results, year
                     html.P([armodel]),
                     html.P(""),
                     html.Img(src=ar_results['plot'], className="graph-image", style={'display': 'block', 'margin-left': 'auto', 'margin-right': 'auto'}),
-                    html.B(f"AR Model RMSFE: {ar_results['rmsfe']}",style={'text-align': 'center', 'color': "black"}),
+                    html.B(f"AR Model RMSE: {ar_results['rmsfe']}",style={'text-align': 'center', 'color': "black"}),
                     html.P(f"We have trained the AR Model using your selection of training data of {year} Q{quarter}. Using a fixed window approach to train and backtest our model, we've developed 8 different models to forecast 8 different points in our forecast."),
                 ]), width=4),
                 dbc.Col(html.Div([
                     html.P([adlmodel]),
                     html.Img(src=adl_results['plot'], className="graph-image",style={'display': 'block', 'margin-left': 'auto', 'margin-right': 'auto'}),
-                    html.B(f"ADL Model RMSFE: {(adl_results['rmsfe'])}",style={'text-align': 'center', 'color': "black"}),
+                    html.B(f"ADL Model RMSE: {(adl_results['rmsfe'])}",style={'text-align': 'center', 'color': "black"}),
                     html.P(f"We have trained the ADL Model using your selection of training data of {year} Q{quarter}. Using a fixed window approach to train and backtest our model, we've developed 8 different models to forecast 8 different points in our forecast."),
                 ]), width=4),
                 dbc.Col(html.Div([
                     html.P([rfmodel]),
                     html.Img(src=rf_results['plot'], className="graph-image",style={'display': 'block', 'margin-left': 'auto', 'margin-right': 'auto'}),
-                    html.B(f"RF Model RMSFE: {rf_results['rmsfe']}",style={'text-align': 'center', 'color': "black"}),
+                    html.B(f"RF Model RMSE: {rf_results['rmsfe']}",style={'text-align': 'center', 'color': "black"}),
                     html.P(f"We have trained the RF Model using your selection of training data of {year} Q{quarter}. Using a fixed window approach to train and backtest our model, we've developed 8 different models to forecast 8 different points in our forecast."),
                     ]), width=4),
                 ]),
