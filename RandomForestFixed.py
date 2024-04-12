@@ -75,7 +75,7 @@ def random_forest(year,quarter):
         for row in range(len(real_time_X_lagged)):
             backtesting_predictions.append(rf_model_selected.predict(real_time_X_lagged[selected_variables].iloc[row:row+1, :])[0])
         backtesting_actual = latest_y_train.iloc[i:, 0].to_list()
-        rmsfe.append(mean_squared_error(backtesting_predictions, backtesting_actual) ** 0.5)
+        rmsfe.append(round(mean_squared_error(backtesting_predictions, backtesting_actual) ** 0.5,3))
     print(rmsfe)
     
     # Plots

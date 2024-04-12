@@ -63,8 +63,8 @@ def AR_MODEL(year_input, quarter_input):
             backtest_X = real_time_y.iloc[i:i+1, 1:optimal_lag+1]
             backtest_predictions.append(linear_model.predict(backtest_X)[0])
         backtest_actual = latest_y_train.iloc[9+h_step:, 0].to_list()
-        rmsfe.append(mean_squared_error(backtest_predictions, backtest_actual) ** 0.5)
-    print(rmsfe)
+        rmsfe.append(round(mean_squared_error(backtest_predictions, backtest_actual) ** 0.5,3))
+    #print(rmsfe)
 
     # Plots
     CI = [0.57, 0.842, 1.282] # 50, 60, 80% predictional interval
