@@ -29,7 +29,7 @@ from components.MLTab import *
 from data import mainplot #Main graph on landing
 from GetData import get_data
 from RandomForestFixed import *   
-from ARModelFixed import *
+from ARModelFinal import *
 from ADLModelFixed import *
 
 
@@ -140,10 +140,10 @@ def ar_results(n_clicks, year_quarter_data):
         return dash.no_update
     year = year_quarter_data['year']
     quarter = year_quarter_data['quarter'].replace("Q", "")
-    h_step_forecast, h_step_lag, rmsfe, real_time_plot = AR_MODEL(year, quarter)
+    h_step_forecast, h_step_lag, rmse, real_time_plot = AR_MODEL(year, quarter)
     ar_results = {
             'lag': h_step_lag,
-            'rmsfe': [0.002,0.011],
+            'rmsfe': rmse,
             'plot': real_time_plot,
             'y_pred': h_step_forecast
         }
