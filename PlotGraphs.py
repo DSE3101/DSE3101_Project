@@ -31,7 +31,7 @@ def plot_forecast_real_time(data, forecast, actual, CI, modelName):
             upper_bound = forecast + ci * forecast.std()
             ax.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
 
-        ax.set_xlim([data.index[-20], forecast.index[-1]])
+        ax.set_xlim([data.index[0], forecast.index[-1]])
         ax.xaxis.set_major_locator(MaxNLocator(5))
         ax.set_title(f'{modelName} Forecast with Real-Time Data')
         ax.set_xlabel('Year:Quarter')
