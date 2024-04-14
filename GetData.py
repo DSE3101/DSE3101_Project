@@ -84,12 +84,12 @@ def get_data(year_input, quarter_input):
     #     latest_y_train = latest_y.iloc[:len(real_time_y)]
     #     latest_X_test = latest_X.iloc[len(real_time_y):, :]
     #     latest_y_test = latest_y.iloc[len(real_time_y):]
-    latest_X_train = latest_X.iloc[len(real_time_X)-28:len(real_time_X), :]
-    latest_y_train = latest_y.iloc[len(real_time_y)-28:len(real_time_y)]
+    latest_X_train = latest_X.iloc[len(real_time_X)-48:len(real_time_X), :]
+    latest_y_train = latest_y.iloc[len(real_time_y)-48:len(real_time_y)]
     latest_X_test = latest_X.iloc[len(real_time_X):, :]
     latest_y_test = latest_y.iloc[len(real_time_y):]
-    real_time_X = real_time_X.iloc[len(real_time_X)-28:, :]
-    real_time_y = real_time_y.iloc[len(real_time_y)-28:]
+    real_time_X = real_time_X.iloc[len(real_time_X)-48:, :]
+    real_time_y = real_time_y.iloc[len(real_time_y)-48:]
     # print(real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test)
 
     return real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter
