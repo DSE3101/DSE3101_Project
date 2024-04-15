@@ -13,7 +13,7 @@ def random_forest(year,quarter):
     real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data(year, quarter)
     top_n_variables = len(real_time_X.columns) // 10
 
-    # region
+    # region Test for optimal n_estimators
     # # Define a range of n_estimators values to try
     # n_estimators_range = [5, 10, 15, 20, 30]
     # # Initialize empty lists to store results
@@ -41,8 +41,8 @@ def random_forest(year,quarter):
     rmsfe = []
     
     for i in range(1,9):
-        # Loop 1, use xt-1 for a values to find yt, then append to pred
-        # loop 2, use xt-2 for all values to find yt, then append to pred
+        # Loop 1, use Xt-1 for all variables to find yt, then append to pred
+        # Loop 2, use Xt-2 for all variables to find yt, then append to pred
 
         # Copy the DataFrame to avoid changing the original unexpectedly
         real_time_X_lagged = real_time_X.copy()
