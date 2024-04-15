@@ -35,6 +35,7 @@ def AR_MODEL(year_input, quarter_input):
     h_steps = 8
     rmse = []
     forecasts = []
+    optimal_lags = []
     for step in range(h_steps):
         # Read in data
         real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data(year_input, quarter_input)
@@ -78,6 +79,7 @@ def AR_MODEL(year_input, quarter_input):
         # Optimal no. of lags = min MSE
         lowest_mse = min(mse_values)
         optimal_lag = mse_values.index(lowest_mse) + 1
+        optimal_lags.append(optimal_lag)
 
         # RMSE for optimal lag model for Yt+i|t
         rmse.append(lowest_mse ** 0.5)
@@ -98,6 +100,6 @@ def AR_MODEL(year_input, quarter_input):
     _, real_time_y, _, _, _, _, _, _ = get_data(year_input, quarter_input)
     plot = plot_forecast_real_time(real_time_y, forecasts, latest_y_test, CI, "AR Model", rmse)
 
-    return forecasts, optimal_lag, rmse, plot
+    return forecasts, optimal_lags, rmse, plot
         
 # AR_MODEL("2012", "2")
