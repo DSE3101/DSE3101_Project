@@ -4,8 +4,9 @@ from GetData import get_data
 import statsmodels.api as sm
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import LeaveOneOut
-import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
+from PlotGraphs import *
+# import matplotlib.pyplot as plt
+# from matplotlib.ticker import MaxNLocator
 
 # Helper function to calculate LOOCV MSE for a single variable at a given lag
 def loocv_mse_for_variable(X, y):
@@ -20,31 +21,31 @@ def loocv_mse_for_variable(X, y):
         mse_values.append(mse)
     return np.mean(mse_values)
 
-def plot_forecast_real_time(data, forecast, actual, CI, modelName, rmse_values):
-        actual = actual.iloc[:,0]
-        fig, ax = plt.subplots(figsize=(8, 6))  # Adjust the figure size as needed
+# def plot_forecast_real_time(data, forecast, actual, CI, modelName, rmse_values):
+#         actual = actual.iloc[:,0]
+#         fig, ax = plt.subplots(figsize=(8, 6))  # Adjust the figure size as needed
 
-        # Plotting the unrevised real-time data
-        ax.plot(data.index, data.values, label='Unrevised Real Time Data', color='blue')
-        # Plotting the forecast
-        ax.plot(forecast.index, forecast.values, label='Forecast', color='red')
-        # Plotting the actual data
-        ax.plot(actual.index, actual.values, color='green', label='Actual Data', alpha=0.6)
+#         # Plotting the unrevised real-time data
+#         ax.plot(data.index, data.values, label='Unrevised Real Time Data', color='blue')
+#         # Plotting the forecast
+#         ax.plot(forecast.index, forecast.values, label='Forecast', color='red')
+#         # Plotting the actual data
+#         ax.plot(actual.index, actual.values, color='green', label='Actual Data', alpha=0.6)
         
-        for i, ci in enumerate(CI):
-            alpha = 0.5 * (i + 1) / len(CI)
-            lower_bound = forecast - ci * rmse_values[i]
-            upper_bound = forecast + ci * rmse_values[i]
-            ax.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
+#         for i, ci in enumerate(CI):
+#             alpha = 0.5 * (i + 1) / len(CI)
+#             lower_bound = forecast - ci * rmse_values[i]
+#             upper_bound = forecast + ci * rmse_values[i]
+#             ax.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
 
-        ax.set_xlim([data.index[0], forecast.index[-1]])
-        ax.xaxis.set_major_locator(MaxNLocator(5))
-        ax.set_title(f'{modelName} Forecast with Real-Time Data')
-        ax.set_xlabel('Year:Quarter')
-        ax.set_ylabel('Change in growth rate')
-        ax.legend()
+#         ax.set_xlim([data.index[0], forecast.index[-1]])
+#         ax.xaxis.set_major_locator(MaxNLocator(5))
+#         ax.set_title(f'{modelName} Forecast with Real-Time Data')
+#         ax.set_xlabel('Year:Quarter')
+#         ax.set_ylabel('Change in growth rate')
+#         ax.legend()
 
-        plt.show()
+#         plt.show()
 
 def ADL_MODEL(year_input, quarter_input, ar_optimal_lags):
     h_steps = 8
