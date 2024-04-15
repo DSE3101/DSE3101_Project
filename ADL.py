@@ -116,6 +116,7 @@ def ADL_MODEL(year_input, quarter_input, ar_optimal_lags):
         # Backtesting
         residuals_squared = []
         for i in range(len(y_train)):
+            # Prepare LOO train test set
             loocv_X_train = X_lagged_valid.reset_index(drop=True, inplace=False)
             loocv_X_train = loocv_X_train[np.arange(len(y_train)) != i]
             loocv_X_test = X_lagged_valid.reset_index(drop=True, inplace=False)
@@ -124,10 +125,13 @@ def ADL_MODEL(year_input, quarter_input, ar_optimal_lags):
             loocv_y_train = loocv_y_train[np.arange(len(y_train)) != i]
             loocv_y_test = y_train.reset_index(drop=True, inplace=False)
             loocv_y_test = loocv_y_test.iloc[i, :]
-
+            # Fit the OLS model
             loocv_model = sm.OLS(loocv_y_train, loocv_X_train).fit()
+            # Make the prediction
             loocv_prediction = loocv_model.predict(loocv_X_test.values)
+            # Calculate residual
             residuals_squared.append((loocv_prediction - loocv_y_test) ** 2)
+        # Append to rmse
         rmse.append(((sum(residuals_squared) / len(y_train))[0]) ** 0.5)
 
         # Fit the model using OLS
@@ -144,4 +148,4 @@ def ADL_MODEL(year_input, quarter_input, ar_optimal_lags):
     
     return plot, forecasts, rmse
 
-ADL_MODEL("2012", "2", [1, 1, 1, 1, 1, 1, 1, 1])
+# ADL_MODEL("2012", "2", [1, 1, 1, 1, 1, 1, 1, 1])
