@@ -22,7 +22,7 @@ def DM(model1_values, model2_values, test_values, h =8, p =8):
     correction_factor = np.sqrt(1+ p**(-1) * (1-2*h) + p**(-2) * h*(h-1))
     t_hln = correction_factor * t_dm
     
-    p_value = 2* t.cdf(-np.abs(t_hln), df = dof)
+    p_value = 2* t.cdf(-np.abs(t_dm), df = dof)
     
     return t_dm, t_hln, p_value
     

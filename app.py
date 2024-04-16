@@ -28,10 +28,9 @@ from components.ADLTab import ADLTab
 from components.MLTab import *
 from data import mainplot #Main graph on landing
 from GetData import get_data
-from RandomForestFixed import *   
-from ARModelFixed import *
-from ADLModelFixed import *
-from RandomForestFixed import *
+from AR import *
+from ADL import *
+from RF import *
 
 
 routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
@@ -141,12 +140,12 @@ def ar_results(n_clicks, year_quarter_data):
         return dash.no_update
     year = year_quarter_data['year']
     quarter = year_quarter_data['quarter'].replace("Q", "")
-    h_step_forecast, h_step_lag, rmse, real_time_plot = AR_MODEL(year, quarter)
+    forecasts, optimal_lags, rmse, plot = AR_MODEL(year, quarter)
     ar_results = {
-            'lag': h_step_lag,
+            'lag': optimal_lags,
             'rmsfe': rmse,
-            'plot': real_time_plot,
-            'y_pred': h_step_forecast
+            'plot': plot,
+            'y_pred': forecasts
         }
     return ar_results
 
@@ -161,10 +160,12 @@ def adl_results(n_clicks, year_quarter_data):
         return dash.no_update
     year = year_quarter_data['year']
     quarter = year_quarter_data['quarter'].replace("Q", "")
-    plot, y_pred, rmsfe = ADL_MODEL(year, quarter)
+    _, optimal_lags, _, _ = AR_MODEL(year, quarter)
+
+    plot, forecasts, rmsfe = ADL_MODEL(year, quarter, optimal_lags)
     adl_results = {
-        'rmsfe': [0.003, 0.01],
-        'y_pred': y_pred,
+        'rmsfe': rmsfe,
+        'y_pred': forecasts,
         'plot': plot,
         }
     return adl_results
@@ -180,9 +181,9 @@ def rf_results(n_clicks, year_quarter_data):
         return dash.no_update
     year = year_quarter_data['year']
     quarter = year_quarter_data['quarter'].replace("Q", "")
-    rmsfe, real_time_plot, y_pred = random_forest(year, quarter)    
+    rmse, real_time_plot, y_pred = RANDOM_FOREST(year, quarter)    
     rf_results = {
-            'rmsfe': [0.001, 0.012],
+            'rmsfe': rmse,
             'plot': real_time_plot,
             'y_pred': y_pred
         } 

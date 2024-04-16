@@ -32,7 +32,7 @@ def plot_forecast_real_time(data, forecast, actual, CI, modelName, rmse_values):
             upper_bound = forecast + ci * rmse_values[i]
             ax.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
 
-        ax.set_xlim([data.index[0], forecast.index[-1]])
+        ax.set_xlim([data.index[-12], forecast.index[-1]])
         ax.xaxis.set_major_locator(MaxNLocator(5))
         ax.set_title(f'{modelName} Forecast with Real-Time Data')
         ax.set_xlabel('Year:Quarter')
@@ -49,31 +49,3 @@ def plot_forecast_real_time(data, forecast, actual, CI, modelName, rmse_values):
         buffer.close()
         
         return f"data:image/png;base64,{base64_string}"
-
-
-def plot_forecast_vintage(data, forecast, actual, CI, modelName):
-    fig, ax = plt.subplots(figsize=(4,4))  # Create a new figure and set the size
-    ax.plot(data.index, data.values, label='Revised Vintage Data', color='blue')
-    ax.plot(forecast.index, forecast.values, label='Forecast', color='red')
-    for i, ci in enumerate(CI):
-        alpha = 0.5 * (i + 1) / len(CI)
-        lower_bound = forecast - ci * forecast.std()
-        upper_bound = forecast + ci * forecast.std()
-        ax.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
-    
-    ax.set_xlim([data.index[-20], forecast.index[-1]])
-    ax.xaxis.set_major_locator(MaxNLocator(5))
-    ax.set_title(f'{modelName} Forecast with Revised Vintage Data')
-    ax.set_xlabel('Year:Quarter')
-    ax.set_ylabel('Change in growth rate')
-    ax.legend()
-    buffer = BytesIO()
-    fig.savefig(buffer, format="png")
-    #plt.show()
-    buffer.seek(0)
-    
-    image_png = buffer.getvalue()
-    base64_string = base64.b64encode(image_png).decode('utf-8')
-    buffer.close()
-    
-    return f"data:image/png;base64,{base64_string}"
