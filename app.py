@@ -19,6 +19,7 @@ import base64
 from io import BytesIO
 from dm import *
 from dash import dash_table
+import os
 
 
 
@@ -301,4 +302,5 @@ def update_evaluation_results_and_show(ar_results, adl_results, rf_results, year
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    port = int(os.environ.get('PORT', 8080))
+    app.run_server(debug=True, host='0.0.0.0', port=port)
