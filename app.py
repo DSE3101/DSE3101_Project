@@ -241,19 +241,19 @@ def update_evaluation_results_and_show(ar_results, adl_results, rf_results, year
     ar_rmses = ar_results['rmsfe']
     ar_table = html.Table(
         [html.Tr([html.Th(header) for header in headers])] +
-        [html.Tr([html.Td(model_numbers[i]), html.Td(ar_rmses[i])]) for i in range(len(model_numbers))]
+        [html.Tr([html.Td(model_numbers[i]), html.Td(round(ar_rmses[i],4))]) for i in range(len(model_numbers))]
     )
     
     adl_rmses = adl_results['rmsfe']
     adl_table = html.Table(
         [html.Tr([html.Th(header) for header in headers])] +
-        [html.Tr([html.Td(model_numbers[i]), html.Td(adl_rmses[i])]) for i in range(len(model_numbers))]
+        [html.Tr([html.Td(model_numbers[i]), html.Td(round(adl_rmses[i],4))]) for i in range(len(model_numbers))]
     )
     
     rf_rmses = rf_results['rmsfe']
     rf_table = html.Table(
         [html.Tr([html.Th(header) for header in headers])] +
-        [html.Tr([html.Td(model_numbers[i]), html.Td(rf_rmses[i])]) for i in range(len(model_numbers))]
+        [html.Tr([html.Td(model_numbers[i]), html.Td(round(rf_rmses[i],4))]) for i in range(len(model_numbers))]
     )
 
     evaluation = html.Div([
@@ -278,19 +278,19 @@ def update_evaluation_results_and_show(ar_results, adl_results, rf_results, year
                     html.P([armodel]),
                     html.P(""),
                     html.Img(src=ar_results['plot'], className="graph-image", style={'display': 'block', 'margin-left': 'auto', 'margin-right': 'auto'}),
-                    html.Div([ar_table]),
+                    html.Div([ar_table],style={'display': 'block', 'margin-left': 'auto', 'margin-right': 'auto'}),
                     html.P(f"We have trained the AR Model using your selection of training data of {year} Q{quarter}. Using a fixed window approach to train and backtest our model, we've developed 8 different models to forecast 8 different points in our forecast."),
                 ]), width=4),
                 dbc.Col(html.Div([
                     html.P([adlmodel]),
                     html.Img(src=adl_results['plot'], className="graph-image",style={'display': 'block', 'margin-left': 'auto', 'margin-right': 'auto'}),
-                    html.Div([adl_table]),
+                    html.Div([adl_table],style={'display': 'block', 'margin-left': 'auto', 'margin-right': 'auto'}),
                     html.P(f"We have trained the ADL Model using your selection of training data of {year} Q{quarter}. Using a fixed window approach to train and backtest our model, we've developed 8 different models to forecast 8 different points in our forecast."),
                 ]), width=4),
                 dbc.Col(html.Div([
                     html.P([rfmodel]),
                     html.Img(src=rf_results['plot'], className="graph-image",style={'display': 'block', 'margin-left': 'auto', 'margin-right': 'auto'}),
-                    html.Div([rf_table]),
+                    html.Div([rf_table],style={'display': 'block', 'margin-left': 'auto', 'margin-right': 'auto'}),
                     html.P(f"We have trained the RF Model using your selection of training data of {year} Q{quarter}. Using a fixed window approach to train and backtest our model, we've developed 8 different models to forecast 8 different points in our forecast."),
                     ]), width=4),
                 ]),
