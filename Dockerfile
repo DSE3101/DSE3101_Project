@@ -1,20 +1,18 @@
-# Use an official Python runtime as a parent image
-FROM python:3.9-slim
+# Example for a Flask or Dash application using Gunicorn
+FROM python:3.8-slim
 
-# Set the working directory in the container
+# Set working directory
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . /app
+# Copy requirements and install dependencies
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --trusted-host pypi.python.org -r requirements.txt
+# Copy the rest of the application
+COPY . .
 
-# Make port 8080 available to the world outside this container
-EXPOSE 8080
+# Expose the correct port
+EXPOSE $PORT
 
-# Define environment variable
-ENV NAME World
-
-# Run app.py when the container launches
-CMD gunicorn --bind :$PORT --workers 1 --threads 8 app:server
+# Start the application
+CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "app:server"]
