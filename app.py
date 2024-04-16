@@ -233,6 +233,28 @@ def update_evaluation_results_and_show(ar_results, adl_results, rf_results, year
 
     adl_p_value_explanation = low_p_value if ar_adl_dm < 0.05 else high_p_value
     rf_p_value_explanation = low_p_value if ar_rf_dm < 0.05 else high_p_value
+    
+    #AR Table
+    headers = ["Model Number", "RMSE"]
+
+    model_numbers =[f"{i}" for i in range(len(ar_results['rmsfe']))]
+    ar_rmses = ar_results['rmsfe']
+    ar_table = html.Table(
+        [html.Tr([html.Th(header) for header in headers])] +
+        [html.Tr([html.Td(model_numbers[i]), html.Td(ar_rmses[i])]) for i in range(len(model_numbers))]
+    )
+    
+    adl_rmses = adl_results['rmsfe']
+    adl_table = html.Table(
+        [html.Tr([html.Th(header) for header in headers])] +
+        [html.Tr([html.Td(model_numbers[i]), html.Td(adl_rmses[i])]) for i in range(len(model_numbers))]
+    )
+    
+    rf_rmses = rf_results['rmsfe']
+    rf_table = html.Table(
+        [html.Tr([html.Th(header) for header in headers])] +
+        [html.Tr([html.Td(model_numbers[i]), html.Td(rf_rmses[i])]) for i in range(len(model_numbers))]
+    )
 
     evaluation = html.Div([
         #Intro
@@ -256,19 +278,19 @@ def update_evaluation_results_and_show(ar_results, adl_results, rf_results, year
                     html.P([armodel]),
                     html.P(""),
                     html.Img(src=ar_results['plot'], className="graph-image", style={'display': 'block', 'margin-left': 'auto', 'margin-right': 'auto'}),
-                    html.B(f"AR Model Min Max RMSE: {ar_results['rmsfe']}",style={'text-align': 'center', 'color': "black"}),
+                    html.Div([ar_table]),
                     html.P(f"We have trained the AR Model using your selection of training data of {year} Q{quarter}. Using a fixed window approach to train and backtest our model, we've developed 8 different models to forecast 8 different points in our forecast."),
                 ]), width=4),
                 dbc.Col(html.Div([
                     html.P([adlmodel]),
                     html.Img(src=adl_results['plot'], className="graph-image",style={'display': 'block', 'margin-left': 'auto', 'margin-right': 'auto'}),
-                    html.B(f"ADL Model Min Max RMSE: {(adl_results['rmsfe'])}",style={'text-align': 'center', 'color': "black"}),
+                    html.Div([adl_table]),
                     html.P(f"We have trained the ADL Model using your selection of training data of {year} Q{quarter}. Using a fixed window approach to train and backtest our model, we've developed 8 different models to forecast 8 different points in our forecast."),
                 ]), width=4),
                 dbc.Col(html.Div([
                     html.P([rfmodel]),
                     html.Img(src=rf_results['plot'], className="graph-image",style={'display': 'block', 'margin-left': 'auto', 'margin-right': 'auto'}),
-                    html.B(f"RF Model Min Max RMSE: {rf_results['rmsfe']}",style={'text-align': 'center', 'color': "black"}),
+                    html.Div([rf_table]),
                     html.P(f"We have trained the RF Model using your selection of training data of {year} Q{quarter}. Using a fixed window approach to train and backtest our model, we've developed 8 different models to forecast 8 different points in our forecast."),
                     ]), width=4),
                 ]),
@@ -302,5 +324,5 @@ def update_evaluation_results_and_show(ar_results, adl_results, rf_results, year
 
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8080))
+    port = int(os.environ.get('PORT', 8081))
     app.run_server(debug=True, host='0.0.0.0', port=port)
