@@ -17,4 +17,4 @@ EXPOSE 8080
 ENV NAME World
 
 # Run app.py when the container launches
-CMD ["gunicorn", "--workers=4", "--bind", "0.0.0.0:8080", "app:server"]
+CMD gunicorn --bind :$PORT --workers 1 --threads 8 app:server
