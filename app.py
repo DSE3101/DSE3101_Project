@@ -29,8 +29,9 @@ from components.MLTab import *
 from data import mainplot #Main graph on landing
 from GetData import get_data
 from RandomForestFixed import *   
-from ARModelFinal import *
+from ARModelFixed import *
 from ADLModelFixed import *
+from RandomForestFixed import *
 
 
 routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
