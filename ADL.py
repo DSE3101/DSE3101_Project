@@ -8,19 +8,6 @@ from PlotGraphs import *
 # import matplotlib.pyplot as plt
 # from matplotlib.ticker import MaxNLocator
 
-# Helper function to calculate LOOCV MSE for a single variable at a given lag
-def loocv_mse_for_variable(X, y):
-    mse_values = []
-    loo = LeaveOneOut()
-    for train_index, test_index in loo.split(X):
-        X_train, X_test = X.iloc[train_index], X.iloc[test_index]
-        y_train, y_test = y.iloc[train_index], y.iloc[test_index]
-        model = sm.OLS(y_train, X_train).fit()
-        y_pred = model.predict(X_test)
-        mse = mean_squared_error(y_test, y_pred)
-        mse_values.append(mse)
-    return np.mean(mse_values)
-
 # def plot_forecast_real_time(data, forecast, actual, CI, modelName, rmse_values):
 #         actual = actual.iloc[:,0]
 #         fig, ax = plt.subplots(figsize=(8, 6))  # Adjust the figure size as needed
@@ -70,6 +57,19 @@ def ADL_MODEL(year_input, quarter_input, ar_optimal_lags):
     Next, the optimal no. of lags of RUC is chosen, it may then affect the optimal no. of lags of CPI.
     However, we will not check for this as it is too computationally expensive.
     '''
+    # Helper function to calculate LOOCV MSE for a single variable at a given lag
+    def loocv_mse_for_variable(X, y):
+        mse_values = []
+        loo = LeaveOneOut()
+        for train_index, test_index in loo.split(X):
+            X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+            y_train, y_test = y.iloc[train_index], y.iloc[test_index]
+            model = sm.OLS(y_train, X_train).fit()
+            y_pred = model.predict(X_test)
+            mse = mean_squared_error(y_test, y_pred)
+            mse_values.append(mse)
+        return np.mean(mse_values)
+    
     optimal_lags = {}
     # Iterate over each variable to find its optimal number of lags
     for var in real_time_X.columns:
@@ -89,6 +89,7 @@ def ADL_MODEL(year_input, quarter_input, ar_optimal_lags):
         # Store the best lag for the variable
         optimal_lags[var] = best_lag
 
+    # Use the optimally selected model
     # Prepare lagged data
     for lag_X in range(1, h_steps+1):
         # Prepare lagged X data
