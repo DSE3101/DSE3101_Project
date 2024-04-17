@@ -4,6 +4,34 @@ from GetData import get_data
 from sklearn.ensemble import RandomForestRegressor
 import statsmodels.api as sm
 from PlotGraphs import *
+# import matplotlib.pyplot as plt
+# from matplotlib.ticker import MaxNLocator
+
+# def plot_forecast_real_time(data, forecast, actual, CI, modelName, rmse_values):
+#         actual = actual.iloc[:,0]
+#         fig, ax = plt.subplots(figsize=(8, 6))  # Adjust the figure size as needed
+
+#         # Plotting the unrevised real-time data
+#         ax.plot(data.index, data.values, label='Unrevised Real Time Data', color='blue')
+#         # Plotting the forecast
+#         ax.plot(forecast.index, forecast.values, label='Forecast', color='red')
+#         # Plotting the actual data
+#         ax.plot(actual.index, actual.values, color='green', label='Actual Data', alpha=0.6)
+        
+#         for i, ci in enumerate(CI):
+#             alpha = 0.5 * (i + 1) / len(CI)
+#             lower_bound = forecast - ci * rmse_values[i]
+#             upper_bound = forecast + ci * rmse_values[i]
+#             ax.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
+
+#         ax.set_xlim([data.index[0], forecast.index[-1]])
+#         ax.xaxis.set_major_locator(MaxNLocator(5))
+#         ax.set_title(f'{modelName} Forecast with Real-Time Data')
+#         ax.set_xlabel('Year:Quarter')
+#         ax.set_ylabel('Change in growth rate')
+#         ax.legend()
+
+#         plt.show()
 
 def RANDOM_FOREST(year_input, quarter_input):
     # region Test for optimal n_estimators
@@ -54,14 +82,13 @@ def RANDOM_FOREST(year_input, quarter_input):
         feature_importance_df = pd.DataFrame({'Feature': real_time_X_lagged.columns, 'Importance': feature_importance})
         feature_importance_df = feature_importance_df.sort_values(by='Importance', ascending=False)
         selected_variables = feature_importance_df.head(top_n_variables)['Feature'].tolist()
-        
         # Train new RF Model with selected variables
         rf_model_selected = RandomForestRegressor(n_estimators=n_estimators, random_state=42)
         rf_model_selected.fit(real_time_X_lagged[selected_variables], real_time_y.values.ravel())
         # Forecast Yt+i|t
         forecasts.append(rf_model_selected.predict(X_predict[selected_variables])[0])
 
-        # Backtesting
+        # Backtesting for Random Forest
         residuals_squared = []
         for i in range(len(real_time_y)):
             # Prepare LOO train test set
@@ -85,8 +112,10 @@ def RANDOM_FOREST(year_input, quarter_input):
     # Plot
     forecasts = pd.Series(forecasts)
     forecasts.index = latest_y_test.index
-    CI = [0.57, 0.842, 1.282] # 50, 60, 80% predictional interval
+    PI = [0.57, 0.842, 1.282] # 50, 60, 80% predictional interval
     _, real_time_y, _, _, _, _, _, _ = get_data(year_input, quarter_input)
-    plot = plot_forecast_real_time(real_time_y, forecasts, latest_y_test, CI, "RF Model", rmse)
+    plot = plot_forecast_real_time(real_time_y, forecasts, latest_y_test, PI, "RF Model", rmse)
 
     return rmse, plot, forecasts
+
+# RANDOM_FOREST("2012", "2")

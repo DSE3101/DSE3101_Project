@@ -15,7 +15,7 @@ from io import BytesIO
 from matplotlib.ticker import MaxNLocator
 import matplotlib.dates as mdates
 
-def plot_forecast_real_time(data, forecast, actual, CI, modelName, rmse_values):
+def plot_forecast_real_time(data, forecast, actual, PI, modelName, rmse_values):
     actual = actual.iloc[:,0]
     data = pd.concat([data, (pd.DataFrame([forecast.iloc[0]], index=[forecast.index[0]], columns=[data.columns[0]]))])
     fig, ax = plt.subplots(figsize=(8, 6))  # Adjust the figure size as needed
@@ -30,10 +30,10 @@ def plot_forecast_real_time(data, forecast, actual, CI, modelName, rmse_values):
     rmse_values = pd.Series(rmse_values)
     rmse_values.index = forecast.index
     
-    for i, ci in enumerate(CI):
-        alpha = 0.5 * (i + 1) / len(CI)
-        lower_bound = forecast - ci * rmse_values
-        upper_bound = forecast + ci * rmse_values
+    for i, pi in enumerate(PI):
+        alpha = 0.5 * (i + 1) / len(PI)
+        lower_bound = forecast - pi * rmse_values
+        upper_bound = forecast + pi * rmse_values
         ax.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
 
     ax.set_xlim([data.index[-12], forecast.index[-1]])

@@ -29,9 +29,9 @@ from components.ADLTab import ADLTab
 from components.MLTab import *
 from data import mainplot #Main graph on landing
 from GetData import get_data
-from AR import *
-from ADL import *
-from RF import *
+from model_AR import *
+from model_ADL import *
+from model_RF import *
 
 
 routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")

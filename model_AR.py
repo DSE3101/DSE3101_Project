@@ -69,8 +69,8 @@ def AR_MODEL(year_input, quarter_input):
     # Plot
     forecasts = pd.Series(forecasts)
     forecasts.index = latest_y_test.index
-    CI = [0.57, 0.842, 1.282] # 50, 60, 80% predictional interval
+    PI = [0.57, 0.842, 1.282] # 50, 60, 80% predictional interval
     _, real_time_y, _, _, _, _, _, _ = get_data(year_input, quarter_input)
-    plot = plot_forecast_real_time(real_time_y.iloc[1:], forecasts, latest_y_test, CI, "AR Model", rmse)
+    plot = plot_forecast_real_time(real_time_y.iloc[1:], forecasts, latest_y_test, PI, "AR Model", rmse)
 
     return forecasts, optimal_lags, rmse, plot
