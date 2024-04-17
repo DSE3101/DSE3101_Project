@@ -95,9 +95,18 @@ def display_page(pathname):
 )
 def update_graph(year_value, quarter_value):
     # Convert the slider value and quarter value to a date
+    year = int(year_value)
+    quarter = int(quarter_value.strip('Q'))
+    start_year = year - 12 
+    start_quarter = quarter
     selected_date_str = f"{year_value}{quarter_value}"
-    selected_date = pd.Period(selected_date_str, freq='Q').to_timestamp(how='end')
-    filtered_data = routput[(routput['DATE'] <= selected_date)]
+    selected_period_index = pd.Period(selected_date_str, freq='Q')
+    start_date_str = f"{start_year}Q{start_quarter}"
+    start_period_index = pd.Period(start_date_str, freq='Q')
+
+    # Filter data between the start and selected periods
+    filtered_data = routput[(routput['DATE'] >= start_period_index.start_time) & (routput['DATE'] <= selected_period_index.end_time)]
+
     
     # Create the figure
     figure = go.Figure()
@@ -116,7 +125,8 @@ def update_graph(year_value, quarter_value):
     [Input('dropdown-year', 'value'), Input('dropdown-quarter', 'value')]
     )
 def update_output(year_value, quarter_value):
-    return f'Your training data will be from 1947 Q1 to {year_value} {quarter_value}'
+    training_year = int(year_value) - 12
+    return f'Your training data will be from {training_year} {quarter_value} to {year_value} {quarter_value}'
 
 #Data taken from training tab will be called to AR, ADL and ML
 @app.callback(
@@ -224,15 +234,28 @@ def update_evaluation_results_and_show(ar_results, adl_results, rf_results, year
     real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data(year, quarter)
 
     #DM test
-    ar_adl_dm = round(DM(ar_results['y_pred'], adl_results['y_pred'], latest_y_test, h = 8)[2],3)
-    ar_rf_dm = round(DM(ar_results['y_pred'], rf_results['y_pred'], latest_y_test, h =8)[2],3)
+    ar_adl_dm = round(DM(ar_results['y_pred'], adl_results['y_pred'], latest_y_test, h = 8)[0],3)
+    ar_rf_dm = round(DM(ar_results['y_pred'], rf_results['y_pred'], latest_y_test, h =8)[0],3)
     
     #DM explainer
-    low_p_value ="Since the p-value is less than 0.05, it means that there is significant predictive capabilities between the AR model and this model."
-    high_p_value = "Since the p-value of the DM test is more than 0.05, there is no significant predictive capabilities of the AR model and this model."
+    low_t_value ="Since the t-value is less than -1.96, it indicates that the AR model has statistically significant better predictive performance compared to this model at the 5% significance level."
+    high_t_value ="Since the t-value is more than 1.96, it indicates that this model has statistically significant better predictive performance compared to the AR model at the 5% significance level."
+    normal_t_value="Since the t-value is more than -1.96 and less than 1.96, it indicates that both models have no differences in predictive capabilities at the 5% significance level"
 
-    adl_p_value_explanation = low_p_value if ar_adl_dm < 0.05 else high_p_value
-    rf_p_value_explanation = low_p_value if ar_rf_dm < 0.05 else high_p_value
+    if ar_adl_dm < -1.96:
+        adl_t_value_explanation = low_t_value
+    elif ar_adl_dm > 1.96:
+        adl_t_value_explanation = high_t_value
+    else:
+        adl_t_value_explanation = normal_t_value 
+        
+           
+    if ar_rf_dm < -1.96:
+        rf_t_value_explanation = low_t_value
+    elif ar_rf_dm > 1.96:
+        rf_t_value_explanation = high_t_value
+    else:
+        rf_t_value_explanation = normal_t_value 
     
     #AR Table
     headers = ["Model Number", "RMSE"]
@@ -309,12 +332,12 @@ def update_evaluation_results_and_show(ar_results, adl_results, rf_results, year
                 dbc.Col(html.Div([
                     html.H5("ADL Model"),
                     html.B(f"ADL Model p-value: {ar_adl_dm}", style={'text-align': 'center', 'color': "black"}),
-                    html.P(adl_p_value_explanation),
+                    html.P(adl_t_value_explanation),
                 ]), width=6),
                 dbc.Col(html.Div([
                     html.H5("RF Model"),
                     html.B(f"RF Model p-value: {ar_rf_dm}", style={'text-align': 'center', 'color': "black"}),
-                    html.P(rf_p_value_explanation),
+                    html.P(rf_t_value_explanation),
                 ]), width=6),
             ]),
         ], className="evaluation-container")
@@ -324,5 +347,5 @@ def update_evaluation_results_and_show(ar_results, adl_results, rf_results, year
 
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8080))
+    port = int(os.environ.get('PORT', 8081))
     app.run_server(debug=True, host='0.0.0.0', port=port)
