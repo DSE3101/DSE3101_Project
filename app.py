@@ -125,7 +125,7 @@ def update_graph(year_value, quarter_value):
     [Input('dropdown-year', 'value'), Input('dropdown-quarter', 'value')]
     )
 def update_output(year_value, quarter_value):
-    training_year = year_value - 5
+    training_year = int(year_value) - 5
     return f'Your training data will be from {training_year} {quarter_value} to {year_value} {quarter_value}'
 
 #Data taken from training tab will be called to AR, ADL and ML
