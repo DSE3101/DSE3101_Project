@@ -35,14 +35,9 @@ def get_data(year_input, quarter_input):
                             "P", "PCON", "pcong", "pconshh", "pconsnp", "pconhh", "PCONX", "PIMP", "POP", "LFC", "LFPART",
                             "RUC", "EMPLOY", "H", "HG", "HS", "OPH", "ULC", "IPT", "IPM", "CUT", "CUM", "HSTARTS", "ROUTPUT"]
     
+    h_step_input = 8
     # chosen_variable_name = input("Choose a macro variable to forecast:\n")
     chosen_variable_name = "ROUTPUT"
-    # year_input = input("Choose real time data from 1966 to 2023:\n")
-    # year_input = "2012"
-    # quarter_input = input("Choose a quarter from 1 to 4:\n")
-    # quarter_input = "2"
-    # h_step_input = int(input("Choose number of steps to forecast:\n")) - 1
-    h_step_input = 8
     # curr_year = input("Choose latest time period (YYYY):\n")
     curr_year = "2020"
     # curr_quarter = input("Choose latest quarter (QQ):\n")
@@ -62,34 +57,12 @@ def get_data(year_input, quarter_input):
     # Slice data as needed
     real_time_X, real_time_y = get_vintage_data(year_input, quarter_input, year_input, quarter_input, chosen_variable_name)
     latest_X, latest_y = get_vintage_data(curr_year, curr_quarter, h_step_year, h_step_quarter, chosen_variable_name)
-    # In ROUTPUT, the vintages in 1992 did not revise values from 1947Q1 to 1958Q4
-    # if (year_input == "1992") or (year_input == "1999" and quarter_input == "4") or (year_input == "2000" and quarter_input == "1"):
-    #     slice_before_1959_Q1 = real_time_X.index.get_loc("1959:Q1")
-    #     latest_X_train = latest_X.iloc[slice_before_1959_Q1:len(real_time_y), :]
-    #     latest_y_train = latest_y.iloc[slice_before_1959_Q1:len(real_time_y)]
-    #     latest_X_test = latest_X.iloc[len(real_time_y):, :]
-    #     latest_y_test = latest_y.iloc[len(real_time_y):]
-    #     real_time_X = real_time_X.iloc[slice_before_1959_Q1:len(real_time_y), :]
-    #     real_time_y = real_time_y.iloc[slice_before_1959_Q1:len(real_time_y), :]
-    # elif (year_input == "1996") or (year_input == "1997" and quarter_input == "1"):
-    #     slice_before_1959_Q3 = real_time_X.index.get_loc("1959:Q3")
-    #     latest_X_train = latest_X.iloc[slice_before_1959_Q3:len(real_time_y), :]
-    #     latest_y_train = latest_y.iloc[slice_before_1959_Q3:len(real_time_y)]
-    #     latest_X_test = latest_X.iloc[len(real_time_y):, :]
-    #     latest_y_test = latest_y.iloc[len(real_time_y):]
-    #     real_time_X = real_time_X.iloc[slice_before_1959_Q3:len(real_time_y), :]
-    #     real_time_y = real_time_y.iloc[slice_before_1959_Q3:len(real_time_y), :]
-    # else:
-    #     latest_X_train = latest_X.iloc[:len(real_time_y), :]
-    #     latest_y_train = latest_y.iloc[:len(real_time_y)]
-    #     latest_X_test = latest_X.iloc[len(real_time_y):, :]
-    #     latest_y_test = latest_y.iloc[len(real_time_y):]
-    latest_X_train = latest_X.iloc[len(real_time_X)-48:len(real_time_X), :]
-    latest_y_train = latest_y.iloc[len(real_time_y)-48:len(real_time_y)]
+    # Some indicators missing data before 1959Q1 (row 146)
+    latest_X_train = latest_X.iloc[146:len(real_time_X), :]
+    latest_y_train = latest_y.iloc[146:len(real_time_y)]
     latest_X_test = latest_X.iloc[len(real_time_X):, :]
     latest_y_test = latest_y.iloc[len(real_time_y):]
-    real_time_X = real_time_X.iloc[len(real_time_X)-48:, :]
-    real_time_y = real_time_y.iloc[len(real_time_y)-48:]
-    # print(real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test)
+    real_time_X = real_time_X.iloc[146:, :]
+    real_time_y = real_time_y.iloc[146:]
 
     return real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter
