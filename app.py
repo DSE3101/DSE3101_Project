@@ -95,9 +95,18 @@ def display_page(pathname):
 )
 def update_graph(year_value, quarter_value):
     # Convert the slider value and quarter value to a date
+    year = int(year_value)
+    quarter = int(quarter_value.strip('Q'))
+    start_year = year - 5 
+    start_quarter = quarter
     selected_date_str = f"{year_value}{quarter_value}"
-    selected_date = pd.Period(selected_date_str, freq='Q').to_timestamp(how='end')
-    filtered_data = routput[(routput['DATE'] <= selected_date)]
+    selected_period_index = pd.Period(selected_date_str, freq='Q')
+    start_date_str = f"{start_year}Q{start_quarter}"
+    start_period_index = pd.Period(start_date_str, freq='Q')
+
+    # Filter data between the start and selected periods
+    filtered_data = routput[(routput['DATE'] >= start_period_index.start_time) & (routput['DATE'] <= selected_period_index.end_time)]
+
     
     # Create the figure
     figure = go.Figure()
@@ -116,7 +125,8 @@ def update_graph(year_value, quarter_value):
     [Input('dropdown-year', 'value'), Input('dropdown-quarter', 'value')]
     )
 def update_output(year_value, quarter_value):
-    return f'Your training data will be from 1947 Q1 to {year_value} {quarter_value}'
+    training_year = year_value - 5
+    return f'Your training data will be from {training_year} {quarter_value} to {year_value} {quarter_value}'
 
 #Data taken from training tab will be called to AR, ADL and ML
 @app.callback(
