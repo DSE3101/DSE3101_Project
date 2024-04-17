@@ -3,34 +3,6 @@ import numpy as np
 from GetData import get_data
 from sklearn.linear_model import LinearRegression
 from PlotGraphs import *
-# import matplotlib.pyplot as plt
-# from matplotlib.ticker import MaxNLocator
-
-# def plot_forecast_real_time(data, forecast, actual, CI, modelName, rmse_values):
-#         actual = actual.iloc[:,0]
-#         fig, ax = plt.subplots(figsize=(8, 6))  # Adjust the figure size as needed
-
-#         # Plotting the unrevised real-time data
-#         ax.plot(data.index, data.values, label='Unrevised Real Time Data', color='blue')
-#         # Plotting the forecast
-#         ax.plot(forecast.index, forecast.values, label='Forecast', color='red')
-#         # Plotting the actual data
-#         ax.plot(actual.index, actual.values, color='green', label='Actual Data', alpha=0.6)
-        
-#         for i, ci in enumerate(CI):
-#             alpha = 0.5 * (i + 1) / len(CI)
-#             lower_bound = forecast - ci * rmse_values[i]
-#             upper_bound = forecast + ci * rmse_values[i]
-#             ax.fill_between(forecast.index, lower_bound, upper_bound, color='blue', alpha=alpha)
-
-#         ax.set_xlim([data.index[0], forecast.index[-1]])
-#         ax.xaxis.set_major_locator(MaxNLocator(5))
-#         ax.set_title(f'{modelName} Forecast with Real-Time Data')
-#         ax.set_xlabel('Year:Quarter')
-#         ax.set_ylabel('Change in growth rate')
-#         ax.legend()
-
-#         plt.show()
 
 def AR_MODEL(year_input, quarter_input):
     h_steps = 8
@@ -99,8 +71,6 @@ def AR_MODEL(year_input, quarter_input):
     forecasts.index = latest_y_test.index
     CI = [0.57, 0.842, 1.282] # 50, 60, 80% predictional interval
     _, real_time_y, _, _, _, _, _, _ = get_data(year_input, quarter_input)
-    plot = plot_forecast_real_time(real_time_y, forecasts, latest_y_test, CI, "AR Model", rmse)
+    plot = plot_forecast_real_time(real_time_y.iloc[1:], forecasts, latest_y_test, CI, "AR Model", rmse)
 
     return forecasts, optimal_lags, rmse, plot
-        
-# AR_MODEL("2012", "2")
