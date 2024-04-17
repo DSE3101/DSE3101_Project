@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib
-# matplotlib.use('Agg')
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from statsmodels.tsa.ar_model import AutoReg
@@ -17,6 +17,7 @@ import matplotlib.dates as mdates
 
 def plot_forecast_real_time(data, forecast, actual, CI, modelName, rmse_values):
     actual = actual.iloc[:,0]
+    data = pd.concat([data, (pd.DataFrame([forecast.iloc[0]], index=[forecast.index[0]], columns=[data.columns[0]]))])
     fig, ax = plt.subplots(figsize=(8, 6))  # Adjust the figure size as needed
 
     # Plotting the unrevised real-time data
@@ -44,7 +45,7 @@ def plot_forecast_real_time(data, forecast, actual, CI, modelName, rmse_values):
 
     buffer = BytesIO()
     fig.savefig(buffer, format="png")
-    plt.show()
+    # plt.show()
     buffer.seek(0)
     
     image_png = buffer.getvalue()
