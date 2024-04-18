@@ -43,7 +43,6 @@ def get_data(year_input, quarter_input):
     # curr_quarter = input("Choose latest quarter (QQ):\n")
     curr_quarter = "1"
 
-
     years_ahead = h_step_input // 4
     quarters_ahead = h_step_input % 4
     h_step_year = int(year_input) + years_ahead
@@ -57,12 +56,11 @@ def get_data(year_input, quarter_input):
     # Slice data as needed
     real_time_X, real_time_y = get_vintage_data(year_input, quarter_input, year_input, quarter_input, chosen_variable_name)
     latest_X, latest_y = get_vintage_data(curr_year, curr_quarter, h_step_year, h_step_quarter, chosen_variable_name)
-    # Some indicators missing data before 1959Q1 (row 146)
-    latest_X_train = latest_X.iloc[146:len(real_time_X), :]
-    latest_y_train = latest_y.iloc[146:len(real_time_y)]
+    latest_X_train = latest_X.iloc[49:len(real_time_X), :]
+    latest_y_train = latest_y.iloc[49:len(real_time_y)]
     latest_X_test = latest_X.iloc[len(real_time_X):, :]
     latest_y_test = latest_y.iloc[len(real_time_y):]
-    real_time_X = real_time_X.iloc[146:, :]
-    real_time_y = real_time_y.iloc[146:]
+    real_time_X = real_time_X.iloc[49:, :]
+    real_time_y = real_time_y.iloc[49:]
 
     return real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter
