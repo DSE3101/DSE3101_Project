@@ -1,34 +1,19 @@
 import dash
-import numpy as np
 import pandas as pd 
 import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
-from matplotlib import pyplot as plt
-import matplotlib.ticker as ticker
-from statsmodels.tsa.ar_model import AutoReg
-from pandas.plotting import lag_plot
-from pandas.plotting import autocorrelation_plot
-from statsmodels.graphics.tsaplots import plot_acf
-from statsmodels.tsa.stattools import adfuller
 from dash import html
 from dash import dcc
 from dash.dependencies import Input, Output, State
-import pickle
-from sklearn.metrics import mean_squared_error
-import base64
-from io import BytesIO
-from dm import *
-from dash import dash_table
 import os
 
-
-
+#Importing components and tests
+from dm import *
 from components.ARTab import *
-from components.TrainingResultsTab import TrainingResultsTab
-from components.ADLTab import ADLTab
+from components.TrainingResultsTab import *
+from components.ADLTab import *
 from components.MLTab import *
-from data import mainplot #Main graph on landing
-from GetData import get_data
+from GetData import *
 from model_AR import *
 from model_ADL import *
 from model_RF import *
