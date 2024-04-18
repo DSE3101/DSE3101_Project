@@ -1,6 +1,6 @@
 import pandas as pd
 import matplotlib
-# matplotlib.use('Agg')
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import base64
 from io import BytesIO
@@ -38,7 +38,7 @@ def plot_forecast_real_time(data, forecast, actual, PI, modelName, rmse_values):
 
     buffer = BytesIO()
     fig.savefig(buffer, format="png")
-    plt.show()
+    # plt.show()
     buffer.seek(0)
     
     image_png = buffer.getvalue()
