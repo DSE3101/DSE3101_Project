@@ -13,7 +13,7 @@ def ADL_MODEL(year_input, quarter_input, ar_optimal_lags):
     # Get data
     real_time_X, real_time_y, latest_X_train, latest_y_train, latest_X_test, latest_y_test, curr_year, curr_quarter = get_data(year_input, quarter_input)
     # Define candidate variables
-    candidate_vars = ['CPI', 'RUC', 'M1', 'HSTARTS', 'IPM', 'OPH']
+    candidate_vars = ['CPI', 'RUC', 'M1', 'HSTARTS', 'IPT']
     # Match to vintage naming convention
     candidate_vars = [f'{var}{year_input[-2:]}Q{quarter_input}' for var in candidate_vars]
     # Filter candidate variables from overall data
