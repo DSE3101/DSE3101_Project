@@ -56,7 +56,7 @@ def AR_MODEL(year_input, quarter_input):
 
         # RMSE for optimal lag model for Yt+i|t
         rmse.append(lowest_mse ** 0.5)
-
+        #print(rmse)
         # Make Yt+i|t forecast
         linear_model = LinearRegression()
         # Fit using optimal lags
@@ -74,3 +74,5 @@ def AR_MODEL(year_input, quarter_input):
     plot = plot_forecast_real_time(real_time_y.iloc[1:], forecasts, latest_y_test, PI, "AR Model", rmse)
 
     return forecasts, optimal_lags, rmse, plot
+
+#AR_MODEL("1970", "1")
