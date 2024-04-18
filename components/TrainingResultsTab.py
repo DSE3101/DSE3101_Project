@@ -1,10 +1,6 @@
 import dash
 from dash import dcc, html
-from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
-import plotly.graph_objs as go
-import pandas as pd
-import numpy as np
 from components.dropdown_quarter import dropdown
 from components.dropdown_year import dropdown_year
 from data import mainplot
@@ -35,14 +31,14 @@ def TrainingResultsTab():
                          armodel, adlmodel, rfmodel,
                      ], style={'text-align': 'center'}),
                      html.P(""),
-                     dcc.Graph(id='time-series-graph', figure =mainplot(), className="graphBorder"),
+                     dcc.Graph(id='time-series-graph', figure =mainplot(), className="graphBorder"), #Calling the mainplot from data.py
                      html.H5("Select training time period"),
                      html.Div([
                          html.H6("Select a year"),
-                         html.Div([dropdown_year()],className="dropdown-container"),
+                         html.Div([dropdown_year()],className="dropdown-container"), #Calling dropdown from dropdown_year
                          html.P(""),
                          html.H6("Select a quarter"),
-                         html.Div([dropdown()], className="dropdown-container")
+                         html.Div([dropdown()], className="dropdown-container") #Calling dropdown from dropdown_quarter
                          ]), 
                      html.Strong(id = 'lag-caller'),
                      html.P(),

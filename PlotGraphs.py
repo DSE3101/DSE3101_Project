@@ -1,19 +1,10 @@
 import pandas as pd
-import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-from statsmodels.tsa.ar_model import AutoReg
-from statsmodels.graphics.tsaplots import plot_acf
-from statsmodels.tsa.stattools import adfuller
-from GetData import get_data
-from sklearn.metrics import mean_squared_error
-import plotly.tools as tls
 import base64
 from io import BytesIO
 from matplotlib.ticker import MaxNLocator
-import matplotlib.dates as mdates
 
 def plot_forecast_real_time(data, forecast, actual, PI, modelName, rmse_values):
     actual = actual.iloc[:,0]
