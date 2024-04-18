@@ -1,6 +1,6 @@
 import pandas as pd
 import matplotlib
-matplotlib.use('Agg')
+# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import base64
 from io import BytesIO
@@ -8,7 +8,8 @@ from matplotlib.ticker import MaxNLocator
 
 def plot_forecast_real_time(data, forecast, actual, PI, modelName, rmse_values):
     actual = actual.iloc[:,0]
-    data = pd.concat([data, (pd.DataFrame([forecast.iloc[0]], index=[forecast.index[0]], columns=[data.columns[0]]))])
+    # data = pd.concat([data, (pd.DataFrame([forecast.iloc[0]], index=[forecast.index[0]], columns=[data.columns[0]]))])
+    forecast = pd.concat([pd.Series(data.iloc[-1].values, index=[data.index[-1]]), forecast])
     fig, ax = plt.subplots(figsize=(8, 6))  # Adjust the figure size as needed
 
     # Plotting the unrevised real-time data
@@ -18,6 +19,7 @@ def plot_forecast_real_time(data, forecast, actual, PI, modelName, rmse_values):
     # Plotting the actual data
     ax.plot(actual.index, actual.values, color='green', label='Actual Data', alpha=0.6)
     
+    rmse_values = [0] + rmse_values
     rmse_values = pd.Series(rmse_values)
     rmse_values.index = forecast.index
     
@@ -36,7 +38,7 @@ def plot_forecast_real_time(data, forecast, actual, PI, modelName, rmse_values):
 
     buffer = BytesIO()
     fig.savefig(buffer, format="png")
-    # plt.show()
+    plt.show()
     buffer.seek(0)
     
     image_png = buffer.getvalue()
