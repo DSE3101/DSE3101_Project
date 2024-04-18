@@ -258,6 +258,12 @@ M2 = M2.apply(lambda x: np.log(x)).diff().fillna(-999)
 # https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/cpi
 CPI = pd.read_excel("./data/project data/cpiQvMd.xlsx", index_col="DATE")
 CPI = rows_to_quarter(CPI)
+temp = CPI.copy()
+for i in range(115):
+    CPI.iloc[:, i] = temp.iloc[:, 115]
+    CPI.iloc[75+i:, i] = np.NaN
+for i in range(130, 171):
+    CPI.iloc[:6, i] = temp.iloc[:6, 171]
 CPI = CPI.apply(lambda x: np.log(x)).diff().diff().fillna(-999)
 
 # Core Consumer Price Index (PCPIX)
@@ -434,11 +440,19 @@ ULC = pad_columns_to_98Q4(ULC, "ULC")
 IPT = pd.read_excel("./data/project data/iptMvMd.xlsx", index_col="DATE")
 IPT = month_to_quarter(IPT, "IPT")
 IPT = rows_to_quarter(IPT)
-IPT = IPT.apply(lambda x: np.log(x)).diff()
 IPT.drop(columns=["IPT62Q4",
                   "IPT63Q1", "IPT63Q2", "IPT63Q3", "IPT63Q4",
                   "IPT64Q1", "IPT64Q2", "IPT64Q3", "IPT64Q4",
                   "IPT65Q1", "IPT65Q2", "IPT65Q3"], inplace=True)
+# Based on the latest non-NA year, most values no change
+# We assume the NA values are the same as the latest non-NA year
+for i in range(98, 132):
+    IPT.iloc[:91, i] = IPT.iloc[:91, 132]
+for i in range(23, 29):
+    IPT.iloc[:28, i] = IPT.iloc[:28, 29]
+IPT.iloc[:28, 44] = IPT.iloc[:28, 45]
+IPT.iloc[:64, 43] = IPT.iloc[:64, 44]
+IPT = IPT.apply(lambda x: np.log(x)).diff()
 IPT.fillna(-999, inplace=True)
 
 # Industrial Production Index: Manufacturing (IPM)
@@ -500,6 +514,12 @@ na_df_HSTARTS = pd.DataFrame(columns=na_cols_HSTARTS)
 HSTARTS = pd.concat([na_df_HSTARTS, HSTARTS], axis=1)
 HSTARTS.index.names = ["DATE"]
 HSTARTS.fillna(-999, inplace=True)
+# These vintages most values don't change
+# We assume the NA values are the same as the next's value
+for i in range(138, 234):
+    HSTARTS.iloc[:49, i] = HSTARTS.iloc[:49, 137]
+for i in range(25, 29):
+    HSTARTS.iloc[:89, i] = HSTARTS.iloc[:89, 29]
 
 # Real Gross Private Domestic Investment: Residential (RINVRESID)
 # Same as above
@@ -511,7 +531,6 @@ HSTARTS.fillna(-999, inplace=True)
 ROUTPUT = pd.read_excel("./data/project data/ROUTPUTQvQd.xlsx", index_col="DATE")
 ROUTPUT = ROUTPUT.apply(lambda x: np.log(x).diff()).fillna(-10000000000000000)
 
-print(ROUTPUT)
 macro_variables = [RCON, rcong, RCONND, RCOND, RCONS, rconshh, rconsnp, rinvbf, rinvresid,
                    rinvchi, RNX, REX, RIMP, RG, RGF, RGSL, rconhh, WSD, OLI, PROPI, RENTI,
                    DIV, PINTI, TRANR, SSCONTRIB, NPI, PTAX, NDPI, NCON, PINTPAID, TRANPF,
