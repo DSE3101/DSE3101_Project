@@ -331,5 +331,5 @@ def update_evaluation_results_and_show(ar_results, adl_results, rf_results, year
 
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8081))
+    port = int(os.environ.get('PORT', 8080))
     app.run_server(debug=True, host='0.0.0.0', port=port)
