@@ -7,20 +7,18 @@ def MLTab():
     html.P("We will be using the 2012 Q2 prediction to explain our models"),
     
     html.H3("How it works"),
-    html.P("We also used Random Forest (RF), a machine learning technique to determine which economic indicators have the most influence on GDP growth. All economic indicators are used to train the model, and optimal n indicators are selected based on their importance scores. The process is then repeated using the optimal n indicators to find which indicators influence GDP the most."),
-    
+    html.P("In using RF, each tree represents different combinations of macroeconomic variables, representing information from different parts of the economy’s current state. Each tree is random, selecting a subset of different macroeconomic variables to be trained on. Each tree would have a feature importance in forecasting GDP growth, with a higher value corresponding to a higher importance in contributing to GDP growth."),
+    html.P("To get a one-step forecast, we first train the RF model with all the variables, and allow the RF algorithm to iterate through every possible decision tree to find all the various feature importance. The decision trees would comprise different combinations of 1 lag of each macroeconomic variable. We then select the top 6 most important variables with the highest feature importance score, and train and fit the new RF model with these selected variables. Lastly, we would then predict one step ahead to get the forecast for Yt+1."),
+    html.P("To get the two-step forecast, we would train a new RF model using 2 lags of each macroeconomic variable, repeating the same steps as the one-step forecast. The RF model may choose 6 new choices of important variables in which we would train and fit a new RF model. This step is repeated for every h-step forecast from 1-step to 8-steps."),
+
     html.H3("Why n = 100?"),
     html.P("Too low n will lead to an underfitted model, while too high n will lead to a very noisy model, so we decided n=100 is a good fit for our project demands."),
     
-    html.H3("Features Importance"),
-    html.P("We then chose the top 6 most important features and used them for the RF model."),
-    html.Img(src="assets/rf_tab/features.png", className="graph-image"),
-    
-    html.H3("Expanding Window"),
-    html.P("Using the identified model, we will run one step forecasts using this model 8 times, using the predicted y+1/y+2/… values all the way until y+7 to predict the y+8 forecast. This will generate 8 prediction values as shown."),
-    
+    html.H3("Why random state = 42"),
+    html.P("There is no specific reason to set random_state = 42 over any other parameter, the purpose of setting seed is to ensure reproducibility, to get the same sequence of numbers each time we run this code. This is helpful with debugging, sharing results, and comparing different models."),
+        
     html.H3("Calculating RMSFE"),
-    html.P("We then calculated the RMSFE using the root mean squared error between the true y values and the predicted y values. In the case of 2012 Q2, the returned RMSFE value was 0.006."),
+    html.P("For the RF model, since we did not manually carry out variable selection through LOOCV, we have to then carry out the procedure of: Doing LOOCV, Finding MSE for the optimal model for every h-step forecast, Finding RMSE for every h-step forecast"),
 ], style={'text-align': 'center', 'color': 'white'})
 
 
