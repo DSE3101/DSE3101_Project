@@ -1,10 +1,10 @@
 import pandas as pd
 import numpy as np
-from GetData import get_data
+from Backend.GetData import get_data
 import statsmodels.api as sm
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import LeaveOneOut
-from PlotGraphs import *
+from Backend.PlotGraphs import *
 
 def ADL_MODEL(year_input, quarter_input, ar_optimal_lags):
     h_steps = 8

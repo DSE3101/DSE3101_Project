@@ -8,15 +8,15 @@ from dash.dependencies import Input, Output, State
 import os
 
 #Importing components and tests
-from dm import *
-from components.ARTab import *
-from components.TrainingResultsTab import *
-from components.ADLTab import *
-from components.MLTab import *
-from GetData import *
-from model_AR import *
-from model_ADL import *
-from model_RF import *
+from Backend.dm import *
+from Frontend.components.ARTab import *
+from Frontend.components.TrainingResultsTab import *
+from Frontend.components.ADLTab import *
+from Frontend.components.MLTab import *
+from Backend.GetData import *
+from Backend.model_AR import *
+from Backend.model_ADL import *
+from Backend.model_RF import *
 
 
 routput = pd.read_excel("data/project data/ROUTPUTQvQd.xlsx", na_values="#N/A")
@@ -82,8 +82,8 @@ def update_graph(year_value, quarter_value):
     # Convert the slider value and quarter value to a date
     year = int(year_value)
     quarter = int(quarter_value.strip('Q'))
-    start_year = year - 12 
-    start_quarter = quarter
+    start_year = 1947 
+    start_quarter = 1
     selected_date_str = f"{year_value}{quarter_value}"
     selected_period_index = pd.Period(selected_date_str, freq='Q')
     start_date_str = f"{start_year}Q{start_quarter}"
@@ -110,8 +110,7 @@ def update_graph(year_value, quarter_value):
     [Input('dropdown-year', 'value'), Input('dropdown-quarter', 'value')]
     )
 def update_output(year_value, quarter_value):
-    training_year = int(year_value) - 12
-    return f'Your training data will be from {training_year} {quarter_value} to {year_value} {quarter_value}'
+    return f'Your training data will be from 1947 Q1 to {year_value} {quarter_value}'
 
 #Data taken from training tab will be called to AR, ADL and ML
 @app.callback(

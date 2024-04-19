@@ -1,9 +1,9 @@
 import pandas as pd
 import numpy as np
-from GetData import get_data
+from Backend.GetData import get_data
 from sklearn.ensemble import RandomForestRegressor
 import statsmodels.api as sm
-from PlotGraphs import *
+from Backend.PlotGraphs import *
 # import matplotlib.pyplot as plt
 # from matplotlib.ticker import MaxNLocator
 

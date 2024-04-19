@@ -1,9 +1,9 @@
 import dash
 from dash import dcc, html
 import dash_bootstrap_components as dbc
-from components.dropdown_quarter import dropdown
-from components.dropdown_year import dropdown_year
-from data import mainplot
+from Frontend.components.dropdown_quarter import dropdown
+from Frontend.components.dropdown_year import dropdown_year
+from Frontend.data import mainplot
 
 def model_name(model_name, background_color):
         return html.Span(model_name, style={
