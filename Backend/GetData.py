@@ -3,7 +3,7 @@ import pandas as pd
 
 def get_data(year_input, quarter_input):
     # Load the macro variables
-    with open('preprocessed_data.pkl', 'rb') as f:
+    with open('Backend/preprocessed_data.pkl', 'rb') as f:
         macro_variables = pickle.load(f)
 
     # Combine all variables for chosen quarter and remove rows
