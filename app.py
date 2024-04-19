@@ -136,6 +136,7 @@ def ar_results(n_clicks, year_quarter_data):
     year = year_quarter_data['year']
     quarter = year_quarter_data['quarter'].replace("Q", "")
     forecasts, optimal_lags, rmse, plot = AR_MODEL(year, quarter)
+    #Storing results in a dictionary, making it more optimised
     ar_results = {
             'lag': optimal_lags,
             'rmsfe': rmse,
@@ -196,7 +197,7 @@ def rf_results(n_clicks, year_quarter_data):
 def update_evaluation_results_and_show(ar_results, adl_results, rf_results, year_quarter_data):
     if not ar_results or not rf_results:
         return [], {'display': 'none'}
-    
+    # Function to show the model names in a stylised version
     def model_name(model_name, background_color):
         return html.Span(model_name, style={
             'background-color': background_color,
